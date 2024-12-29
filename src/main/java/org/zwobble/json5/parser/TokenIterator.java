@@ -13,9 +13,9 @@ class TokenIterator {
     TokenIterator(List<Json5Token> tokens) {
         this.tokens = tokens;
         this.tokenIndex = 0;
-        // TODO: handle no tokens
-        var lastToken = this.tokens.getLast();
-        var lastTokenSourceRange = lastToken.sourceRange();
+        var lastTokenSourceRange = this.tokens.isEmpty()
+            ? new Json5SourceRange(0, 0)
+            : tokens.getLast().sourceRange();
         this.tokenEnd = new Json5Token(
             Json5TokenType.END,
             CharBuffer.wrap(""),

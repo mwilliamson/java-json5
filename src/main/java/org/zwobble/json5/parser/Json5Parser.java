@@ -74,7 +74,7 @@ public class Json5Parser {
             return json5Array.get();
         }
 
-        throw new RuntimeException("TODO");
+        throw unexpectedTokenError("JSON value", tokens);
     }
 
     private static Optional<Json5Value> tryParseNull(TokenIterator tokens) {

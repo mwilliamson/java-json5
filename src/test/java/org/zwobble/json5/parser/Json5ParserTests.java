@@ -107,6 +107,20 @@ public class Json5ParserTests {
     // == Documents ==
 
     @Test
+    public void whenDocumentIsEmptyThenErrorIsThrown() {
+        var error = assertThrows(
+            Json5ParseError.class,
+            () -> Json5Parser.parseText("")
+        );
+
+        assertThat(
+            error.getMessage(),
+            equalTo("Expected JSON value, but was end of document")
+        );
+        assertThat(error.sourceRange(), isJson5SourceRange(0, 0));
+    }
+
+    @Test
     public void whenDocumentHasTokensAfterValueThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,
