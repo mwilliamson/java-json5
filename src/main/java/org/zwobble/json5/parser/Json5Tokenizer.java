@@ -6,6 +6,8 @@ import java.util.List;
 
 class Json5Tokenizer {
     private static final CharBuffer NULL = CharBuffer.wrap("null");
+    private static final CharBuffer TRUE = CharBuffer.wrap("true");
+    private static final CharBuffer FALSE = CharBuffer.wrap("false");
 
     private Json5Tokenizer() {
     }
@@ -23,6 +25,12 @@ class Json5Tokenizer {
                 tokens.add(token);
             } else if (iterator.trySkip(NULL)) {
                 var token = new Json5Token(Json5TokenType.NULL);
+                tokens.add(token);
+            } else if (iterator.trySkip(TRUE)) {
+                var token = new Json5Token(Json5TokenType.TRUE);
+                tokens.add(token);
+            } else if (iterator.trySkip(FALSE)) {
+                var token = new Json5Token(Json5TokenType.FALSE);
                 tokens.add(token);
             }
         }

@@ -1,18 +1,21 @@
 package org.zwobble.json5.parser.values;
 
-import org.zwobble.json5.values.Json5Member;
-import org.zwobble.json5.values.Json5Null;
-import org.zwobble.json5.values.Json5Object;
-import org.zwobble.json5.values.Json5Value;
+import org.zwobble.json5.values.*;
 import org.zwobble.precisely.Matcher;
 
-import static org.zwobble.precisely.Matchers.has;
-import static org.zwobble.precisely.Matchers.instanceOf;
+import static org.zwobble.precisely.Matchers.*;
 
 public class Json5ValueMatchers {
     public static Matcher<Json5Value> isJson5Null() {
         return instanceOf(
             Json5Null.class
+        );
+    }
+
+    public static Matcher<Json5Value> isJson5Boolean(boolean value) {
+        return instanceOf(
+            Json5Boolean.class,
+            has("value", x -> x.value(), equalTo(value))
         );
     }
 
