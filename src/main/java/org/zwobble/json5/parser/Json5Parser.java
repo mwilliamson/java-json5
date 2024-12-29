@@ -132,11 +132,15 @@ public class Json5Parser {
         //     `[` `]`
         //     `[` JSON5ElementList `,`? `]`
 
-        if (tokens.trySkip(Json5TokenType.PUNCTUATOR_SQUARE_OPEN)) {
-            return Optional.of(new Json5Array(new ArrayList<>()));
-        } else {
+        if (!tokens.trySkip(Json5TokenType.PUNCTUATOR_SQUARE_OPEN)) {
             return Optional.empty();
         }
+
+        if (tokens.trySkip(Json5TokenType.PUNCTUATOR_SQUARE_CLOSE)) {
+            return Optional.of(new Json5Array(new ArrayList<>()));
+        }
+
+        throw unexpectedTokenError("JSON value or closing square bracket", tokens);
     }
 
     private static Json5ParseError unexpectedTokenError(String expected, TokenIterator tokens) {

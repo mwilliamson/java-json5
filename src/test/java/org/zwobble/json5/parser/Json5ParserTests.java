@@ -66,7 +66,10 @@ public class Json5ParserTests {
             () -> Json5Parser.parseText("{")
         );
 
-        assertThat(error.getMessage(), equalTo("Expected JSON value or closing brace, but was end of document"));
+        assertThat(
+            error.getMessage(),
+            equalTo("Expected JSON value or closing brace, but was end of document")
+        );
     }
 
     // == Arrays ==
@@ -76,5 +79,18 @@ public class Json5ParserTests {
         var result = Json5Parser.parseText("[]");
 
         assertThat(result, isJson5Array(isSequence()));
+    }
+
+    @Test
+    public void whenArrayIsMissingClosingSquareBracketThenErrorIsThrown() {
+        var error = assertThrows(
+            Json5ParseError.class,
+            () -> Json5Parser.parseText("[")
+        );
+
+        assertThat(
+            error.getMessage(),
+            equalTo("Expected JSON value or closing square bracket, but was end of document")
+        );
     }
 }
