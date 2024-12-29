@@ -10,4 +10,5 @@ enum Json5TokenType {
     IDENTIFIER,
     PUNCTUATOR_BRACE_OPEN,
     PUNCTUATOR_BRACE_CLOSE,
+    STRING,
 }

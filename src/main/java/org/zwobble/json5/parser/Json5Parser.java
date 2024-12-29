@@ -1,9 +1,6 @@
 package org.zwobble.json5.parser;
 
-import org.zwobble.json5.values.Json5Boolean;
-import org.zwobble.json5.values.Json5Null;
-import org.zwobble.json5.values.Json5Object;
-import org.zwobble.json5.values.Json5Value;
+import org.zwobble.json5.values.*;
 
 import java.nio.CharBuffer;
 import java.util.LinkedHashMap;
@@ -51,6 +48,11 @@ public class Json5Parser {
             return json5Boolean.get();
         }
 
+        var json5OString = tryParseString(tokens);
+        if (json5OString.isPresent()) {
+            return json5OString.get();
+        }
+
         var json5Object = tryParseObject(tokens);
         if (json5Object.isPresent()) {
             return json5Object.get();
@@ -93,6 +95,14 @@ public class Json5Parser {
 
     private static final CharBuffer BUFFER_TRUE = CharBuffer.wrap("true");
     private static final CharBuffer BUFFER_FALSE = CharBuffer.wrap("false");
+
+    private static Optional<Json5Value> tryParseString(TokenIterator tokens) {
+        if (tokens.trySkip(Json5TokenType.STRING)) {
+            return Optional.of(new Json5String(""));
+        } else {
+            return Optional.empty();
+        }
+    }
 
     private static Optional<Json5Value> tryParseObject(TokenIterator tokens) {
         // JSON5Object ::

@@ -32,6 +32,15 @@ public class Json5ParserTests {
         assertThat(result, isJson5Boolean(false));
     }
 
+    // == Strings ==
+
+    @Test
+    public void canParseEmptyStringUsingDoubleQuotes() {
+        var result = Json5Parser.parseText("\"\"");
+
+        assertThat(result, isJson5String(""));
+    }
+
     // == Objects ==
 
     @Test

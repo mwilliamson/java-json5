@@ -43,6 +43,11 @@ class Json5Tokenizer {
             return json5Punctuator;
         }
 
+        var json5String = tokenizeJson5String(codePoints);
+        if (json5String.isPresent()) {
+            return json5String;
+        }
+
         return Optional.empty();
     }
 
@@ -157,6 +162,19 @@ class Json5Tokenizer {
                 start
             );
             return Optional.of(token);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private static Optional<Json5Token> tokenizeJson5String(CodePointIterator codePoints) {
+        // JSON5String ::
+        //     `"` JSON5DoubleStringCharacters? `"`
+        //     `'` JSON5SingleStringCharacters? `'`
+
+        var start = codePoints.position();
+        if (codePoints.trySkip('"')) {
+            return Optional.of(createToken(codePoints, Json5TokenType.STRING, start));
         } else {
             return Optional.empty();
         }
