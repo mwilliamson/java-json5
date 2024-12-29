@@ -50,6 +50,15 @@ public class Json5ParserTests {
         assertThat(result, isJson5String(""));
     }
 
+    // == Numbers ==
+
+    @Test
+    public void canParseIntegerZero() {
+        var result = Json5Parser.parseText("0");
+
+        assertThat(result, isJson5Number("0"));
+    }
+
     // == Objects ==
 
     @Test

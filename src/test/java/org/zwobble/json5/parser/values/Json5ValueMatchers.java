@@ -26,6 +26,13 @@ public class Json5ValueMatchers {
         );
     }
 
+    public static Matcher<Json5Value> isJson5Number(String value) {
+        return instanceOf(
+            Json5Number.class,
+            has("value", x -> x.value(), equalTo(value))
+        );
+    }
+
     public static Matcher<Json5Value> isJson5Object(Matcher<Iterable<? extends Json5Member>> members) {
         return instanceOf(
             Json5Object.class,

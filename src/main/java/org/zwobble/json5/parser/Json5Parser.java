@@ -49,9 +49,14 @@ public class Json5Parser {
             return json5Boolean.get();
         }
 
-        var json5OString = tryParseString(tokens);
-        if (json5OString.isPresent()) {
-            return json5OString.get();
+        var json5String = tryParseString(tokens);
+        if (json5String.isPresent()) {
+            return json5String.get();
+        }
+
+        var json5Number = tryParseNumber(tokens);
+        if (json5Number.isPresent()) {
+            return json5Number.get();
         }
 
         var json5Object = tryParseObject(tokens);
@@ -106,6 +111,14 @@ public class Json5Parser {
     private static Optional<Json5Value> tryParseString(TokenIterator tokens) {
         if (tokens.trySkip(Json5TokenType.STRING)) {
             return Optional.of(new Json5String(""));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private static Optional<Json5Value> tryParseNumber(TokenIterator tokens) {
+        if (tokens.trySkip(Json5TokenType.NUMBER)) {
+            return Optional.of(new Json5Number("0"));
         } else {
             return Optional.empty();
         }
@@ -170,6 +183,9 @@ public class Json5Parser {
                 "]";
 
             case STRING ->
+                throw new UnsupportedOperationException("TODO");
+
+            case NUMBER ->
                 throw new UnsupportedOperationException("TODO");
 
             case END ->

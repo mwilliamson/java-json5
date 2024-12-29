@@ -48,6 +48,11 @@ class Json5Tokenizer {
             return json5String;
         }
 
+        var json5Number = tokenizeJson5Number(codePoints);
+        if (json5Number.isPresent()) {
+            return json5Number;
+        }
+
         return Optional.empty();
     }
 
@@ -184,6 +189,49 @@ class Json5Tokenizer {
         } else {
             return Optional.empty();
         }
+    }
+
+    private static Optional<Json5Token> tokenizeJson5Number(CodePointIterator codePoints) {
+        // JSON5Number ::
+        //     JSON5NumericLiteral
+        //     `+` JSON5NumericLiteral
+        //     `-` JSON5NumericLiteral
+
+        if (!trySkipNumericLiteral(codePoints)) {
+            return Optional.empty();
+        }
+
+        var token = createToken(codePoints, Json5TokenType.NUMBER);
+        return Optional.of(token);
+    }
+
+    private static boolean trySkipJson5NumericLiteral(CodePointIterator codePoints) {
+        // JSON5NumericLiteral ::
+        //     NumericLiteral
+        //     `Infinity`
+        //     `Nan`
+        //
+        // TODO: The source character immediately following a NumericLiteral
+        // must not be an IdentifierStart or DecimalDigit.
+
+        return trySkipNumericLiteral(codePoints);
+    }
+
+    private static boolean trySkipNumericLiteral(CodePointIterator codePoints) {
+        // NumericLiteral ::
+        //     DecimalLiteral
+        //     HexIntegerLiteral
+
+        return trySkipDecimalLiteral(codePoints);
+    }
+
+    private static boolean trySkipDecimalLiteral(CodePointIterator codePoints) {
+        // DecimalLiteral ::
+        //     DecimalIntegerLiteral `.` DecimalDigits? ExponentPart?
+        //     `.` DecimalDigits ExponentPart?
+        //     DecimalIntegerLiteral ExponentPart?
+
+        return codePoints.trySkip('0');
     }
 
     private static Json5Token createToken(
