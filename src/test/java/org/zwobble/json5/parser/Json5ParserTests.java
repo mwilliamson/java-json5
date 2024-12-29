@@ -32,6 +32,8 @@ public class Json5ParserTests {
         assertThat(result, isJson5Boolean(false));
     }
 
+    // == Objects ==
+
     @Test
     public void emptyObject() {
         var result = Json5Parser.parseText("{}");
