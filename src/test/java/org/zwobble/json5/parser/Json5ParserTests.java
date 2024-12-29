@@ -41,6 +41,13 @@ public class Json5ParserTests {
         assertThat(result, isJson5String(""));
     }
 
+    @Test
+    public void canParseEmptyStringUsingSingleQuotes() {
+        var result = Json5Parser.parseText("''");
+
+        assertThat(result, isJson5String(""));
+    }
+
     // == Objects ==
 
     @Test

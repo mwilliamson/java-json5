@@ -175,6 +175,8 @@ class Json5Tokenizer {
         var start = codePoints.position();
         if (codePoints.trySkip('"')) {
             return Optional.of(createToken(codePoints, Json5TokenType.STRING, start));
+        } else if (codePoints.trySkip('\'')) {
+            return Optional.of(createToken(codePoints, Json5TokenType.STRING, start));
         } else {
             return Optional.empty();
         }
