@@ -84,6 +84,7 @@ public class Json5Parser {
         // BooleanLiteral ::
         //     `true`
         //     `false`
+
         if (tokens.trySkip(Json5TokenType.IDENTIFIER, BUFFER_TRUE)) {
             return Optional.of(new Json5Boolean(true));
         } else if (tokens.trySkip(Json5TokenType.IDENTIFIER, BUFFER_FALSE)) {
