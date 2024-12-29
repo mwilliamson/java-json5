@@ -21,11 +21,41 @@ class Json5Tokenizer {
             //     LineTerminator
             //     Comment
             //     JSON5Token
-            var token = tokenizeJson5Token(iterator);
-            tokens.add(token.get());
+            if (trySkipWhiteSpace(iterator)) {
+                // Skip whitespace.
+            } else {
+                iterator.startToken();
+                var token = tokenizeJson5Token(iterator);
+                // TODO: handle no token
+                tokens.add(token.get());
+            }
         }
 
         return tokens;
+    }
+
+    private static boolean trySkipWhiteSpace(CodePointIterator iterator) {
+        var whitespace = false;
+
+        while (isWhiteSpace(iterator.peek())) {
+            iterator.skip();
+            whitespace = true;
+        }
+
+        return whitespace;
+    }
+
+    private static boolean isWhiteSpace(int codePoint) {
+        // WhiteSpace ::
+        //     <TAB>
+        //     <VT>
+        //     <FF>
+        //     <SP>
+        //     <NBSP>
+        //     <BOM>
+        //     <USP>
+
+        return codePoint == ' ';
     }
 
     private static Optional<Json5Token> tokenizeJson5Token(CodePointIterator codePoints) {
@@ -296,6 +326,10 @@ class Json5Tokenizer {
 
         void skip() {
             this.index += 1;
+        }
+
+        void startToken() {
+            this.tokenStartIndex = this.index;
         }
 
         CharBuffer tokenSubBuffer() {

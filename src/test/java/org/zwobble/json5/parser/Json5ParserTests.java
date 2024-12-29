@@ -133,4 +133,11 @@ public class Json5ParserTests {
         );
         assertThat(error.sourceRange(), isJson5SourceRange(2, 3));
     }
+
+    @Test
+    public void whitespaceIsIgnored() {
+        var result = Json5Parser.parseText("   [ ]  ");
+
+        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(3, 6)));
+    }
 }
