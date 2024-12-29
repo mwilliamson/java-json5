@@ -3,46 +3,183 @@ package org.zwobble.json5.parser;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 class Json5Tokenizer {
-    private static final CharBuffer NULL = CharBuffer.wrap("null");
-    private static final CharBuffer TRUE = CharBuffer.wrap("true");
-    private static final CharBuffer FALSE = CharBuffer.wrap("false");
-
     private Json5Tokenizer() {
     }
 
     static List<Json5Token> tokenize(String text) {
-        var iterator = new CharIterator(text);
+        var iterator = new CodePointIterator(text);
         var tokens = new ArrayList<Json5Token>();
 
         while (!iterator.isEnd()) {
-            if (iterator.trySkip('{')) {
-                var token = new Json5Token(Json5TokenType.BRACE_OPEN);
-                tokens.add(token);
-            } else if (iterator.trySkip('}')) {
-                var token = new Json5Token(Json5TokenType.BRACE_CLOSE);
-                tokens.add(token);
-            } else if (iterator.trySkip(NULL)) {
-                var token = new Json5Token(Json5TokenType.NULL);
-                tokens.add(token);
-            } else if (iterator.trySkip(TRUE)) {
-                var token = new Json5Token(Json5TokenType.TRUE);
-                tokens.add(token);
-            } else if (iterator.trySkip(FALSE)) {
-                var token = new Json5Token(Json5TokenType.FALSE);
-                tokens.add(token);
-            }
+            // JSON5InputElement ::
+            //     WhiteSpace
+            //     LineTerminator
+            //     Comment
+            //     JSON5Token
+            var token = tokenizeJson5Token(iterator);
+            tokens.add(token.get());
         }
 
         return tokens;
     }
 
-    private static class CharIterator {
+    private static Optional<Json5Token> tokenizeJson5Token(CodePointIterator codePoints) {
+        // JSON5Token ::
+        //     JSON5Identifier
+        //     JSON5Punctuator
+        //     JSON5String
+        //     JSON5Number
+
+        var json5Identifier = tokenizeJson5Identifier(codePoints);
+        if (json5Identifier.isPresent()) {
+            return json5Identifier;
+        }
+
+        var json5Punctuator = tokenizeJson5Punctuator(codePoints);
+        if (json5Punctuator.isPresent()) {
+            return json5Punctuator;
+        }
+
+        return Optional.empty();
+    }
+
+    private static Optional<Json5Token> tokenizeJson5Identifier(CodePointIterator codePoints) {
+        // JSON5Identifier ::
+        //     IdentifierName
+        //
+        // IdentifierName ::
+        //     IdentifierStart
+        //     IdentifierName IdentifierPart
+
+        var start = codePoints.position();
+
+        if (!trySkipIdentifierStart(codePoints)) {
+            return Optional.empty();
+        }
+
+        while (trySkipIdentifierPart(codePoints)) {
+        }
+
+        var token = createToken(codePoints, Json5TokenType.IDENTIFIER, start);
+
+        return Optional.of(token);
+    }
+
+    private static boolean trySkipIdentifierStart(CodePointIterator codePoints) {
+        // IdentifierStart ::
+        //     UnicodeLetter
+        //     `$`
+        //     `_`
+        //     `\` UnicodeEscapeSequence
+
+        var first = codePoints.peek();
+        if (isUnicodeLetter(first)) {
+            codePoints.skip();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private static boolean trySkipIdentifierPart(CodePointIterator codePoints) {
+        // IdentifierPart ::
+        //     IdentifierStart
+        //     UnicodeCombiningMark
+        //     UnicodeDigit
+        //     UnicodeConnectorPunctuation
+        //     <ZWNJ>
+        //     <ZWJ>
+
+        if (trySkipIdentifierStart(codePoints)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private static boolean isUnicodeLetter(int codePoint) {
+        // UnicodeLetter ::
+        //     any character in the Unicode categories “Uppercase letter (Lu)”,
+        //     “Lowercase letter (Ll)”, “Titlecase letter (Lt)”, “Modifier
+        //     letter (Lm)”, “Other letter (Lo)”, or “Letter number (Nl)”.
+
+        var mask = (1 << Character.UPPERCASE_LETTER) |
+            (1 << Character.LOWERCASE_LETTER) |
+            (1 << Character.TITLECASE_LETTER) |
+            (1 << Character.MODIFIER_LETTER) |
+            (1 << Character.OTHER_LETTER) |
+            (1 << Character.LETTER_NUMBER);
+        return ((mask >> Character.getType(codePoint)) & 1) != 0;
+    }
+
+    private static boolean isUnicodeCombiningMark(int codePoint) {
+        // UnicodeCombiningMark ::
+        //     any character in the Unicode categories “Non-spacing mark (Mn)”
+        //     or “Combining spacing mark (Mc)”
+
+        return false;
+    }
+
+    private static boolean isUnicodeDigit(int codePoint) {
+        // UnicodeDigit ::
+        //     any character in the Unicode category “Decimal number (Nd)”
+
+        return false;
+    }
+
+    private static boolean isUnicodeConnectorPunctuation(int codePoint) {
+        // UnicodeConnectorPunctuation ::
+        //     any character in the Unicode category “Connector punctuation (Pc)”
+
+        return false;
+    }
+
+    private static Optional<Json5Token> tokenizeJson5Punctuator(CodePointIterator codePoints) {
+        // JSON5Punctuator :: one of
+        //     `{` `}` `[` `]` `:` `,`
+
+        // TODO: store token start on CodePointIterator?
+        var start = codePoints.position();
+        if (codePoints.trySkip('{')) {
+            var token = createToken(
+                codePoints,
+                Json5TokenType.PUNCTUATOR_BRACE_OPEN,
+                start
+            );
+            return Optional.of(token);
+        } else if (codePoints.trySkip('}')) {
+            var token = createToken(
+                codePoints,
+                Json5TokenType.PUNCTUATOR_BRACE_CLOSE,
+                start
+            );
+            return Optional.of(token);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private static Json5Token createToken(
+        CodePointIterator codePoints,
+        Json5TokenType tokenType,
+        CodePointPosition start
+    ) {
+        var buffer = codePoints.subBuffer(
+            start,
+            codePoints.position()
+        );
+
+        return new Json5Token(tokenType, buffer);
+    }
+
+    private static class CodePointIterator {
         private final CharBuffer buffer;
         private int index;
 
-        private CharIterator(String text) {
+        private CodePointIterator(String text) {
             this.buffer = CharBuffer.wrap(text);
             this.index = 0;
         }
@@ -60,21 +197,32 @@ class Json5Tokenizer {
             }
         }
 
-        private boolean trySkip(CharBuffer skip) {
-            if (skip.length() > this.remaining()) {
-                return false;
-            }
-
-            if (this.buffer.subSequence(this.index, skip.length()).equals(skip)) {
-                this.index += skip.length();
-                return true;
-            } else {
-                return false;
-            }
-        }
-
         private int remaining() {
             return this.buffer.length() - this.index;
         }
+
+        int peek() {
+            if (this.index >= this.buffer.length()) {
+                return -1;
+            }
+
+            // TODO: handle codepoints instead of char
+            return this.buffer.get(this.index);
+        }
+
+        void skip() {
+            this.index += 1;
+        }
+
+        CodePointPosition position() {
+            return new CodePointPosition(this.index);
+        }
+
+        CharBuffer subBuffer(CodePointPosition start, CodePointPosition end) {
+            return this.buffer.subSequence(start.bufferIndex, end.bufferIndex);
+        }
+    }
+
+    record CodePointPosition(int bufferIndex) {
     }
 }

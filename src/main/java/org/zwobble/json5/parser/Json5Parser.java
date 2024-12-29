@@ -5,6 +5,7 @@ import org.zwobble.json5.values.Json5Null;
 import org.zwobble.json5.values.Json5Object;
 import org.zwobble.json5.values.Json5Value;
 
+import java.nio.CharBuffer;
 import java.util.LinkedHashMap;
 import java.util.Optional;
 
@@ -64,12 +65,15 @@ public class Json5Parser {
         //
         // NullLiteral ::
         //     `null`
-        if (tokens.trySkip(Json5TokenType.NULL)) {
+
+        if (tokens.trySkip(Json5TokenType.IDENTIFIER, BUFFER_NULL)) {
             return Optional.of(new Json5Null());
         } else {
             return Optional.empty();
         }
     }
+
+    private static final CharBuffer BUFFER_NULL = CharBuffer.wrap("null");
 
     private static Optional<Json5Value> tryParseBoolean(TokenIterator tokens) {
         // JSON5Boolean ::
@@ -78,21 +82,24 @@ public class Json5Parser {
         // BooleanLiteral ::
         //     `true`
         //     `false`
-        if (tokens.trySkip(Json5TokenType.TRUE)) {
+        if (tokens.trySkip(Json5TokenType.IDENTIFIER, BUFFER_TRUE)) {
             return Optional.of(new Json5Boolean(true));
-        } else if (tokens.trySkip(Json5TokenType.FALSE)) {
+        } else if (tokens.trySkip(Json5TokenType.IDENTIFIER, BUFFER_FALSE)) {
             return Optional.of(new Json5Boolean(false));
         } else {
             return Optional.empty();
         }
     }
 
+    private static final CharBuffer BUFFER_TRUE = CharBuffer.wrap("true");
+    private static final CharBuffer BUFFER_FALSE = CharBuffer.wrap("false");
+
     private static Optional<Json5Value> tryParseObject(TokenIterator tokens) {
         // JSON5Object ::
         //     `{` `}`
         //     `{` JSON5MemberList `,`? `}`
 
-        if (tokens.trySkip(Json5TokenType.BRACE_OPEN)) {
+        if (tokens.trySkip(Json5TokenType.PUNCTUATOR_BRACE_OPEN)) {
             return Optional.of(new Json5Object(new LinkedHashMap<>()));
         } else {
             return Optional.empty();
