@@ -116,11 +116,15 @@ public class Json5Parser {
         //     `{` `}`
         //     `{` JSON5MemberList `,`? `}`
 
-        if (tokens.trySkip(Json5TokenType.PUNCTUATOR_BRACE_OPEN)) {
-            return Optional.of(new Json5Object(new LinkedHashMap<>()));
-        } else {
+        if (!tokens.trySkip(Json5TokenType.PUNCTUATOR_BRACE_OPEN)) {
             return Optional.empty();
         }
+
+        if (tokens.trySkip(Json5TokenType.PUNCTUATOR_BRACE_CLOSE)) {
+            return Optional.of(new Json5Object(new LinkedHashMap<>()));
+        }
+
+        throw unexpectedTokenError("JSON value or closing brace", tokens);
     }
 
     private static Optional<Json5Value> tryParseArray(TokenIterator tokens) {
@@ -133,5 +137,39 @@ public class Json5Parser {
         } else {
             return Optional.empty();
         }
+    }
+
+    private static Json5ParseError unexpectedTokenError(String expected, TokenIterator tokens) {
+        var message = String.format(
+            "Expected %s, but was %s",
+            expected,
+            describeToken(tokens.peek())
+        );
+        return new Json5ParseError(message);
+    }
+
+    private static String describeToken(Json5Token tokens) {
+        return switch (tokens.tokenType()) {
+            case IDENTIFIER ->
+                throw new UnsupportedOperationException("TODO");
+
+            case PUNCTUATOR_BRACE_OPEN ->
+                "{";
+
+            case PUNCTUATOR_BRACE_CLOSE ->
+                "}";
+
+            case PUNCTUATOR_SQUARE_OPEN ->
+                "[";
+
+            case PUNCTUATOR_SQUARE_CLOSE ->
+                "]";
+
+            case STRING ->
+                throw new UnsupportedOperationException("TODO");
+
+            case END ->
+                "end of document";
+        };
     }
 }

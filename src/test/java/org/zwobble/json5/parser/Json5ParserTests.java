@@ -2,8 +2,10 @@ package org.zwobble.json5.parser;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.zwobble.json5.parser.values.Json5ValueMatchers.*;
 import static org.zwobble.precisely.AssertThat.assertThat;
+import static org.zwobble.precisely.Matchers.equalTo;
 import static org.zwobble.precisely.Matchers.isSequence;
 
 public class Json5ParserTests {
@@ -55,6 +57,16 @@ public class Json5ParserTests {
         var result = Json5Parser.parseText("{}");
 
         assertThat(result, isJson5Object(isSequence()));
+    }
+
+    @Test
+    public void whenObjectIsMissingClosingBraceThenErrorIsThrown() {
+        var error = assertThrows(
+            Json5ParseError.class,
+            () -> Json5Parser.parseText("{")
+        );
+
+        assertThat(error.getMessage(), equalTo("Expected JSON value or closing brace, but was end of document"));
     }
 
     // == Arrays ==

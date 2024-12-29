@@ -4,6 +4,11 @@ import java.nio.CharBuffer;
 import java.util.List;
 
 class TokenIterator {
+    public static final Json5Token TOKEN_END = new Json5Token(
+        Json5TokenType.END,
+        CharBuffer.wrap("")
+    );
+
     private final List<Json5Token> tokens;
     private int tokenIndex;
 
@@ -32,6 +37,10 @@ class TokenIterator {
     }
 
     Json5Token peek() {
+        if (this.tokenIndex >= this.tokens.size()) {
+            return TOKEN_END;
+        }
+
         return this.tokens.get(this.tokenIndex);
     }
 }

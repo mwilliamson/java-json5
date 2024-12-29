@@ -13,4 +13,7 @@ enum Json5TokenType {
     PUNCTUATOR_SQUARE_OPEN,
     PUNCTUATOR_SQUARE_CLOSE,
     STRING,
+
+    // Add a token type for the end of the document to simplify the parser.
+    END,
 }
