@@ -27,6 +27,10 @@ public class Json5Parser {
 
         var value = parseValue(tokenIterator);
 
+        if (tokenIterator.peek().tokenType() != Json5TokenType.END) {
+            throw unexpectedTokenError("end of document", tokenIterator);
+        }
+
         return value;
     }
 

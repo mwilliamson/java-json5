@@ -183,9 +183,17 @@ class Json5Tokenizer {
         //     `'` JSON5SingleStringCharacters? `'`
 
         if (codePoints.trySkip('"')) {
-            return Optional.of(createToken(codePoints, Json5TokenType.STRING));
+            if (codePoints.trySkip('"')) {
+                return Optional.of(createToken(codePoints, Json5TokenType.STRING));
+            } else {
+                throw new UnsupportedOperationException("TODO");
+            }
         } else if (codePoints.trySkip('\'')) {
-            return Optional.of(createToken(codePoints, Json5TokenType.STRING));
+            if (codePoints.trySkip('\'')) {
+                return Optional.of(createToken(codePoints, Json5TokenType.STRING));
+            } else {
+                throw new UnsupportedOperationException("TODO");
+            }
         } else {
             return Optional.empty();
         }

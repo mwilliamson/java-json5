@@ -102,4 +102,19 @@ public class Json5ParserTests {
             equalTo("Expected JSON value or ']', but was end of document")
         );
     }
+
+    // == Documents ==
+
+    @Test
+    public void whenDocumentHasTokensAfterValueThenErrorIsThrown() {
+        var error = assertThrows(
+            Json5ParseError.class,
+            () -> Json5Parser.parseText("[][")
+        );
+
+        assertThat(
+            error.getMessage(),
+            equalTo("Expected end of document, but was '['")
+        );
+    }
 }
