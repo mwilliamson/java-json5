@@ -139,7 +139,7 @@ public class Json5Parser {
     }
 
     private static Optional<Json5Value> tryParseObject(TokenIterator tokens) {
-        // JSON5Object ::
+        // JSON5Object :
         //     `{` `}`
         //     `{` JSON5MemberList `,`? `}`
 
@@ -164,7 +164,7 @@ public class Json5Parser {
     }
 
     private static Optional<Json5Value> tryParseArray(TokenIterator tokens) {
-        // JSON5Array ::
+        // JSON5Array :
         //     `[` `]`
         //     `[` JSON5ElementList `,`? `]`
 
