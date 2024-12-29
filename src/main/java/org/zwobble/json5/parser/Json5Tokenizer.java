@@ -55,7 +55,13 @@ class Json5Tokenizer {
         //     <BOM>
         //     <USP>
 
-        return codePoint == ' ';
+        return codePoint == '\t' ||
+            codePoint == 0xb ||
+            codePoint == '\f' ||
+            codePoint == ' ' ||
+            codePoint == 0xa0 ||
+            codePoint == 0xfeff ||
+            Character.getType(codePoint) == Character.SPACE_SEPARATOR;
     }
 
     private static Optional<Json5Token> tokenizeJson5Token(CodePointIterator codePoints) {

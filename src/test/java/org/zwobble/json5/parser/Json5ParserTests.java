@@ -140,4 +140,53 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(3, 6)));
     }
+
+    @Test
+    public void tabIsTreatedAsWhiteSpace() {
+        var result = Json5Parser.parseText("\t[]");
+
+        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(1, 3)));
+    }
+
+    @Test
+    public void verticalTabIsTreatedAsWhiteSpace() {
+        var result = Json5Parser.parseText("\u000b[]");
+
+        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(1, 3)));
+    }
+
+    @Test
+    public void formFeedIsTreatedAsWhiteSpace() {
+        var result = Json5Parser.parseText("\f[]");
+
+        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(1, 3)));
+    }
+
+    @Test
+    public void noBreakSpaceIsTreatedAsWhiteSpace() {
+        var result = Json5Parser.parseText("\u00a0[]");
+
+        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(1, 3)));
+    }
+
+    @Test
+    public void spaceIsTreatedAsWhiteSpace() {
+        var result = Json5Parser.parseText(" []");
+
+        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(1, 3)));
+    }
+
+    @Test
+    public void byteOrderMarkIsTreatedAsWhiteSpace() {
+        var result = Json5Parser.parseText("\ufeff[]");
+
+        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(1, 3)));
+    }
+
+    @Test
+    public void anyOtherUnicodeSpaceSeparatorIsTreatedAsWhiteSpace() {
+        var result = Json5Parser.parseText("\u2000[]");
+
+        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(1, 3)));
+    }
 }
