@@ -77,7 +77,7 @@ public class Json5ParserTests {
 
         assertThat(
             error.getMessage(),
-            equalTo("Expected JSON value or closing brace, but was end of document")
+            equalTo("Expected JSON value or '}', but was end of document")
         );
     }
 
@@ -99,7 +99,7 @@ public class Json5ParserTests {
 
         assertThat(
             error.getMessage(),
-            equalTo("Expected JSON value or closing square bracket, but was end of document")
+            equalTo("Expected JSON value or ']', but was end of document")
         );
     }
 }

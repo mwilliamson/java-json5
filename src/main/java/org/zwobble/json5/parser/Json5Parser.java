@@ -137,7 +137,7 @@ public class Json5Parser {
             return Optional.of(new Json5Object(new LinkedHashMap<>()));
         }
 
-        throw unexpectedTokenError("JSON value or closing brace", tokens);
+        throw unexpectedTokenError("JSON value or '}'", tokens);
     }
 
     private static Optional<Json5Value> tryParseArray(TokenIterator tokens) {
@@ -153,7 +153,7 @@ public class Json5Parser {
             return Optional.of(new Json5Array(new ArrayList<>()));
         }
 
-        throw unexpectedTokenError("JSON value or closing square bracket", tokens);
+        throw unexpectedTokenError("JSON value or ']'", tokens);
     }
 
     private static Json5ParseError unexpectedTokenError(String expected, TokenIterator tokens) {
@@ -171,16 +171,16 @@ public class Json5Parser {
                 throw new UnsupportedOperationException("TODO");
 
             case PUNCTUATOR_BRACE_OPEN ->
-                "{";
+                "'{'";
 
             case PUNCTUATOR_BRACE_CLOSE ->
-                "}";
+                "'}'";
 
             case PUNCTUATOR_SQUARE_OPEN ->
-                "[";
+                "'['";
 
             case PUNCTUATOR_SQUARE_CLOSE ->
-                "]";
+                "']'";
 
             case STRING ->
                 throw new UnsupportedOperationException("TODO");
