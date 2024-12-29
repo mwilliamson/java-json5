@@ -3,6 +3,7 @@ package org.zwobble.json5.parser;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.zwobble.json5.sources.Json5SourceRangeMatchers.isJson5SourceRange;
 import static org.zwobble.json5.parser.values.Json5ValueMatchers.*;
 import static org.zwobble.precisely.AssertThat.assertThat;
 import static org.zwobble.precisely.Matchers.equalTo;
@@ -15,7 +16,7 @@ public class Json5ParserTests {
     public void canParseNullLiteral() {
         var result = Json5Parser.parseText("null");
 
-        assertThat(result, isJson5Null());
+        assertThat(result, isJson5Null(isJson5SourceRange(0, 4)));
     }
 
     // == Booleans ==
@@ -24,14 +25,14 @@ public class Json5ParserTests {
     public void canParseTrue() {
         var result = Json5Parser.parseText("true");
 
-        assertThat(result, isJson5Boolean(true));
+        assertThat(result, isJson5Boolean(true, isJson5SourceRange(0, 4)));
     }
 
     @Test
     public void canParseFalse() {
         var result = Json5Parser.parseText("false");
 
-        assertThat(result, isJson5Boolean(false));
+        assertThat(result, isJson5Boolean(false, isJson5SourceRange(0, 5)));
     }
 
     // == Strings ==
@@ -40,14 +41,14 @@ public class Json5ParserTests {
     public void canParseEmptyStringUsingDoubleQuotes() {
         var result = Json5Parser.parseText("\"\"");
 
-        assertThat(result, isJson5String(""));
+        assertThat(result, isJson5String("", isJson5SourceRange(0, 2)));
     }
 
     @Test
     public void canParseEmptyStringUsingSingleQuotes() {
         var result = Json5Parser.parseText("''");
 
-        assertThat(result, isJson5String(""));
+        assertThat(result, isJson5String("", isJson5SourceRange(0, 2)));
     }
 
     // == Numbers ==
@@ -56,7 +57,7 @@ public class Json5ParserTests {
     public void canParseIntegerZero() {
         var result = Json5Parser.parseText("0");
 
-        assertThat(result, isJson5Number("0"));
+        assertThat(result, isJson5Number("0", isJson5SourceRange(0, 1)));
     }
 
     // == Objects ==
@@ -65,7 +66,7 @@ public class Json5ParserTests {
     public void emptyObject() {
         var result = Json5Parser.parseText("{}");
 
-        assertThat(result, isJson5Object(isSequence()));
+        assertThat(result, isJson5Object(isSequence(), isJson5SourceRange(0, 2)));
     }
 
     @Test
@@ -87,7 +88,7 @@ public class Json5ParserTests {
     public void emptyArray() {
         var result = Json5Parser.parseText("[]");
 
-        assertThat(result, isJson5Array(isSequence()));
+        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(0, 2)));
     }
 
     @Test
@@ -116,5 +117,6 @@ public class Json5ParserTests {
             error.getMessage(),
             equalTo("Expected end of document, but was '['")
         );
+        assertThat(error.sourceRange(), isJson5SourceRange(2, 3));
     }
 }

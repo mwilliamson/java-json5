@@ -1,5 +1,7 @@
 package org.zwobble.json5.parser;
 
+import org.zwobble.json5.sources.Json5SourceRange;
+
 import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -246,9 +248,13 @@ class Json5Tokenizer {
         CodePointIterator codePoints,
         Json5TokenType tokenType
     ) {
+        var startCodePointIndex = codePoints.tokenStartIndex;
+        var endCodePointIndex = codePoints.index;
+        var sourceRange = new Json5SourceRange(startCodePointIndex, endCodePointIndex);
+
         var buffer = codePoints.tokenSubBuffer();
 
-        return new Json5Token(tokenType, buffer);
+        return new Json5Token(tokenType, buffer, sourceRange);
     }
 
     private static class CodePointIterator {
