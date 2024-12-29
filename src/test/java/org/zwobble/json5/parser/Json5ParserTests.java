@@ -1,26 +1,24 @@
 package org.zwobble.json5.parser;
 
 import org.junit.jupiter.api.Test;
-import org.zwobble.json5.values.Json5Member;
-import org.zwobble.json5.values.Json5Object;
-import org.zwobble.json5.values.Json5Value;
-import org.zwobble.precisely.Matcher;
 
+import static org.zwobble.json5.parser.values.Json5ValueMatchers.isJson5Null;
+import static org.zwobble.json5.parser.values.Json5ValueMatchers.isJson5Object;
 import static org.zwobble.precisely.AssertThat.assertThat;
-import static org.zwobble.precisely.Matchers.*;
+import static org.zwobble.precisely.Matchers.isSequence;
 
 public class Json5ParserTests {
+    @Test
+    public void canParseNullLiteral() {
+        var result = Json5Parser.parseText("null");
+
+        assertThat(result, isJson5Null());
+    }
+
     @Test
     public void emptyObject() {
         var result = Json5Parser.parseText("{}");
 
         assertThat(result, isJson5Object(isSequence()));
-    }
-
-    private Matcher<Json5Value> isJson5Object(Matcher<Iterable<? extends Json5Member>> members) {
-        return instanceOf(
-            Json5Object.class,
-            has("members", x -> x.members(), members)
-        );
     }
 }

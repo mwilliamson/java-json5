@@ -1,5 +1,6 @@
 package org.zwobble.json5.parser;
 
+import org.zwobble.json5.values.Json5Null;
 import org.zwobble.json5.values.Json5Object;
 import org.zwobble.json5.values.Json5Value;
 
@@ -20,6 +21,21 @@ public class Json5Parser {
      * {@code text}.
      */
     public static Json5Value parseText(String text) {
-        return new Json5Object(new LinkedHashMap<>());
+        var tokens = Json5Tokenizer.tokenize(text);
+        var tokenIterator = new TokenIterator(tokens);
+
+        var value = parseValue(tokenIterator);
+
+        return value;
+    }
+
+    private static Json5Value parseValue(TokenIterator tokens) {
+        if (tokens.trySkip(Json5TokenType.NULL)) {
+            return new Json5Null();
+        } else if (tokens.trySkip(Json5TokenType.BRACE_OPEN)) {
+            return new Json5Object(new LinkedHashMap<>());
+        } else {
+            throw new RuntimeException("TODO");
+        }
     }
 }
