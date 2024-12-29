@@ -56,4 +56,13 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5Object(isSequence()));
     }
+
+    // == Arrays ==
+
+    @Test
+    public void emptyArray() {
+        var result = Json5Parser.parseText("[]");
+
+        assertThat(result, isJson5Array(isSequence()));
+    }
 }

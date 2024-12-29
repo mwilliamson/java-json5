@@ -144,21 +144,32 @@ class Json5Tokenizer {
         // JSON5Punctuator :: one of
         //     `{` `}` `[` `]` `:` `,`
 
-        if (codePoints.trySkip('{')) {
-            var token = createToken(
-                codePoints,
-                Json5TokenType.PUNCTUATOR_BRACE_OPEN
-            );
-            return Optional.of(token);
-        } else if (codePoints.trySkip('}')) {
-            var token = createToken(
-                codePoints,
-                Json5TokenType.PUNCTUATOR_BRACE_CLOSE
-            );
-            return Optional.of(token);
-        } else {
-            return Optional.empty();
+        Json5TokenType tokenType;
+        switch (codePoints.peek()) {
+            case '{':
+                tokenType = Json5TokenType.PUNCTUATOR_BRACE_OPEN;
+                break;
+
+            case '}':
+                tokenType = Json5TokenType.PUNCTUATOR_BRACE_CLOSE;
+                break;
+
+            case '[':
+                tokenType = Json5TokenType.PUNCTUATOR_SQUARE_OPEN;
+                break;
+
+            case ']':
+                tokenType = Json5TokenType.PUNCTUATOR_SQUARE_CLOSE;
+                break;
+
+            default:
+                return Optional.empty();
         }
+
+        codePoints.skip();
+
+        var token = createToken(codePoints, tokenType);
+        return Optional.of(token);
     }
 
     private static Optional<Json5Token> tokenizeJson5String(CodePointIterator codePoints) {

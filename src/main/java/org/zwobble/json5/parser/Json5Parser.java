@@ -3,6 +3,7 @@ package org.zwobble.json5.parser;
 import org.zwobble.json5.values.*;
 
 import java.nio.CharBuffer;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Optional;
 
@@ -56,6 +57,11 @@ public class Json5Parser {
         var json5Object = tryParseObject(tokens);
         if (json5Object.isPresent()) {
             return json5Object.get();
+        }
+
+        var json5Array = tryParseArray(tokens);
+        if (json5Array.isPresent()) {
+            return json5Array.get();
         }
 
         throw new RuntimeException("TODO");
@@ -112,6 +118,18 @@ public class Json5Parser {
 
         if (tokens.trySkip(Json5TokenType.PUNCTUATOR_BRACE_OPEN)) {
             return Optional.of(new Json5Object(new LinkedHashMap<>()));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private static Optional<Json5Value> tryParseArray(TokenIterator tokens) {
+        // JSON5Array ::
+        //     `[` `]`
+        //     `[` JSON5ElementList `,`? `]`
+
+        if (tokens.trySkip(Json5TokenType.PUNCTUATOR_SQUARE_OPEN)) {
+            return Optional.of(new Json5Array(new ArrayList<>()));
         } else {
             return Optional.empty();
         }

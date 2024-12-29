@@ -32,4 +32,11 @@ public class Json5ValueMatchers {
             has("members", x -> x.members(), members)
         );
     }
+
+    public static Matcher<Json5Value> isJson5Array(Matcher<Iterable<? extends Json5Value>> elements) {
+        return instanceOf(
+            Json5Array.class,
+            has("elements", x -> x.elements(), elements)
+        );
+    }
 }
