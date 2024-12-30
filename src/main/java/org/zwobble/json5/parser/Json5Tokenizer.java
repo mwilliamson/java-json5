@@ -421,6 +421,40 @@ class Json5Tokenizer {
         //     DecimalIntegerLiteral `.` DecimalDigits? ExponentPart?
         //     `.` DecimalDigits ExponentPart?
         //     DecimalIntegerLiteral ExponentPart?
+        //
+        // ExponentPart ::
+        //     ExponentIndicator SignedInteger
+        //
+        // ExponentIndicator :: one of
+        //     `e` `E`
+        //
+        // SignedInteger ::
+        //     DecimalDigits
+        //     `+` DecimalDigits
+        //     `-` DecimalDigits
+
+        trySkipDecimalIntegerLiteral(codePoints);
+        codePoints.trySkip('.');
+
+        return true;
+    }
+
+    private static boolean trySkipDecimalIntegerLiteral(CodePointIterator codePoints) {
+        // DecimalIntegerLiteral ::
+        //     `0`
+        //     NonZeroDigit DecimalDigits?
+        //
+        // DecimalDigits ::
+        //     DecimalDigit
+        //     DecimalDigits DecimalDigit
+        //
+        // DecimalDigit :: one of
+        //     `0` `1` `2` `3 `4` `5` `6` `7` `8` `9`
+        //
+        // NonZeroDigit :: one of
+        //     `1` `2` `3 `4` `5` `6` `7` `8` `9`
+
+        // TODO: prevent leading zeroes
 
         var firstCodePoint = codePoints.peek();
         if (!(firstCodePoint >= '0' && firstCodePoint <= '9')) {
@@ -432,13 +466,9 @@ class Json5Tokenizer {
             if (codePoint >= '0' && codePoint <= '9') {
                 codePoints.skip();
             } else {
-                break;
+                return true;
             }
         }
-
-        codePoints.trySkip('.');
-
-        return true;
     }
 
     private static void skipHexDigit(CodePointIterator codePoints) {
