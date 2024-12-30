@@ -116,6 +116,16 @@ public class Json5ParserTests {
     }
 
     @Test
+    public void canParseIntegerWithTrailingDot() {
+        var result = Json5Parser.parseText("123.");
+
+        assertThat(result, isJson5NumberFinite(
+            BigDecimal.valueOf(123),
+            isJson5SourceRange(0, 4)
+        ));
+    }
+
+    @Test
     public void canParseInfinityWithoutSign() {
         var result = Json5Parser.parseText("Infinity");
 

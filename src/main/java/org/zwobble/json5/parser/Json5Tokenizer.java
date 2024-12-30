@@ -432,9 +432,13 @@ class Json5Tokenizer {
             if (codePoint >= '0' && codePoint <= '9') {
                 codePoints.skip();
             } else {
-                return true;
+                break;
             }
         }
+
+        codePoints.trySkip('.');
+
+        return true;
     }
 
     private static void skipHexDigit(CodePointIterator codePoints) {
@@ -492,7 +496,7 @@ class Json5Tokenizer {
         }
 
         private boolean trySkip(char skip) {
-            if (this.buffer.get(this.index) == skip) {
+            if (peek() == skip) {
                 this.skip();
                 return true;
             } else {
