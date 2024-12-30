@@ -15,7 +15,10 @@ enum Json5TokenType {
     PUNCTUATOR_COLON,
     PUNCTUATOR_COMMA,
     STRING,
-    NUMBER,
+    NUMBER_FINITE,
+    NUMBER_POSITIVE_INFINITY,
+    NUMBER_NEGATIVE_INFINITY,
+    NUMBER_NAN,
 
     // Add a token type for the end of the document to simplify the parser.
     END,

@@ -4,6 +4,8 @@ import org.zwobble.json5.sources.Json5SourceRange;
 import org.zwobble.json5.values.*;
 import org.zwobble.precisely.Matcher;
 
+import java.math.BigDecimal;
+
 import static org.zwobble.precisely.Matchers.*;
 
 public class Json5ValueMatchers {
@@ -38,13 +40,40 @@ public class Json5ValueMatchers {
         );
     }
 
-    public static Matcher<Json5Value> isJson5Number(
-        String value,
+    public static Matcher<Json5Value> isJson5NumberFinite(
+        BigDecimal value,
         Matcher<Json5SourceRange> sourceRange
     ) {
         return instanceOf(
-            Json5Number.class,
+            Json5NumberFinite.class,
             has("value", x -> x.value(), equalTo(value)),
+            has("sourceRange", x -> x.sourceRange(), sourceRange)
+        );
+    }
+
+    public static Matcher<Json5Value> isJson5NumberPositiveInfinity(
+        Matcher<Json5SourceRange> sourceRange
+    ) {
+        return instanceOf(
+            Json5NumberPositiveInfinity.class,
+            has("sourceRange", x -> x.sourceRange(), sourceRange)
+        );
+    }
+
+    public static Matcher<Json5Value> isJson5NumberNegativeInfinity(
+        Matcher<Json5SourceRange> sourceRange
+    ) {
+        return instanceOf(
+            Json5NumberNegativeInfinity.class,
+            has("sourceRange", x -> x.sourceRange(), sourceRange)
+        );
+    }
+
+    public static Matcher<Json5Value> isJson5NumberNan(
+        Matcher<Json5SourceRange> sourceRange
+    ) {
+        return instanceOf(
+            Json5NumberNan.class,
             has("sourceRange", x -> x.sourceRange(), sourceRange)
         );
     }

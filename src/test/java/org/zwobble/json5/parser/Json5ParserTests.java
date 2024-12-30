@@ -2,6 +2,8 @@ package org.zwobble.json5.parser;
 
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.zwobble.json5.sources.Json5SourceRangeMatchers.isJson5SourceRange;
 import static org.zwobble.json5.parser.values.Json5ValueMatchers.*;
@@ -57,21 +59,63 @@ public class Json5ParserTests {
     public void canParseIntegerZero() {
         var result = Json5Parser.parseText("0");
 
-        assertThat(result, isJson5Number("0", isJson5SourceRange(0, 1)));
+        assertThat(result, isJson5NumberFinite(BigDecimal.ZERO, isJson5SourceRange(0, 1)));
     }
 
     @Test
     public void canParseIntegerZeroWithPositiveSign() {
         var result = Json5Parser.parseText("+0");
 
-        assertThat(result, isJson5Number("+0", isJson5SourceRange(0, 2)));
+        assertThat(result, isJson5NumberFinite(BigDecimal.ZERO, isJson5SourceRange(0, 2)));
     }
 
     @Test
     public void canParseIntegerZeroWithNegativeSign() {
         var result = Json5Parser.parseText("-0");
 
-        assertThat(result, isJson5Number("-0", isJson5SourceRange(0, 2)));
+        assertThat(result, isJson5NumberFinite(BigDecimal.ZERO, isJson5SourceRange(0, 2)));
+    }
+
+    @Test
+    public void canParseInfinityWithoutSign() {
+        var result = Json5Parser.parseText("Infinity");
+
+        assertThat(result, isJson5NumberPositiveInfinity(isJson5SourceRange(0, 8)));
+    }
+
+    @Test
+    public void canParseInfinityWithPositiveSign() {
+        var result = Json5Parser.parseText("+Infinity");
+
+        assertThat(result, isJson5NumberPositiveInfinity(isJson5SourceRange(0, 9)));
+    }
+
+    @Test
+    public void canParseInfinityWithNegativeSign() {
+        var result = Json5Parser.parseText("-Infinity");
+
+        assertThat(result, isJson5NumberNegativeInfinity(isJson5SourceRange(0, 9)));
+    }
+
+    @Test
+    public void canParseNanWithoutSign() {
+        var result = Json5Parser.parseText("NaN");
+
+        assertThat(result, isJson5NumberNan(isJson5SourceRange(0, 3)));
+    }
+
+    @Test
+    public void canParseNanWithPositiveSign() {
+        var result = Json5Parser.parseText("+NaN");
+
+        assertThat(result, isJson5NumberNan(isJson5SourceRange(0, 4)));
+    }
+
+    @Test
+    public void canParseNanWithNegativeSign() {
+        var result = Json5Parser.parseText("-NaN");
+
+        assertThat(result, isJson5NumberNan(isJson5SourceRange(0, 4)));
     }
 
     // == Objects ==

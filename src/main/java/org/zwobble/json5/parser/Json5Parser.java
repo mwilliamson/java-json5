@@ -3,6 +3,7 @@ package org.zwobble.json5.parser;
 import org.zwobble.json5.sources.Json5SourceRange;
 import org.zwobble.json5.values.*;
 
+import java.math.BigDecimal;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -139,16 +140,61 @@ public class Json5Parser {
 
     private static Optional<Json5Value> tryParseNumber(TokenIterator tokens) {
         var token = tokens.peek();
-        if (token.is(Json5TokenType.NUMBER)) {
-            tokens.skip();
-            return Optional.of(new Json5Number(
-                token.buffer().toString(),
-                token.sourceRange()
-            ));
-        } else {
-            return Optional.empty();
+
+        switch (token.tokenType()) {
+            case IDENTIFIER -> {
+                // The JSON5 lexical grammar is ambiguous in that Infinity and
+                // NaN tokens can be interpreted as either identifiers or as
+                // numbers. Since identifiers are always member names, not
+                // JSON5 values, this isn't ambiguous in the syntactic grammar.
+                //
+                // Therefore, to keep identifier handling straightforward, we
+                // interpret such tokens as identifiers, and handle the special
+                // case when parsing numbers i.e. here.
+                if (token.buffer().equals(BUFFER_INFINITY)) {
+                    tokens.skip();
+                    return Optional.of(new Json5NumberPositiveInfinity(
+                        token.sourceRange()
+                    ));
+                } else if (token.buffer().equals(BUFFER_NAN)) {
+                    tokens.skip();
+                    return Optional.of(new Json5NumberNan(
+                        token.sourceRange()
+                    ));
+                }
+            }
+            case NUMBER_FINITE -> {
+                tokens.skip();
+                return Optional.of(new Json5NumberFinite(
+                    new BigDecimal(token.buffer().toString()),
+                    token.sourceRange()
+                ));
+            }
+            case NUMBER_POSITIVE_INFINITY -> {
+                tokens.skip();
+                return Optional.of(new Json5NumberPositiveInfinity(
+                    token.sourceRange()
+                ));
+            }
+            case NUMBER_NEGATIVE_INFINITY -> {
+                tokens.skip();
+                return Optional.of(new Json5NumberNegativeInfinity(
+                    token.sourceRange()
+                ));
+            }
+            case NUMBER_NAN -> {
+                tokens.skip();
+                return Optional.of(new Json5NumberNan(
+                    token.sourceRange()
+                ));
+            }
         }
+
+        return Optional.empty();
     }
+
+    private static final CharBuffer BUFFER_INFINITY = CharBuffer.wrap("Infinity");
+    private static final CharBuffer BUFFER_NAN = CharBuffer.wrap("NaN");
 
     private static Optional<Json5Value> tryParseObject(TokenIterator tokens) {
         // JSON5Object :
@@ -342,7 +388,16 @@ public class Json5Parser {
             case STRING ->
                 throw new UnsupportedOperationException("TODO");
 
-            case NUMBER ->
+            case NUMBER_FINITE ->
+                throw new UnsupportedOperationException("TODO");
+
+            case NUMBER_POSITIVE_INFINITY ->
+                throw new UnsupportedOperationException("TODO");
+
+            case NUMBER_NEGATIVE_INFINITY ->
+                throw new UnsupportedOperationException("TODO");
+
+            case NUMBER_NAN ->
                 throw new UnsupportedOperationException("TODO");
 
             case END ->

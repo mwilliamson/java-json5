@@ -366,20 +366,7 @@ class Json5Tokenizer {
         //     JSON5NumericLiteral
         //     `+` JSON5NumericLiteral
         //     `-` JSON5NumericLiteral
-
-        if (!codePoints.trySkip('+')) {
-            codePoints.trySkip('-');
-        }
-
-        if (!trySkipJson5NumericLiteral(codePoints)) {
-            return Optional.empty();
-        }
-
-        var token = createToken(codePoints, Json5TokenType.NUMBER);
-        return Optional.of(token);
-    }
-
-    private static boolean trySkipJson5NumericLiteral(CodePointIterator codePoints) {
+        //
         // JSON5NumericLiteral ::
         //     NumericLiteral
         //     `Infinity`
@@ -387,6 +374,41 @@ class Json5Tokenizer {
         //
         // TODO: The source character immediately following a NumericLiteral
         // must not be an IdentifierStart or DecimalDigit.
+
+        // TODO: handle sign not followed by numeric literal
+
+        var isNegative = false;
+
+        if (!codePoints.trySkip('+')) {
+            isNegative = codePoints.trySkip('-');
+        }
+
+        if (codePoints.trySkip(BUFFER_INFINITY)) {
+            var tokenType = isNegative
+                ? Json5TokenType.NUMBER_NEGATIVE_INFINITY
+                : Json5TokenType.NUMBER_POSITIVE_INFINITY;
+
+            var token = createToken(codePoints, tokenType);
+            return Optional.of(token);
+        }
+
+        if (codePoints.trySkip(BUFFER_NAN)) {
+            var token = createToken(codePoints, Json5TokenType.NUMBER_NAN);
+            return Optional.of(token);
+        }
+
+        if (!trySkipJson5NumericLiteral(codePoints)) {
+            return Optional.empty();
+        }
+
+        var token = createToken(codePoints, Json5TokenType.NUMBER_FINITE);
+        return Optional.of(token);
+    }
+
+    private static final CharBuffer BUFFER_INFINITY = CharBuffer.wrap("Infinity");
+    private static final CharBuffer BUFFER_NAN = CharBuffer.wrap("NaN");
+
+    private static boolean trySkipJson5NumericLiteral(CodePointIterator codePoints) {
 
         return trySkipNumericLiteral(codePoints);
     }
