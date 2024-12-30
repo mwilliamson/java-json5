@@ -126,6 +126,20 @@ public class Json5ParserTests {
     }
 
     @Test
+    public void integerCannotHaveLeadingZeroes() {
+        var error = assertThrows(
+            Json5ParseError.class,
+            () -> Json5Parser.parseText("01")
+        );
+
+        assertThat(
+            error.getMessage(),
+            equalTo("Integer part of number cannot have leading zeroes")
+        );
+        assertThat(error.sourceRange(), isJson5SourceRange(0, 2));
+    }
+
+    @Test
     public void canParseNumberWithIntegerPartAndFractionalPart() {
         var result = Json5Parser.parseText("123.456");
 

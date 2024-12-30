@@ -458,16 +458,25 @@ class Json5Tokenizer {
         // NonZeroDigit :: one of
         //     `1` `2` `3 `4` `5` `6` `7` `8` `9`
 
-        // TODO: prevent leading zeroes
-
         var firstCodePoint = codePoints.peek();
-        if (!(firstCodePoint >= '0' && firstCodePoint <= '9')) {
+        if (firstCodePoint == '0') {
+            codePoints.skip();
+            if (trySkipDecimalDigits(codePoints)) {
+                var sourceRange = codePoints.tokenSourceRange();
+                throw new Json5ParseError(
+                    "Integer part of number cannot have leading zeroes",
+                    sourceRange
+                );
+            } else {
+                return true;
+            }
+        } else if (firstCodePoint >= '1' && firstCodePoint <= '9') {
+            codePoints.skip();
+            trySkipDecimalDigits(codePoints);
+            return true;
+        } else {
             return false;
         }
-
-        trySkipDecimalDigits(codePoints);
-
-        return true;
     }
 
     private static boolean trySkipDecimalDigits(CodePointIterator codePoints) {
@@ -524,12 +533,8 @@ class Json5Tokenizer {
         CodePointIterator codePoints,
         Json5TokenType tokenType
     ) {
-        var startCodePointIndex = codePoints.tokenStartIndex;
-        var endCodePointIndex = codePoints.index;
-        var sourceRange = new Json5SourceRange(startCodePointIndex, endCodePointIndex);
-
+        var sourceRange = codePoints.tokenSourceRange();
         var buffer = codePoints.tokenSubBuffer();
-
         return new Json5Token(tokenType, buffer, sourceRange);
     }
 
@@ -614,9 +619,14 @@ class Json5Tokenizer {
             this.tokenStartIndex = this.index;
         }
 
+        Json5SourceRange tokenSourceRange() {
+            var startCodePointIndex = this.tokenStartIndex;
+            var endCodePointIndex = this.index;
+            return new Json5SourceRange(startCodePointIndex, endCodePointIndex);
+        }
+
         CharBuffer tokenSubBuffer() {
             var startIndex = this.tokenStartIndex;
-            this.tokenStartIndex = this.index;
             return this.buffer.subSequence(startIndex, this.index);
         }
     }
