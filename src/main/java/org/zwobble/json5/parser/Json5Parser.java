@@ -174,7 +174,7 @@ public class Json5Parser {
         //     `[` `]`
         //     `[` JSON5ElementList `,`? `]`
         //
-        // JSON5ElementList:
+        // JSON5ElementList :
         //     JSON5Value
         //     JSON5ElementList `,` JSON5Value
 
