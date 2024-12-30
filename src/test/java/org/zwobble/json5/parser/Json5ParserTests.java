@@ -395,6 +395,24 @@ public class Json5ParserTests {
         assertThat(result, isJson5NumberNan(isJson5SourceRange(0, 4)));
     }
 
+    @Test
+    public void sourceCharacterAfterNumericLiteralMustNotBeIdentifierStart() {
+        var error = assertThrows(
+            Json5ParseError.class,
+            () -> Json5Parser.parseText("0x0g")
+        );
+
+        assertThat(
+            error.getMessage(),
+            equalTo(
+                "The source character immediately following a numeric " +
+                    "literal must not be the start of an identifier or a" +
+                    "decimal digit"
+            )
+        );
+        assertThat(error.sourceRange(), isJson5SourceRange(3, 4));
+    }
+
     // == Objects ==
 
     @Test

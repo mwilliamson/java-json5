@@ -233,6 +233,16 @@ class Json5Tokenizer {
         }
     }
 
+    private static boolean isIdentifierStart(CodePointIterator codePoints) {
+        var index = codePoints.index;
+        if (trySkipIdentifierStart(codePoints)) {
+            codePoints.index = index;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private static boolean trySkipIdentifierPart(CodePointIterator codePoints) {
         // IdentifierPart ::
         //     IdentifierStart
@@ -376,7 +386,7 @@ class Json5Tokenizer {
         //     DecimalLiteral
         //     HexIntegerLiteral
         //
-        // TODO: The source character immediately following a NumericLiteral
+        // The source character immediately following a NumericLiteral
         // must not be an IdentifierStart or DecimalDigit.
 
         var hasPlusSign = codePoints.trySkip('+');
@@ -400,12 +410,11 @@ class Json5Tokenizer {
             return Optional.of(token);
         }
 
+        Json5Token token;
         if (trySkipHexIntegerLiteral(codePoints)) {
-            var token = createToken(codePoints, Json5TokenType.NUMBER_HEX);
-            return Optional.of(token);
+            token = createToken(codePoints, Json5TokenType.NUMBER_HEX);
         } else if (trySkipDecimalLiteral(codePoints)) {
-            var token = createToken(codePoints, Json5TokenType.NUMBER_DECIMAL);
-            return Optional.of(token);
+            token = createToken(codePoints, Json5TokenType.NUMBER_DECIMAL);
         } else if (hasPlusSign || isNegative) {
             throw Json5ParseError.unexpectedTextError(
                 "numeric literal",
@@ -415,6 +424,17 @@ class Json5Tokenizer {
         } else {
             return Optional.empty();
         }
+
+        if (isIdentifierStart(codePoints) || isDecimalDigit(codePoints.peek())) {
+            throw new Json5ParseError(
+                "The source character immediately following a numeric " +
+                "literal must not be the start of an identifier or a" +
+                    "decimal digit",
+                codePoints.codePointSourceRange()
+            );
+        }
+
+        return Optional.of(token);
     }
 
     private static final CharBuffer BUFFER_INFINITY = CharBuffer.wrap("Infinity");
@@ -490,20 +510,24 @@ class Json5Tokenizer {
         // DecimalDigits ::
         //     DecimalDigit
         //     DecimalDigits DecimalDigit
-        //
-        // DecimalDigit :: one of
-        //     `0` `1` `2` `3 `4` `5` `6` `7` `8` `9`
 
         var initialIndex = codePoints.index;
 
         while (true) {
             var codePoint = codePoints.peek();
-            if (codePoint >= '0' && codePoint <= '9') {
+            if (isDecimalDigit(codePoint)) {
                 codePoints.skip();
             } else {
                 return initialIndex != codePoints.index;
             }
         }
+    }
+
+    private static boolean isDecimalDigit(int codePoint) {
+        // DecimalDigit :: one of
+        //     `0` `1` `2` `3 `4` `5` `6` `7` `8` `9`
+
+        return codePoint >= '0' && codePoint <= '9';
     }
 
     private static void trySkipExponentPart(CodePointIterator codePoints) {
