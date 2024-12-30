@@ -289,6 +289,38 @@ public class Json5ParserTests {
         ));
     }
 
+    @Test
+    public void memberNameCanStartWithUnderscore() {
+        var result = Json5Parser.parseText("{_foo: true}");
+
+        assertThat(result, isJson5Object(
+            isSequence(
+                isJson5Member(
+                    isJson5MemberName("_foo", isJson5SourceRange(1, 5)),
+                    isJson5Boolean(true, isJson5SourceRange(7, 11)),
+                    isJson5SourceRange(1, 11)
+                )
+            ),
+            isJson5SourceRange(0, 12)
+        ));
+    }
+
+    @Test
+    public void memberNameCanContainUnderscore() {
+        var result = Json5Parser.parseText("{foo_: true}");
+
+        assertThat(result, isJson5Object(
+            isSequence(
+                isJson5Member(
+                    isJson5MemberName("foo_", isJson5SourceRange(1, 5)),
+                    isJson5Boolean(true, isJson5SourceRange(7, 11)),
+                    isJson5SourceRange(1, 11)
+                )
+            ),
+            isJson5SourceRange(0, 12)
+        ));
+    }
+
     // == Arrays ==
 
     @Test
