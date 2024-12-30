@@ -224,6 +224,10 @@ class Json5Tokenizer {
         if (isUnicodeLetter(first) || first == '$' || first == '_') {
             codePoints.skip();
             return true;
+        } else if (first == '\\') {
+            codePoints.skip();
+            skipUnicodeEscapeSequence(codePoints);
+            return true;
         } else {
             return false;
         }
@@ -344,6 +348,18 @@ class Json5Tokenizer {
         }
     }
 
+    private static void skipUnicodeEscapeSequence(CodePointIterator codePoints) {
+        // UnicodeEscapeSequence ::
+        //     `u` HexDigit HexDigit HexDigit HexDigit
+        //
+
+        codePoints.skip('u');
+        skipHexDigit(codePoints);
+        skipHexDigit(codePoints);
+        skipHexDigit(codePoints);
+        skipHexDigit(codePoints);
+    }
+
     private static Optional<Json5Token> tokenizeJson5Number(CodePointIterator codePoints) {
         // JSON5Number ::
         //     JSON5NumericLiteral
@@ -385,6 +401,32 @@ class Json5Tokenizer {
         //     DecimalIntegerLiteral ExponentPart?
 
         return codePoints.trySkip('0');
+    }
+
+    private static void skipHexDigit(CodePointIterator codePoints) {
+        // HexDigit :: one of
+        //     `0` `1` `2` `3` `4` `5` `6` `7` `8` `9` `a` `b` `c` `d` `e` `f` `A` `B` `C` `D` `E` `F`
+
+        var codePoint = codePoints.peek();
+        if (
+            (codePoint >= '0' && codePoint <= '9') ||
+                (codePoint >= 'a' && codePoint <= 'f') ||
+                (codePoint >= 'A' && codePoint <= 'F')
+        ) {
+            codePoints.skip();
+        } else {
+            var sourceRange = codePoints.codePointSourceRange();
+            throw Json5ParseError.unexpectedTextError(
+                "hex digit",
+                describeCodePoint(codePoint),
+                sourceRange
+            );
+        }
+    }
+
+    private static String describeCodePoint(int codePoint) {
+        // TODO: handle codepoints that should be escaped
+        return String.format("'%s'", new String(new int[]{codePoint}, 0, 1));
     }
 
     private static Json5Token createToken(
@@ -453,6 +495,27 @@ class Json5Tokenizer {
         void skip() {
             if (this.index < this.buffer.length()) {
                 this.index += 1;
+            }
+        }
+
+        void skip(int expectedCodePoint) {
+            var actualCodePoint = peek();
+            if (actualCodePoint == expectedCodePoint) {
+                skip();
+            } else {
+                throw Json5ParseError.unexpectedTextError(
+                    describeCodePoint(expectedCodePoint),
+                    describeCodePoint(actualCodePoint),
+                    codePointSourceRange()
+                );
+            }
+        }
+
+        Json5SourceRange codePointSourceRange() {
+            if (isEnd()) {
+                return new Json5SourceRange(this.index, this.index);
+            } else {
+                return new Json5SourceRange(this.index, this.index + 1);
             }
         }
 

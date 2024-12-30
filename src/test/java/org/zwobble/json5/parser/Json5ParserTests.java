@@ -321,6 +321,49 @@ public class Json5ParserTests {
         ));
     }
 
+    @Test
+    public void memberNameCanStartWithUnicodeEscapeSequence() {
+        var result = Json5Parser.parseText("{\\u0020foo: true}");
+
+        assertThat(result, isJson5Object(
+            isSequence(
+                isJson5Member(
+                    isJson5MemberName(" foo", isJson5SourceRange(1, 10)),
+                    isJson5Boolean(true, isJson5SourceRange(12, 16)),
+                    isJson5SourceRange(1, 16)
+                )
+            ),
+            isJson5SourceRange(0, 17)
+        ));
+    }
+
+    @Test
+    public void memberNameCanContainUnicodeEscapeSequence() {
+        var result = Json5Parser.parseText("{foo\\u0020: true}");
+
+        assertThat(result, isJson5Object(
+            isSequence(
+                isJson5Member(
+                    isJson5MemberName("foo ", isJson5SourceRange(1, 10)),
+                    isJson5Boolean(true, isJson5SourceRange(12, 16)),
+                    isJson5SourceRange(1, 16)
+                )
+            ),
+            isJson5SourceRange(0, 17)
+        ));
+    }
+
+    @Test
+    public void whenMemberNameContainsSyntacticallyInvalidUnicodeEscapeSequenceThenErrorIsThrown() {
+        var error = assertThrows(
+            Json5ParseError.class,
+            () -> Json5Parser.parseText("{foo\\u20: true}")
+        );
+
+        assertThat(error.getMessage(), equalTo("Expected hex digit, but was ':'"));
+        assertThat(error.sourceRange(), isJson5SourceRange(8, 9));
+    }
+
     // == Arrays ==
 
     @Test

@@ -223,8 +223,7 @@ public class Json5Parser {
         var token = tokens.peek();
         if (token.tokenType() == Json5TokenType.IDENTIFIER) {
             tokens.skip();
-            // TODO: decode Unicode escape sequence
-            var name = token.buffer().toString();
+            var name = parseIdentifier(token.buffer());
             return Optional.of(new Json5MemberName(name, token.sourceRange()));
         } else {
             return Optional.empty();
@@ -271,6 +270,38 @@ public class Json5Parser {
             elements,
             sourceRange(startToken, endToken)
         ));
+    }
+
+    private static String parseIdentifier(CharBuffer buffer) {
+        // We assume that any buffer is a valid identifier.
+        var identifier = new StringBuilder();
+        var index = 0;
+        while (index < buffer.length()) {
+            var rawCharacter = buffer.charAt(index);
+            if (rawCharacter == '\\') {
+                var character =
+                    (parseHexDigit(buffer.charAt(index + 2)) << 12) +
+                        (parseHexDigit(buffer.charAt(index + 3)) << 8) +
+                        (parseHexDigit(buffer.charAt(index + 4)) << 4) +
+                        parseHexDigit(buffer.charAt(index + 5));
+                identifier.append((char)character);
+                index += 6;
+            } else {
+                identifier.append(rawCharacter);
+                index++;
+            }
+        }
+        return identifier.toString();
+    }
+
+    private static int parseHexDigit(char digit) {
+        if (digit >= '0' && digit <= '9') {
+            return digit - '0';
+        } else if (digit >= 'a' && digit <= 'f') {
+            return digit - 'a' + 10;
+        } else {
+            return digit - 'A' + 10;
+        }
     }
 
     private static Json5ParseError unexpectedTokenError(String expected, TokenIterator tokens) {
