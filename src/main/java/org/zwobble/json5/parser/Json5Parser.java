@@ -275,12 +275,11 @@ public class Json5Parser {
 
     private static Json5ParseError unexpectedTokenError(String expected, TokenIterator tokens) {
         var token = tokens.peek();
-        var message = String.format(
-            "Expected %s, but was %s",
+        return Json5ParseError.unexpectedTextError(
             expected,
-            describeToken(token)
+            describeToken(token),
+            token.sourceRange()
         );
-        return new Json5ParseError(message, token.sourceRange());
     }
 
     private static String describeToken(Json5Token tokens) {

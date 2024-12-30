@@ -129,7 +129,7 @@ class Json5Tokenizer {
         while (!codePoints.trySkip(BUFFER_ASTERISK_FORWARD_SLASH)) {
             if (codePoints.isEnd()) {
                 var sourceRange = new Json5SourceRange(codePoints.index, codePoints.index);
-                throw new Json5ParseError("Expected '*/', but was end of document", sourceRange);
+                throw Json5ParseError.unexpectedTextError("'*/'", "end of document", sourceRange);
             }
             codePoints.skip();
         }
