@@ -412,6 +412,22 @@ public class Json5ParserTests {
         ));
     }
 
+    @Test
+    public void memberNameCanContainUnicodeConnectorPunctation() {
+        var result = Json5Parser.parseText("{foo\u203f: true}");
+
+        assertThat(result, isJson5Object(
+            isSequence(
+                isJson5Member(
+                    isJson5MemberName("foo\u203f", isJson5SourceRange(1, 5)),
+                    isJson5Boolean(true, isJson5SourceRange(7, 11)),
+                    isJson5SourceRange(1, 11)
+                )
+            ),
+            isJson5SourceRange(0, 12)
+        ));
+    }
+
     // == Arrays ==
 
     @Test

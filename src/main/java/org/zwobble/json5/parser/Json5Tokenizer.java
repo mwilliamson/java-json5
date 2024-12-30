@@ -256,7 +256,8 @@ class Json5Tokenizer {
         var codePoint = codePoints.peek();
         var mask = (1 << Character.NON_SPACING_MARK) |
             (1 << Character.COMBINING_SPACING_MARK) |
-            (1 << Character.DECIMAL_DIGIT_NUMBER);
+            (1 << Character.DECIMAL_DIGIT_NUMBER) |
+            (1 << Character.CONNECTOR_PUNCTUATION);
         if (((mask >> Character.getType(codePoint)) & 1) != 0) {
             codePoints.skip();
             return true;
