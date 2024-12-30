@@ -296,6 +296,64 @@ public class Json5ParserTests {
     }
 
     @Test
+    public void whenLowercaseHexLiteralPrefixIsNotFollowedByHexDigitThenErrorIsThrown() {
+        var error = assertThrows(
+            Json5ParseError.class,
+            () -> Json5Parser.parseText("0x")
+        );
+
+        assertThat(
+            error.getMessage(),
+            equalTo("Expected hex digit, but was end of document")
+        );
+        assertThat(error.sourceRange(), isJson5SourceRange(2, 2));
+    }
+
+    @Test
+    public void whenUppercaseHexLiteralPrefixIsNotFollowedByHexDigitThenErrorIsThrown() {
+        var error = assertThrows(
+            Json5ParseError.class,
+            () -> Json5Parser.parseText("0X")
+        );
+
+        assertThat(
+            error.getMessage(),
+            equalTo("Expected hex digit, but was end of document")
+        );
+        assertThat(error.sourceRange(), isJson5SourceRange(2, 2));
+    }
+
+    @Test
+    public void hexLiteralPrefixCanBeLowercase() {
+        var result = Json5Parser.parseText("0x0");
+
+        assertThat(result, isJson5NumberFinite(
+            BigDecimal.ZERO,
+            isJson5SourceRange(0, 3)
+        ));
+    }
+
+    @Test
+    public void hexLiteralPrefixCanBeUppercase() {
+        var result = Json5Parser.parseText("0X0");
+
+        assertThat(result, isJson5NumberFinite(
+            BigDecimal.ZERO,
+            isJson5SourceRange(0, 3)
+        ));
+    }
+
+    @Test
+    public void hexLiteral() {
+        var result = Json5Parser.parseText("0x19afAFcD");
+
+        assertThat(result, isJson5NumberFinite(
+            BigDecimal.valueOf(0x19afafcd),
+            isJson5SourceRange(0, 10)
+        ));
+    }
+
+    @Test
     public void canParseInfinityWithoutSign() {
         var result = Json5Parser.parseText("Infinity");
 

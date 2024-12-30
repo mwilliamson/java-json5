@@ -402,7 +402,10 @@ class Json5Tokenizer {
             return Optional.of(token);
         }
 
-        if (trySkipDecimalLiteral(codePoints)) {
+        if (trySkipHexIntegerLiteral(codePoints)) {
+            var token = createToken(codePoints, Json5TokenType.NUMBER_HEX);
+            return Optional.of(token);
+        } else if (trySkipDecimalLiteral(codePoints)) {
             var token = createToken(codePoints, Json5TokenType.NUMBER_DECIMAL);
             return Optional.of(token);
         } else if (hasPlusSign || isNegative) {
@@ -530,7 +533,40 @@ class Json5Tokenizer {
         skipDecimalDigits(codePoints);
     }
 
+    private static boolean trySkipHexIntegerLiteral(CodePointIterator codePoints) {
+        // HexIntegerLiteral ::
+        //     `0x` HexDigit
+        //     `0X` HexDigit
+        //     HexIntegerLiteral HexDigit
+
+        if (
+            codePoints.trySkip(BUFFER_HEX_INTEGER_LITERAL_PREFIX_LOWERCASE) ||
+                codePoints.trySkip(BUFFER_HEX_INTEGER_LITERAL_PREFIX_UPPERCASE)
+        ) {
+            skipHexDigit(codePoints);
+            while (trySkipHexDigit(codePoints)) {
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private static final CharBuffer BUFFER_HEX_INTEGER_LITERAL_PREFIX_LOWERCASE = CharBuffer.wrap("0x");
+    private static final CharBuffer BUFFER_HEX_INTEGER_LITERAL_PREFIX_UPPERCASE = CharBuffer.wrap("0X");
+
     private static void skipHexDigit(CodePointIterator codePoints) {
+        if (!trySkipHexDigit(codePoints)) {
+            var sourceRange = codePoints.codePointSourceRange();
+            throw Json5ParseError.unexpectedTextError(
+                "hex digit",
+                describeCodePoint(codePoints.peek()),
+                sourceRange
+            );
+        }
+    }
+
+    private static boolean trySkipHexDigit(CodePointIterator codePoints) {
         // HexDigit :: one of
         //     `0` `1` `2` `3` `4` `5` `6` `7` `8` `9` `a` `b` `c` `d` `e` `f` `A` `B` `C` `D` `E` `F`
 
@@ -541,13 +577,9 @@ class Json5Tokenizer {
                 (codePoint >= 'A' && codePoint <= 'F')
         ) {
             codePoints.skip();
+            return true;
         } else {
-            var sourceRange = codePoints.codePointSourceRange();
-            throw Json5ParseError.unexpectedTextError(
-                "hex digit",
-                describeCodePoint(codePoint),
-                sourceRange
-            );
+            return false;
         }
     }
 

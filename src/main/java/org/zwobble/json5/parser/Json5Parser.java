@@ -4,6 +4,7 @@ import org.zwobble.json5.sources.Json5SourceRange;
 import org.zwobble.json5.values.*;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -167,6 +168,17 @@ public class Json5Parser {
                 tokens.skip();
                 return Optional.of(new Json5NumberFinite(
                     new BigDecimal(token.buffer().toString()),
+                    token.sourceRange()
+                ));
+            }
+            case NUMBER_HEX -> {
+                tokens.skip();
+                var integer = new BigInteger(
+                    token.buffer().toString().substring(2),
+                    16
+                );
+                return Optional.of(new Json5NumberFinite(
+                    new BigDecimal(integer),
                     token.sourceRange()
                 ));
             }
@@ -389,6 +401,9 @@ public class Json5Parser {
                 throw new UnsupportedOperationException("TODO");
 
             case NUMBER_DECIMAL ->
+                throw new UnsupportedOperationException("TODO");
+
+            case NUMBER_HEX ->
                 throw new UnsupportedOperationException("TODO");
 
             case NUMBER_POSITIVE_INFINITY ->
