@@ -425,11 +425,10 @@ class Json5Tokenizer {
             return Optional.empty();
         }
 
-        if (isIdentifierStart(codePoints) || isDecimalDigit(codePoints.peek())) {
+        if (isIdentifierStart(codePoints)) {
             throw new Json5ParseError(
                 "The source character immediately following a numeric " +
-                "literal must not be the start of an identifier or a" +
-                    "decimal digit",
+                    "literal must not be the start of an identifier",
                 codePoints.codePointSourceRange()
             );
         }

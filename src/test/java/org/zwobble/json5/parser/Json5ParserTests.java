@@ -406,8 +406,7 @@ public class Json5ParserTests {
             error.getMessage(),
             equalTo(
                 "The source character immediately following a numeric " +
-                    "literal must not be the start of an identifier or a" +
-                    "decimal digit"
+                    "literal must not be the start of an identifier"
             )
         );
         assertThat(error.sourceRange(), isJson5SourceRange(3, 4));
