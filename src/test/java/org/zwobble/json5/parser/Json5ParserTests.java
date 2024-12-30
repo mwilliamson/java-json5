@@ -116,6 +116,34 @@ public class Json5ParserTests {
     }
 
     @Test
+    public void whenPlusSignIsNotFollowedByNumericLiteralThenErrorIsThrown() {
+        var error = assertThrows(
+            Json5ParseError.class,
+            () -> Json5Parser.parseText("+")
+        );
+
+        assertThat(
+            error.getMessage(),
+            equalTo("Expected numeric literal, but was end of document")
+        );
+        assertThat(error.sourceRange(), isJson5SourceRange(1, 1));
+    }
+
+    @Test
+    public void whenNegativeSignIsNotFollowedByNumericLiteralThenErrorIsThrown() {
+        var error = assertThrows(
+            Json5ParseError.class,
+            () -> Json5Parser.parseText("-")
+        );
+
+        assertThat(
+            error.getMessage(),
+            equalTo("Expected numeric literal, but was end of document")
+        );
+        assertThat(error.sourceRange(), isJson5SourceRange(1, 1));
+    }
+
+    @Test
     public void canParseIntegerWithTrailingDot() {
         var result = Json5Parser.parseText("123.");
 

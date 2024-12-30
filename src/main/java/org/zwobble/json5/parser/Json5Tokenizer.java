@@ -377,9 +377,10 @@ class Json5Tokenizer {
 
         // TODO: handle sign not followed by numeric literal
 
+        var hasPlusSign = codePoints.trySkip('+');
         var isNegative = false;
 
-        if (!codePoints.trySkip('+')) {
+        if (!hasPlusSign) {
             isNegative = codePoints.trySkip('-');
         }
 
@@ -397,12 +398,18 @@ class Json5Tokenizer {
             return Optional.of(token);
         }
 
-        if (!trySkipNumericLiteral(codePoints)) {
+        if (trySkipNumericLiteral(codePoints)) {
+            var token = createToken(codePoints, Json5TokenType.NUMBER_FINITE);
+            return Optional.of(token);
+        } else if (hasPlusSign || isNegative) {
+            throw Json5ParseError.unexpectedTextError(
+                "numeric literal",
+                describeCodePoint(codePoints.peek()),
+                codePoints.codePointSourceRange()
+            );
+        } else {
             return Optional.empty();
         }
-
-        var token = createToken(codePoints, Json5TokenType.NUMBER_FINITE);
-        return Optional.of(token);
     }
 
     private static final CharBuffer BUFFER_INFINITY = CharBuffer.wrap("Infinity");
