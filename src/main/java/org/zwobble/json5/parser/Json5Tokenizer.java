@@ -135,8 +135,6 @@ class Json5Tokenizer {
         }
 
         return true;
-
-        // TODO: handle unclosed comment
     }
 
     private static final CharBuffer BUFFER_FORWARD_SLASH_ASTERISK = CharBuffer.wrap("/*");
