@@ -520,6 +520,10 @@ class Json5Tokenizer {
         }
         codePoints.skip();
 
+        if (!codePoints.trySkip('+')) {
+            codePoints.trySkip('-');
+        }
+
         skipDecimalDigits(codePoints);
     }
 

@@ -224,6 +224,36 @@ public class Json5ParserTests {
     }
 
     @Test
+    public void whenExponentPartHasNoSignThenExponentIsPositive() {
+        var result = Json5Parser.parseText("1e3");
+
+        assertThat(result, isJson5NumberFinite(
+            new BigDecimal("1000"),
+            isJson5SourceRange(0, 3)
+        ));
+    }
+
+    @Test
+    public void whenExponentPartHasPlusSignThenExponentIsPositive() {
+        var result = Json5Parser.parseText("1e+3");
+
+        assertThat(result, isJson5NumberFinite(
+            new BigDecimal("1000"),
+            isJson5SourceRange(0, 4)
+        ));
+    }
+
+    @Test
+    public void whenExponentPartHasMinusSignThenExponentIsNegative() {
+        var result = Json5Parser.parseText("1e-3");
+
+        assertThat(result, isJson5NumberFinite(
+            new BigDecimal("0.001"),
+            isJson5SourceRange(0, 4)
+        ));
+    }
+
+    @Test
     public void whenExponentIndicatorIsNotFollowedByDecimalDigitsThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,
