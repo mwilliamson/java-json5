@@ -25,6 +25,8 @@ class Json5Tokenizer {
                 // Skip whitespace.
             } else if (trySkipLineTerminator(iterator)) {
                 // Skip line terminator.
+            } else if (trySkipComment(iterator)) {
+                // Skip comment
             } else {
                 iterator.startToken();
                 var token = tokenizeJson5Token(iterator);
@@ -36,11 +38,11 @@ class Json5Tokenizer {
         return tokens;
     }
 
-    private static boolean trySkipWhiteSpace(CodePointIterator iterator) {
+    private static boolean trySkipWhiteSpace(CodePointIterator codePoints) {
         var whitespace = false;
 
-        while (isWhiteSpace(iterator.peek())) {
-            iterator.skip();
+        while (isWhiteSpace(codePoints.peek())) {
+            codePoints.skip();
             whitespace = true;
         }
 
@@ -66,11 +68,11 @@ class Json5Tokenizer {
             Character.getType(codePoint) == Character.SPACE_SEPARATOR;
     }
 
-    private static boolean trySkipLineTerminator(CodePointIterator iterator) {
+    private static boolean trySkipLineTerminator(CodePointIterator codePoints) {
         var whitespace = false;
 
-        while (isLineTerminator(iterator.peek())) {
-            iterator.skip();
+        while (isLineTerminator(codePoints.peek())) {
+            codePoints.skip();
             whitespace = true;
         }
 
@@ -89,6 +91,37 @@ class Json5Tokenizer {
             codePoint == '\u2028' ||
             codePoint == '\u2029';
     }
+
+    private static boolean trySkipComment(CodePointIterator codePoints) {
+        // Comment ::
+        //     MultiLineComment
+        //     SingleLineComment
+
+        return trySkipSingleLineComment(codePoints);
+    }
+
+    private static boolean trySkipSingleLineComment(CodePointIterator codePoints) {
+        // SingleLineComment ::
+        //     `//` SingleLineCommentChars?
+        //
+        // SingleLineCommentChars ::
+        //     SingleLineCommentChar SingleLineCommentChars?
+        //
+        // SingleLineCommentChar ::
+        //     SourceCharacter but not LineTerminator
+
+        if (!codePoints.trySkip(BUFFER_DOUBLE_FORWARD_SLASH)) {
+            return false;
+        }
+
+        while (!isLineTerminator(codePoints.peek())) {
+            codePoints.skip();
+        }
+
+        return true;
+    }
+
+    private static final CharBuffer BUFFER_DOUBLE_FORWARD_SLASH = CharBuffer.wrap("//");
 
     private static Optional<Json5Token> tokenizeJson5Token(CodePointIterator codePoints) {
         // JSON5Token ::
@@ -337,6 +370,19 @@ class Json5Tokenizer {
         private boolean trySkip(char skip) {
             if (this.buffer.get(this.index) == skip) {
                 this.index += 1;
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        private boolean trySkip(CharBuffer skip) {
+            if (remaining() < skip.length()) {
+                return false;
+            }
+
+            if (this.buffer.subSequence(this.index, this.index + skip.length()).equals(skip)) {
+                this.index += skip.length();
                 return true;
             } else {
                 return false;
