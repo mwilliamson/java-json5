@@ -36,6 +36,15 @@ public class Json5Parser {
     }
 
     private static Json5Value parseValue(TokenIterator tokens) {
+        var json5Value = tryParseValue(tokens);
+        if (json5Value.isPresent()) {
+            return json5Value.get();
+        }
+
+        throw unexpectedTokenError("JSON value", tokens);
+    }
+
+    private static Optional<Json5Value> tryParseValue(TokenIterator tokens) {
         // JSON5Value :
         //     JSON5Null
         //     JSON5Boolean
@@ -46,35 +55,35 @@ public class Json5Parser {
 
         var json5Null = tryParseNull(tokens);
         if (json5Null.isPresent()) {
-            return json5Null.get();
+            return json5Null;
         }
 
         var json5Boolean = tryParseBoolean(tokens);
         if (json5Boolean.isPresent()) {
-            return json5Boolean.get();
+            return json5Boolean;
         }
 
         var json5String = tryParseString(tokens);
         if (json5String.isPresent()) {
-            return json5String.get();
+            return json5String;
         }
 
         var json5Number = tryParseNumber(tokens);
         if (json5Number.isPresent()) {
-            return json5Number.get();
+            return json5Number;
         }
 
         var json5Object = tryParseObject(tokens);
         if (json5Object.isPresent()) {
-            return json5Object.get();
+            return json5Object;
         }
 
         var json5Array = tryParseArray(tokens);
         if (json5Array.isPresent()) {
-            return json5Array.get();
+            return json5Array;
         }
 
-        throw unexpectedTokenError("JSON value", tokens);
+        return Optional.empty();
     }
 
     private static Optional<Json5Value> tryParseNull(TokenIterator tokens) {
@@ -153,10 +162,7 @@ public class Json5Parser {
             var endToken = tokens.peek();
             return Optional.of(new Json5Object(
                 new LinkedHashMap<>(),
-                sourceRange(
-                    startToken.sourceRange(),
-                    endToken.sourceRange()
-                )
+                sourceRange(startToken, endToken)
             ));
         }
 
@@ -174,18 +180,31 @@ public class Json5Parser {
         }
         tokens.skip();
 
-        if (tokens.trySkip(Json5TokenType.PUNCTUATOR_SQUARE_CLOSE)) {
-            var endToken = tokens.peek();
-            return Optional.of(new Json5Array(
-                new ArrayList<>(),
-                sourceRange(
-                    startToken.sourceRange(),
-                    endToken.sourceRange()
-                )
-            ));
+        var elements = new ArrayList<Json5Value>();
+        while (true) {
+            var element = tryParseValue(tokens);
+            if (element.isPresent()) {
+                elements.add(element.get());
+            } else if (tokens.trySkip(Json5TokenType.PUNCTUATOR_SQUARE_CLOSE)) {
+                break;
+            } else {
+                throw unexpectedTokenError("JSON value or ']'", tokens);
+            }
+
+            if (tokens.trySkip(Json5TokenType.PUNCTUATOR_COMMA)) {
+                // Next element
+            } else if (tokens.trySkip(Json5TokenType.PUNCTUATOR_SQUARE_CLOSE)) {
+                break;
+            } else {
+                throw unexpectedTokenError("',' or ']'", tokens);
+            }
         }
 
-        throw unexpectedTokenError("JSON value or ']'", tokens);
+        var endToken = tokens.peek();
+        return Optional.of(new Json5Array(
+            elements,
+            sourceRange(startToken, endToken)
+        ));
     }
 
     private static Json5ParseError unexpectedTokenError(String expected, TokenIterator tokens) {
@@ -215,6 +234,9 @@ public class Json5Parser {
             case PUNCTUATOR_SQUARE_CLOSE ->
                 "']'";
 
+            case PUNCTUATOR_COMMA ->
+                "','";
+
             case STRING ->
                 throw new UnsupportedOperationException("TODO");
 
@@ -224,6 +246,13 @@ public class Json5Parser {
             case END ->
                 "end of document";
         };
+    }
+
+    private static Json5SourceRange sourceRange(
+        Json5Token start,
+        Json5Token end
+    ) {
+        return sourceRange(start.sourceRange(), end.sourceRange());
     }
 
     private static Json5SourceRange sourceRange(

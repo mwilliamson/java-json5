@@ -92,6 +92,86 @@ public class Json5ParserTests {
     }
 
     @Test
+    public void canParseArrayWithOneElementAndNoTrailingComma() {
+        var result = Json5Parser.parseText("[true]");
+
+        assertThat(result, isJson5Array(
+            isSequence(
+                isJson5Boolean(true, isJson5SourceRange(1, 5))
+            ),
+            isJson5SourceRange(0, 6)
+        ));
+    }
+
+    @Test
+    public void canParseArrayWithOneElementAndTrailingComma() {
+        var result = Json5Parser.parseText("[true,]");
+
+        assertThat(result, isJson5Array(
+            isSequence(
+                isJson5Boolean(true, isJson5SourceRange(1, 5))
+            ),
+            isJson5SourceRange(0, 7)
+        ));
+    }
+
+    @Test
+    public void canParseArrayWithMultipleElementsAndNoTrailingComma() {
+        var result = Json5Parser.parseText("[true, false, null]");
+
+        assertThat(result, isJson5Array(
+            isSequence(
+                isJson5Boolean(true, isJson5SourceRange(1, 5)),
+                isJson5Boolean(false, isJson5SourceRange(7, 12)),
+                isJson5Null(isJson5SourceRange(14, 18))
+            ),
+            isJson5SourceRange(0, 19)
+        ));
+    }
+
+    @Test
+    public void canParseArrayWithMultipleElementsAndTrailingComma() {
+        var result = Json5Parser.parseText("[true, false, null,]");
+
+        assertThat(result, isJson5Array(
+            isSequence(
+                isJson5Boolean(true, isJson5SourceRange(1, 5)),
+                isJson5Boolean(false, isJson5SourceRange(7, 12)),
+                isJson5Null(isJson5SourceRange(14, 18))
+            ),
+            isJson5SourceRange(0, 20)
+        ));
+    }
+
+    @Test
+    public void whenArrayHasElementThatIsNeitherValueNorClosingSquareBracketThenErrorIsThrown() {
+        var error = assertThrows(
+            Json5ParseError.class,
+            () -> Json5Parser.parseText("[}]")
+        );
+
+        assertThat(
+            error.getMessage(),
+            equalTo("Expected JSON value or ']', but was '}'")
+        );
+        assertThat(error.sourceRange(), isJson5SourceRange(1, 2));
+    }
+
+    @Test
+    public void whenArrayHasPostElementTokenThatIsNeitherCommaNorClosingSquareBracketThenErrorIsThrown() {
+        var error = assertThrows(
+            Json5ParseError.class,
+            () -> Json5Parser.parseText("[null}]")
+        );
+
+        assertThat(
+            error.getMessage(),
+            equalTo("Expected ',' or ']', but was '}'")
+        );
+        assertThat(error.sourceRange(), isJson5SourceRange(5, 6));
+    }
+
+    @Test
     public void whenArrayIsMissingClosingSquareBracketThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,

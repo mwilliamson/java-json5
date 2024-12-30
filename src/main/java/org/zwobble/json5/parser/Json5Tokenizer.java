@@ -306,6 +306,10 @@ class Json5Tokenizer {
                 tokenType = Json5TokenType.PUNCTUATOR_SQUARE_CLOSE;
                 break;
 
+            case ',':
+                tokenType = Json5TokenType.PUNCTUATOR_COMMA;
+                break;
+
             default:
                 return Optional.empty();
         }
