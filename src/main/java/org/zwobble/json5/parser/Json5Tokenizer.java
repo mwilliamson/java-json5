@@ -466,7 +466,4 @@ class Json5Tokenizer {
             return this.buffer.subSequence(startIndex, this.index);
         }
     }
-
-    record CodePointPosition(int bufferIndex) {
-    }
 }
