@@ -142,34 +142,6 @@ public class Json5ParserTests {
     }
 
     @Test
-    public void lineTerminatorLineFeedIsIgnored() {
-        var result = Json5Parser.parseText("\n\n\n[\n]\n\n");
-
-        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(3, 6)));
-    }
-
-    @Test
-    public void lineTerminatorCarriageReturnIsIgnored() {
-        var result = Json5Parser.parseText("\r\r\r[\r]\r\r");
-
-        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(3, 6)));
-    }
-
-    @Test
-    public void lineTerminatorLineSeparatorIsIgnored() {
-        var result = Json5Parser.parseText("\u2028\u2028\u2028[\u2028]\u2028\u2028");
-
-        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(3, 6)));
-    }
-
-    @Test
-    public void lineTerminatorParagraphSeparatorIsIgnored() {
-        var result = Json5Parser.parseText("\u2029\u2029\u2029[\u2029]\u2029\u2029");
-
-        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(3, 6)));
-    }
-
-    @Test
     public void tabIsTreatedAsWhiteSpace() {
         var result = Json5Parser.parseText("\t[]");
 
@@ -216,5 +188,33 @@ public class Json5ParserTests {
         var result = Json5Parser.parseText("\u2000[]");
 
         assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(1, 3)));
+    }
+
+    @Test
+    public void lineTerminatorLineFeedIsIgnored() {
+        var result = Json5Parser.parseText("\n\n\n[\n]\n\n");
+
+        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(3, 6)));
+    }
+
+    @Test
+    public void lineTerminatorCarriageReturnIsIgnored() {
+        var result = Json5Parser.parseText("\r\r\r[\r]\r\r");
+
+        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(3, 6)));
+    }
+
+    @Test
+    public void lineTerminatorLineSeparatorIsIgnored() {
+        var result = Json5Parser.parseText("\u2028\u2028\u2028[\u2028]\u2028\u2028");
+
+        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(3, 6)));
+    }
+
+    @Test
+    public void lineTerminatorParagraphSeparatorIsIgnored() {
+        var result = Json5Parser.parseText("\u2029\u2029\u2029[\u2029]\u2029\u2029");
+
+        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(3, 6)));
     }
 }
