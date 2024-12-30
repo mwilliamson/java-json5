@@ -261,7 +261,7 @@ class Json5Tokenizer {
         if (((mask >> Character.getType(codePoint)) & 1) != 0) {
             codePoints.skip();
             return true;
-        } else if (codePoint == 0x200c) {
+        } else if (codePoint == 0x200c || codePoint == 0x200d) {
             codePoints.skip();
             return true;
         } else {
