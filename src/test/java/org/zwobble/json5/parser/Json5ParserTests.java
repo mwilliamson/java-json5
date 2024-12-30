@@ -396,6 +396,22 @@ public class Json5ParserTests {
         ));
     }
 
+    @Test
+    public void memberNameCanContainUnicodeDecimalNumber() {
+        var result = Json5Parser.parseText("{foo0: true}");
+
+        assertThat(result, isJson5Object(
+            isSequence(
+                isJson5Member(
+                    isJson5MemberName("foo0", isJson5SourceRange(1, 5)),
+                    isJson5Boolean(true, isJson5SourceRange(7, 11)),
+                    isJson5SourceRange(1, 11)
+                )
+            ),
+            isJson5SourceRange(0, 12)
+        ));
+    }
+
     // == Arrays ==
 
     @Test

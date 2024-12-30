@@ -245,6 +245,9 @@ class Json5Tokenizer {
         // UnicodeCombiningMark ::
         //     any character in the Unicode categories “Non-spacing mark (Mn)”
         //     or “Combining spacing mark (Mc)”
+        //
+        // UnicodeDigit ::
+        //     any character in the Unicode category “Decimal number (Nd)”
 
         if (trySkipIdentifierStart(codePoints)) {
             return true;
@@ -252,7 +255,8 @@ class Json5Tokenizer {
 
         var codePoint = codePoints.peek();
         var mask = (1 << Character.NON_SPACING_MARK) |
-            (1 << Character.COMBINING_SPACING_MARK);
+            (1 << Character.COMBINING_SPACING_MARK) |
+            (1 << Character.DECIMAL_DIGIT_NUMBER);
         if (((mask >> Character.getType(codePoint)) & 1) != 0) {
             codePoints.skip();
             return true;
