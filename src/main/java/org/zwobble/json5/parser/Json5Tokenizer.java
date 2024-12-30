@@ -421,17 +421,6 @@ class Json5Tokenizer {
         //     DecimalIntegerLiteral `.` DecimalDigits? ExponentPart?
         //     `.` DecimalDigits ExponentPart?
         //     DecimalIntegerLiteral ExponentPart?
-        //
-        // ExponentPart ::
-        //     ExponentIndicator SignedInteger
-        //
-        // ExponentIndicator :: one of
-        //     `e` `E`
-        //
-        // SignedInteger ::
-        //     DecimalDigits
-        //     `+` DecimalDigits
-        //     `-` DecimalDigits
 
         if (trySkipDecimalIntegerLiteral(codePoints)) {
             if (codePoints.trySkip('.')) {
@@ -448,6 +437,8 @@ class Json5Tokenizer {
         } else {
             return false;
         }
+
+        trySkipExponentPart(codePoints);
 
         return true;
     }
@@ -481,6 +472,16 @@ class Json5Tokenizer {
         }
     }
 
+    private static void skipDecimalDigits(CodePointIterator codePoints) {
+        if (!trySkipDecimalDigits(codePoints)) {
+            throw Json5ParseError.unexpectedTextError(
+                "decimal digit",
+                describeCodePoint(codePoints.peek()),
+                codePoints.codePointSourceRange()
+            );
+        }
+    }
+
     private static boolean trySkipDecimalDigits(CodePointIterator codePoints) {
         // DecimalDigits ::
         //     DecimalDigit
@@ -499,6 +500,27 @@ class Json5Tokenizer {
                 return initialIndex != codePoints.index;
             }
         }
+    }
+
+    private static void trySkipExponentPart(CodePointIterator codePoints) {
+        // ExponentPart ::
+        //     ExponentIndicator SignedInteger
+        //
+        // ExponentIndicator :: one of
+        //     `e` `E`
+        //
+        // SignedInteger ::
+        //     DecimalDigits
+        //     `+` DecimalDigits
+        //     `-` DecimalDigits
+
+        var codePoint = codePoints.peek();
+        if (!(codePoint == 'e' || codePoint == 'E')) {
+            return;
+        }
+        codePoints.skip();
+
+        skipDecimalDigits(codePoints);
     }
 
     private static void skipHexDigit(CodePointIterator codePoints) {

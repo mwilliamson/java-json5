@@ -174,6 +174,70 @@ public class Json5ParserTests {
     }
 
     @Test
+    public void canParseNumberWithIntegerPartAndExponent() {
+        var result = Json5Parser.parseText("1e3");
+
+        assertThat(result, isJson5NumberFinite(
+            new BigDecimal("1000"),
+            isJson5SourceRange(0, 3)
+        ));
+    }
+
+    @Test
+    public void canParseNumberWithIntegerPartAndFractionalPartAndExponent() {
+        var result = Json5Parser.parseText("1.4e3");
+
+        assertThat(result, isJson5NumberFinite(
+            new BigDecimal("1400"),
+            isJson5SourceRange(0, 5)
+        ));
+    }
+
+    @Test
+    public void canParseNumberWithFractionalPartAndExponent() {
+        var result = Json5Parser.parseText(".4e3");
+
+        assertThat(result, isJson5NumberFinite(
+            new BigDecimal("400"),
+            isJson5SourceRange(0, 4)
+        ));
+    }
+
+    @Test
+    public void exponentIndicatorCanBeLowercase() {
+        var result = Json5Parser.parseText("1e3");
+
+        assertThat(result, isJson5NumberFinite(
+            new BigDecimal("1000"),
+            isJson5SourceRange(0, 3)
+        ));
+    }
+
+    @Test
+    public void exponentIndicatorCanBeUppercase() {
+        var result = Json5Parser.parseText("1E3");
+
+        assertThat(result, isJson5NumberFinite(
+            new BigDecimal("1000"),
+            isJson5SourceRange(0, 3)
+        ));
+    }
+
+    @Test
+    public void whenExponentIndicatorIsNotFollowedByDecimalDigitsThenErrorIsThrown() {
+        var error = assertThrows(
+            Json5ParseError.class,
+            () -> Json5Parser.parseText("1e")
+        );
+
+        assertThat(
+            error.getMessage(),
+            equalTo("Expected decimal digit, but was end of document")
+        );
+        assertThat(error.sourceRange(), isJson5SourceRange(2, 2));
+    }
+
+    @Test
     public void canParseInfinityWithoutSign() {
         var result = Json5Parser.parseText("Infinity");
 

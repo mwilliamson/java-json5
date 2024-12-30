@@ -2,7 +2,9 @@ package org.zwobble.json5.parser.values;
 
 import org.zwobble.json5.sources.Json5SourceRange;
 import org.zwobble.json5.values.*;
+import org.zwobble.precisely.MatchResult;
 import org.zwobble.precisely.Matcher;
+import org.zwobble.precisely.TextTree;
 
 import java.math.BigDecimal;
 
@@ -46,9 +48,31 @@ public class Json5ValueMatchers {
     ) {
         return instanceOf(
             Json5NumberFinite.class,
-            has("value", x -> x.value(), equalTo(value)),
+            has("value", x -> x.value(), new BigDecimalMatcher(value)),
             has("sourceRange", x -> x.sourceRange(), sourceRange)
         );
+    }
+
+    static class BigDecimalMatcher implements Matcher<BigDecimal> {
+        private final BigDecimal value;
+
+        BigDecimalMatcher(BigDecimal value) {
+            this.value = value;
+        }
+
+        @Override
+        public MatchResult match(BigDecimal actual) {
+            if (value.compareTo(actual) == 0) {
+                return MatchResult.matched();
+            } else {
+                return MatchResult.unmatched(TextTree.object("was ", actual));
+            }
+        }
+
+        @Override
+        public TextTree describe() {
+            return TextTree.object(value);
+        }
     }
 
     public static Matcher<Json5Value> isJson5NumberPositiveInfinity(
