@@ -383,7 +383,7 @@ class Json5Tokenizer {
         // JSON5NumericLiteral ::
         //     NumericLiteral
         //     `Infinity`
-        //     `Nan`
+        //     `NaN`
         //
         // TODO: The source character immediately following a NumericLiteral
         // must not be an IdentifierStart or DecimalDigit.
