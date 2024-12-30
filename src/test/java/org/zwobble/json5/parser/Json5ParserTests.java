@@ -257,6 +257,38 @@ public class Json5ParserTests {
         ));
     }
 
+    @Test
+    public void memberNameCanStartWithDollar() {
+        var result = Json5Parser.parseText("{$foo: true}");
+
+        assertThat(result, isJson5Object(
+            isSequence(
+                isJson5Member(
+                    isJson5MemberName("$foo", isJson5SourceRange(1, 5)),
+                    isJson5Boolean(true, isJson5SourceRange(7, 11)),
+                    isJson5SourceRange(1, 11)
+                )
+            ),
+            isJson5SourceRange(0, 12)
+        ));
+    }
+
+    @Test
+    public void memberNameCanContainDollar() {
+        var result = Json5Parser.parseText("{foo$: true}");
+
+        assertThat(result, isJson5Object(
+            isSequence(
+                isJson5Member(
+                    isJson5MemberName("foo$", isJson5SourceRange(1, 5)),
+                    isJson5Boolean(true, isJson5SourceRange(7, 11)),
+                    isJson5SourceRange(1, 11)
+                )
+            ),
+            isJson5SourceRange(0, 12)
+        ));
+    }
+
     // == Arrays ==
 
     @Test

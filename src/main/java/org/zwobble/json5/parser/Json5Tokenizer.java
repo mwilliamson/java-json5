@@ -223,7 +223,7 @@ class Json5Tokenizer {
         //     `\` UnicodeEscapeSequence
 
         var first = codePoints.peek();
-        if (isUnicodeLetter(first)) {
+        if (isUnicodeLetter(first) || first == '$') {
             codePoints.skip();
             return true;
         } else {
