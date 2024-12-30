@@ -173,6 +173,10 @@ public class Json5Parser {
         // JSON5Array :
         //     `[` `]`
         //     `[` JSON5ElementList `,`? `]`
+        //
+        // JSON5ElementList:
+        //     JSON5Value
+        //     JSON5ElementList `,` JSON5Value
 
         var startToken = tokens.peek();
         if (!startToken.is(Json5TokenType.PUNCTUATOR_SQUARE_OPEN)) {
