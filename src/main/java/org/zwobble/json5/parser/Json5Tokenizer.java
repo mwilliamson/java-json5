@@ -397,7 +397,7 @@ class Json5Tokenizer {
             return Optional.of(token);
         }
 
-        if (!trySkipJson5NumericLiteral(codePoints)) {
+        if (!trySkipNumericLiteral(codePoints)) {
             return Optional.empty();
         }
 
@@ -407,11 +407,6 @@ class Json5Tokenizer {
 
     private static final CharBuffer BUFFER_INFINITY = CharBuffer.wrap("Infinity");
     private static final CharBuffer BUFFER_NAN = CharBuffer.wrap("NaN");
-
-    private static boolean trySkipJson5NumericLiteral(CodePointIterator codePoints) {
-
-        return trySkipNumericLiteral(codePoints);
-    }
 
     private static boolean trySkipNumericLiteral(CodePointIterator codePoints) {
         // NumericLiteral ::
@@ -427,7 +422,19 @@ class Json5Tokenizer {
         //     `.` DecimalDigits ExponentPart?
         //     DecimalIntegerLiteral ExponentPart?
 
-        return codePoints.trySkip('0');
+        var firstCodePoint = codePoints.peek();
+        if (!(firstCodePoint >= '0' && firstCodePoint <= '9')) {
+            return false;
+        }
+
+        while (true) {
+            var codePoint = codePoints.peek();
+            if (codePoint >= '0' && codePoint <= '9') {
+                codePoints.skip();
+            } else {
+                return true;
+            }
+        }
     }
 
     private static void skipHexDigit(CodePointIterator codePoints) {

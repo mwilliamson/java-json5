@@ -59,21 +59,60 @@ public class Json5ParserTests {
     public void canParseIntegerZero() {
         var result = Json5Parser.parseText("0");
 
-        assertThat(result, isJson5NumberFinite(BigDecimal.ZERO, isJson5SourceRange(0, 1)));
+        assertThat(result, isJson5NumberFinite(
+            BigDecimal.ZERO,
+            isJson5SourceRange(0, 1)
+        ));
     }
 
     @Test
     public void canParseIntegerZeroWithPositiveSign() {
         var result = Json5Parser.parseText("+0");
 
-        assertThat(result, isJson5NumberFinite(BigDecimal.ZERO, isJson5SourceRange(0, 2)));
+        assertThat(result, isJson5NumberFinite(
+            BigDecimal.ZERO,
+            isJson5SourceRange(0, 2)
+        ));
     }
 
     @Test
     public void canParseIntegerZeroWithNegativeSign() {
         var result = Json5Parser.parseText("-0");
 
-        assertThat(result, isJson5NumberFinite(BigDecimal.ZERO, isJson5SourceRange(0, 2)));
+        assertThat(result, isJson5NumberFinite(
+            BigDecimal.ZERO,
+            isJson5SourceRange(0, 2)
+        ));
+    }
+
+    @Test
+    public void canParseIntegerWithoutSign() {
+        var result = Json5Parser.parseText("123");
+
+        assertThat(result, isJson5NumberFinite(
+            BigDecimal.valueOf(123),
+            isJson5SourceRange(0, 3)
+        ));
+    }
+
+    @Test
+    public void canParseIntegerWithPositiveSign() {
+        var result = Json5Parser.parseText("+123");
+
+        assertThat(result, isJson5NumberFinite(
+            BigDecimal.valueOf(123),
+            isJson5SourceRange(0, 4)
+        ));
+    }
+
+    @Test
+    public void canParseIntegerWithNegativeSign() {
+        var result = Json5Parser.parseText("-123");
+
+        assertThat(result, isJson5NumberFinite(
+            BigDecimal.valueOf(-123),
+            isJson5SourceRange(0, 4)
+        ));
     }
 
     @Test
