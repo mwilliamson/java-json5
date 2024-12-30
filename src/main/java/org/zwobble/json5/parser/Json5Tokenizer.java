@@ -433,9 +433,18 @@ class Json5Tokenizer {
         //     `+` DecimalDigits
         //     `-` DecimalDigits
 
-        trySkipDecimalIntegerLiteral(codePoints);
-        if (codePoints.trySkip('.')) {
-            skipDecimalDigits(codePoints);
+        if (trySkipDecimalIntegerLiteral(codePoints)) {
+            if (codePoints.trySkip('.')) {
+                trySkipDecimalDigits(codePoints);
+            }
+        } else if (codePoints.trySkip('.')) {
+            if (!trySkipDecimalDigits(codePoints)) {
+                throw Json5ParseError.unexpectedTextError(
+                    "decimal digit",
+                    describeCodePoint(codePoints.peek()),
+                    codePoints.codePointSourceRange()
+                );
+            }
         }
 
         return true;
@@ -445,13 +454,6 @@ class Json5Tokenizer {
         // DecimalIntegerLiteral ::
         //     `0`
         //     NonZeroDigit DecimalDigits?
-        //
-        // DecimalDigits ::
-        //     DecimalDigit
-        //     DecimalDigits DecimalDigit
-        //
-        // DecimalDigit :: one of
-        //     `0` `1` `2` `3 `4` `5` `6` `7` `8` `9`
         //
         // NonZeroDigit :: one of
         //     `1` `2` `3 `4` `5` `6` `7` `8` `9`
@@ -463,18 +465,27 @@ class Json5Tokenizer {
             return false;
         }
 
-        skipDecimalDigits(codePoints);
+        trySkipDecimalDigits(codePoints);
 
         return true;
     }
 
-    private static void skipDecimalDigits(CodePointIterator codePoints) {
+    private static boolean trySkipDecimalDigits(CodePointIterator codePoints) {
+        // DecimalDigits ::
+        //     DecimalDigit
+        //     DecimalDigits DecimalDigit
+        //
+        // DecimalDigit :: one of
+        //     `0` `1` `2` `3 `4` `5` `6` `7` `8` `9`
+
+        var initialIndex = codePoints.index;
+
         while (true) {
             var codePoint = codePoints.peek();
             if (codePoint >= '0' && codePoint <= '9') {
                 codePoints.skip();
             } else {
-                return;
+                return initialIndex != codePoints.index;
             }
         }
     }
@@ -502,7 +513,11 @@ class Json5Tokenizer {
 
     private static String describeCodePoint(int codePoint) {
         // TODO: handle codepoints that should be escaped
-        return String.format("'%s'", new String(new int[]{codePoint}, 0, 1));
+        if (codePoint == -1) {
+            return "end of document";
+        } else {
+            return String.format("'%s'", new String(new int[]{codePoint}, 0, 1));
+        }
     }
 
     private static Json5Token createToken(

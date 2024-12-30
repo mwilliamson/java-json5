@@ -126,7 +126,7 @@ public class Json5ParserTests {
     }
 
     @Test
-    public void canParseIntegerWithIntegerPartAndFractionalPart() {
+    public void canParseNumberWithIntegerPartAndFractionalPart() {
         var result = Json5Parser.parseText("123.456");
 
         assertThat(result, isJson5NumberFinite(
@@ -136,13 +136,27 @@ public class Json5ParserTests {
     }
 
     @Test
-    public void canParseIntegerWithoutIntegerPartAndWithFractionalPart() {
+    public void canParseNumberWithoutIntegerPartAndWithFractionalPart() {
         var result = Json5Parser.parseText(".456");
 
         assertThat(result, isJson5NumberFinite(
             new BigDecimal(".456"),
             isJson5SourceRange(0, 4)
         ));
+    }
+
+    @Test
+    public void whenThereIsNoIntegerPartThenDigitsAreExpectedAfterDot() {
+        var error = assertThrows(
+            Json5ParseError.class,
+            () -> Json5Parser.parseText(".")
+        );
+
+        assertThat(
+            error.getMessage(),
+            equalTo("Expected decimal digit, but was end of document")
+        );
+        assertThat(error.sourceRange(), isJson5SourceRange(1, 1));
     }
 
     @Test
