@@ -23,7 +23,7 @@ class Json5Tokenizer {
             //     JSON5Token
             if (trySkipWhiteSpace(iterator)) {
                 // Skip whitespace.
-            } else if (trySkipLineTerminator(iterator)) {
+            } else if (trySkipLineTerminators(iterator)) {
                 // Skip line terminator.
             } else if (trySkipComment(iterator)) {
                 // Skip comment
@@ -68,15 +68,15 @@ class Json5Tokenizer {
             Character.getType(codePoint) == Character.SPACE_SEPARATOR;
     }
 
-    private static boolean trySkipLineTerminator(CodePointIterator codePoints) {
-        var whitespace = false;
+    private static boolean trySkipLineTerminators(CodePointIterator codePoints) {
+        var skipped = false;
 
         while (isLineTerminator(codePoints.peek())) {
             codePoints.skip();
-            whitespace = true;
+            skipped = true;
         }
 
-        return whitespace;
+        return skipped;
     }
 
     private static boolean isLineTerminator(int codePoint) {
