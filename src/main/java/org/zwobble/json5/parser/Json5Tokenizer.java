@@ -156,7 +156,7 @@ class Json5Tokenizer {
             return false;
         }
 
-        while (!isLineTerminator(codePoints.peek())) {
+        while (!isLineTerminator(codePoints.peek()) && !codePoints.isEnd()) {
             codePoints.skip();
         }
 

@@ -245,4 +245,11 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(5, 12)));
     }
+
+    @Test
+    public void singleLineCommentCanBeClosedByEndOfDocument() {
+        var result = Json5Parser.parseText("[]//");
+
+        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(0, 2)));
+    }
 }
