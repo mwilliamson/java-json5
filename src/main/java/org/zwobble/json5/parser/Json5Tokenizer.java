@@ -372,6 +372,10 @@ class Json5Tokenizer {
         //     `Infinity`
         //     `NaN`
         //
+        // NumericLiteral ::
+        //     DecimalLiteral
+        //     HexIntegerLiteral
+        //
         // TODO: The source character immediately following a NumericLiteral
         // must not be an IdentifierStart or DecimalDigit.
 
@@ -398,8 +402,8 @@ class Json5Tokenizer {
             return Optional.of(token);
         }
 
-        if (trySkipNumericLiteral(codePoints)) {
-            var token = createToken(codePoints, Json5TokenType.NUMBER_FINITE);
+        if (trySkipDecimalLiteral(codePoints)) {
+            var token = createToken(codePoints, Json5TokenType.NUMBER_DECIMAL);
             return Optional.of(token);
         } else if (hasPlusSign || isNegative) {
             throw Json5ParseError.unexpectedTextError(
@@ -414,14 +418,6 @@ class Json5Tokenizer {
 
     private static final CharBuffer BUFFER_INFINITY = CharBuffer.wrap("Infinity");
     private static final CharBuffer BUFFER_NAN = CharBuffer.wrap("NaN");
-
-    private static boolean trySkipNumericLiteral(CodePointIterator codePoints) {
-        // NumericLiteral ::
-        //     DecimalLiteral
-        //     HexIntegerLiteral
-
-        return trySkipDecimalLiteral(codePoints);
-    }
 
     private static boolean trySkipDecimalLiteral(CodePointIterator codePoints) {
         // DecimalLiteral ::

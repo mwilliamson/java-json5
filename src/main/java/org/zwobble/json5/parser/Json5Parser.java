@@ -163,7 +163,7 @@ public class Json5Parser {
                     ));
                 }
             }
-            case NUMBER_FINITE -> {
+            case NUMBER_DECIMAL -> {
                 tokens.skip();
                 return Optional.of(new Json5NumberFinite(
                     new BigDecimal(token.buffer().toString()),
@@ -388,7 +388,7 @@ public class Json5Parser {
             case STRING ->
                 throw new UnsupportedOperationException("TODO");
 
-            case NUMBER_FINITE ->
+            case NUMBER_DECIMAL ->
                 throw new UnsupportedOperationException("TODO");
 
             case NUMBER_POSITIVE_INFINITY ->
