@@ -445,6 +445,8 @@ class Json5Tokenizer {
                     codePoints.codePointSourceRange()
                 );
             }
+        } else {
+            return false;
         }
 
         return true;
