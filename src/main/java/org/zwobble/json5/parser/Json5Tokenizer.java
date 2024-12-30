@@ -352,7 +352,7 @@ class Json5Tokenizer {
         //     `+` JSON5NumericLiteral
         //     `-` JSON5NumericLiteral
 
-        if (!trySkipNumericLiteral(codePoints)) {
+        if (!trySkipJson5NumericLiteral(codePoints)) {
             return Optional.empty();
         }
 
