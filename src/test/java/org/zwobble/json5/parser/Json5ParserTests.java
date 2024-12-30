@@ -226,6 +226,20 @@ public class Json5ParserTests {
     }
 
     @Test
+    public void whenMultiLineCommentIsNotClosedThenErrorIsThrown() {
+        var error = assertThrows(
+            Json5ParseError.class,
+            () -> Json5Parser.parseText("[]/*")
+        );
+
+        assertThat(
+            error.getMessage(),
+            equalTo("Expected '*/', but was end of document")
+        );
+        assertThat(error.sourceRange(), isJson5SourceRange(4, 4));
+    }
+
+    @Test
     public void singleLineCommentIsIgnored() {
         var result = Json5Parser.parseText("// a\n[// b\n] // c\n\n");
 

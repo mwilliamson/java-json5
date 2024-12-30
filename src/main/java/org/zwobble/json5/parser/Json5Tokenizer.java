@@ -127,6 +127,10 @@ class Json5Tokenizer {
         }
 
         while (!codePoints.trySkip(BUFFER_ASTERISK_FORWARD_SLASH)) {
+            if (codePoints.isEnd()) {
+                var sourceRange = new Json5SourceRange(codePoints.index, codePoints.index);
+                throw new Json5ParseError("Expected '*/', but was end of document", sourceRange);
+            }
             codePoints.skip();
         }
 
@@ -407,7 +411,7 @@ class Json5Tokenizer {
 
         private boolean trySkip(char skip) {
             if (this.buffer.get(this.index) == skip) {
-                this.index += 1;
+                this.skip();
                 return true;
             } else {
                 return false;
@@ -441,7 +445,9 @@ class Json5Tokenizer {
         }
 
         void skip() {
-            this.index += 1;
+            if (this.index < this.buffer.length()) {
+                this.index += 1;
+            }
         }
 
         void startToken() {
