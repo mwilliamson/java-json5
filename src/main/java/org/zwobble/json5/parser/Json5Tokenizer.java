@@ -248,6 +248,9 @@ class Json5Tokenizer {
         //
         // UnicodeDigit ::
         //     any character in the Unicode category “Decimal number (Nd)”
+        //
+        // UnicodeConnectorPunctuation ::
+        //     any character in the Unicode category “Connector punctuation (Pc)”
 
         if (trySkipIdentifierStart(codePoints)) {
             return true;
@@ -282,28 +285,6 @@ class Json5Tokenizer {
             (1 << Character.OTHER_LETTER) |
             (1 << Character.LETTER_NUMBER);
         return ((mask >> Character.getType(codePoint)) & 1) != 0;
-    }
-
-    private static boolean isUnicodeCombiningMark(int codePoint) {
-        // UnicodeCombiningMark ::
-        //     any character in the Unicode categories “Non-spacing mark (Mn)”
-        //     or “Combining spacing mark (Mc)”
-
-        return false;
-    }
-
-    private static boolean isUnicodeDigit(int codePoint) {
-        // UnicodeDigit ::
-        //     any character in the Unicode category “Decimal number (Nd)”
-
-        return false;
-    }
-
-    private static boolean isUnicodeConnectorPunctuation(int codePoint) {
-        // UnicodeConnectorPunctuation ::
-        //     any character in the Unicode category “Connector punctuation (Pc)”
-
-        return false;
     }
 
     private static Optional<Json5Token> tokenizeJson5Punctuator(CodePointIterator codePoints) {
