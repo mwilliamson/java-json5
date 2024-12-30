@@ -126,6 +126,16 @@ public class Json5ParserTests {
     }
 
     @Test
+    public void canParseIntegerWithIntegerAndFractionalPart() {
+        var result = Json5Parser.parseText("123.456");
+
+        assertThat(result, isJson5NumberFinite(
+            new BigDecimal("123.456"),
+            isJson5SourceRange(0, 7)
+        ));
+    }
+
+    @Test
     public void canParseInfinityWithoutSign() {
         var result = Json5Parser.parseText("Infinity");
 

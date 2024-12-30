@@ -434,7 +434,9 @@ class Json5Tokenizer {
         //     `-` DecimalDigits
 
         trySkipDecimalIntegerLiteral(codePoints);
-        codePoints.trySkip('.');
+        if (codePoints.trySkip('.')) {
+            skipDecimalDigits(codePoints);
+        }
 
         return true;
     }
@@ -461,12 +463,18 @@ class Json5Tokenizer {
             return false;
         }
 
+        skipDecimalDigits(codePoints);
+
+        return true;
+    }
+
+    private static void skipDecimalDigits(CodePointIterator codePoints) {
         while (true) {
             var codePoint = codePoints.peek();
             if (codePoint >= '0' && codePoint <= '9') {
                 codePoints.skip();
             } else {
-                return true;
+                return;
             }
         }
     }
