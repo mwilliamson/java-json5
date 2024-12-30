@@ -60,6 +60,20 @@ public class Json5ParserTests {
         assertThat(result, isJson5Number("0", isJson5SourceRange(0, 1)));
     }
 
+    @Test
+    public void canParseIntegerZeroWithPositiveSign() {
+        var result = Json5Parser.parseText("+0");
+
+        assertThat(result, isJson5Number("+0", isJson5SourceRange(0, 2)));
+    }
+
+    @Test
+    public void canParseIntegerZeroWithNegativeSign() {
+        var result = Json5Parser.parseText("-0");
+
+        assertThat(result, isJson5Number("-0", isJson5SourceRange(0, 2)));
+    }
+
     // == Objects ==
 
     @Test

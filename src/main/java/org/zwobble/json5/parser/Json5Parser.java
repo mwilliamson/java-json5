@@ -141,7 +141,10 @@ public class Json5Parser {
         var token = tokens.peek();
         if (token.is(Json5TokenType.NUMBER)) {
             tokens.skip();
-            return Optional.of(new Json5Number("0", token.sourceRange()));
+            return Optional.of(new Json5Number(
+                token.buffer().toString(),
+                token.sourceRange()
+            ));
         } else {
             return Optional.empty();
         }

@@ -367,6 +367,10 @@ class Json5Tokenizer {
         //     `+` JSON5NumericLiteral
         //     `-` JSON5NumericLiteral
 
+        if (!codePoints.trySkip('+')) {
+            codePoints.trySkip('-');
+        }
+
         if (!trySkipJson5NumericLiteral(codePoints)) {
             return Optional.empty();
         }
