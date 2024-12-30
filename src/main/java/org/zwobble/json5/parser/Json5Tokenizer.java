@@ -379,8 +379,6 @@ class Json5Tokenizer {
         // TODO: The source character immediately following a NumericLiteral
         // must not be an IdentifierStart or DecimalDigit.
 
-        // TODO: handle sign not followed by numeric literal
-
         var hasPlusSign = codePoints.trySkip('+');
         var isNegative = false;
 
