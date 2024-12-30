@@ -219,6 +219,13 @@ public class Json5ParserTests {
     }
 
     @Test
+    public void multiLineCommentIsIgnored() {
+        var result = Json5Parser.parseText("/* a */[/* b\n\nc */] /** d*  **/");
+
+        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(7, 19)));
+    }
+
+    @Test
     public void singleLineCommentIsIgnored() {
         var result = Json5Parser.parseText("// a\n[// b\n] // c\n\n");
 

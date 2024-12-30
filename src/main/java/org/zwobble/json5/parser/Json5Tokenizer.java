@@ -97,8 +97,46 @@ class Json5Tokenizer {
         //     MultiLineComment
         //     SingleLineComment
 
-        return trySkipSingleLineComment(codePoints);
+        return trySkipMultiLineComment(codePoints) || trySkipSingleLineComment(codePoints);
     }
+
+    private static boolean trySkipMultiLineComment(CodePointIterator codePoints) {
+        // MultiLineComment ::
+        //     `/*` MultiLineCommentChars? `*/`
+        //
+        // MultiLineCommentChars ::
+        //     MultiLineNotAsteriskChar MultiLineCommentChars?
+        //     `*` PostAsteriskCommentChars?
+        //
+        // PostAsteriskCommentChars ::
+        //     MultiLineNotForwardSlashOrAsteriskChar MultiLineCommentChars?
+        //     * PostAsteriskCommentChars?
+        //
+        // MultiLineNotAsteriskChar ::
+        //     SourceCharacter but not `*`
+        //
+        // MultiLineNotForwardSlashOrAsteriskChar ::
+        //     SourceCharacter but not one of `/` or `*`
+
+        // TODO: if a MultiLineComment contains a line terminator character,
+        // then the entire comment is considered to be a LineTerminator for
+        // purposes of parsing by the syntactic grammar.
+
+        if (!codePoints.trySkip(BUFFER_FORWARD_SLASH_ASTERISK)) {
+            return false;
+        }
+
+        while (!codePoints.trySkip(BUFFER_ASTERISK_FORWARD_SLASH)) {
+            codePoints.skip();
+        }
+
+        return true;
+
+        // TODO: handle unclosed comment
+    }
+
+    private static final CharBuffer BUFFER_FORWARD_SLASH_ASTERISK = CharBuffer.wrap("/*");
+    private static final CharBuffer BUFFER_ASTERISK_FORWARD_SLASH = CharBuffer.wrap("*/");
 
     private static boolean trySkipSingleLineComment(CodePointIterator codePoints) {
         // SingleLineComment ::
