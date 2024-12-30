@@ -223,6 +223,40 @@ public class Json5ParserTests {
         );
     }
 
+    // === Member names ===
+
+    @Test
+    public void memberNameCanBeIdentifier() {
+        var result = Json5Parser.parseText("{foo: true}");
+
+        assertThat(result, isJson5Object(
+            isSequence(
+                isJson5Member(
+                    isJson5MemberName("foo", isJson5SourceRange(1, 4)),
+                    isJson5Boolean(true, isJson5SourceRange(6, 10)),
+                    isJson5SourceRange(1, 10)
+                )
+            ),
+            isJson5SourceRange(0, 11)
+        ));
+    }
+
+    @Test
+    public void memberNameCanBeReservedWord() {
+        var result = Json5Parser.parseText("{null: true}");
+
+        assertThat(result, isJson5Object(
+            isSequence(
+                isJson5Member(
+                    isJson5MemberName("null", isJson5SourceRange(1, 5)),
+                    isJson5Boolean(true, isJson5SourceRange(7, 11)),
+                    isJson5SourceRange(1, 11)
+                )
+            ),
+            isJson5SourceRange(0, 12)
+        ));
+    }
+
     // == Arrays ==
 
     @Test
