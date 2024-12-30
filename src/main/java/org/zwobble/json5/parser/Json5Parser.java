@@ -151,6 +151,10 @@ public class Json5Parser {
         // JSON5Object :
         //     `{` `}`
         //     `{` JSON5MemberList `,`? `}`
+        //
+        //  JSON5MemberList :
+        //      JSON5Member
+        //      JSON5MemberList `,` JSON5Member
 
         var startToken = tokens.peek();
         if (!startToken.is(Json5TokenType.PUNCTUATOR_BRACE_OPEN)) {
@@ -158,15 +162,73 @@ public class Json5Parser {
         }
         tokens.skip();
 
-        if (tokens.trySkip(Json5TokenType.PUNCTUATOR_BRACE_CLOSE)) {
-            var endToken = tokens.peek();
-            return Optional.of(new Json5Object(
-                new LinkedHashMap<>(),
-                sourceRange(startToken, endToken)
-            ));
+        var members = new LinkedHashMap<String, Json5Member>();
+        while (true) {
+            var member = tryParseMember(tokens);
+            if (member.isPresent()) {
+                // TODO: handle duplicates
+                members.put(member.get().name().value(), member.get());
+            } else if (tokens.trySkip(Json5TokenType.PUNCTUATOR_BRACE_CLOSE)) {
+                break;
+            } else {
+                throw unexpectedTokenError("JSON member or '}'", tokens);
+            }
+
+            if (tokens.trySkip(Json5TokenType.PUNCTUATOR_COMMA)) {
+                // Next member
+            } else if (tokens.trySkip(Json5TokenType.PUNCTUATOR_BRACE_CLOSE)) {
+                break;
+            } else {
+                throw unexpectedTokenError("',' or '}'", tokens);
+            }
         }
 
-        throw unexpectedTokenError("JSON value or '}'", tokens);
+        var endToken = tokens.peek();
+        return Optional.of(new Json5Object(
+            members,
+            sourceRange(startToken, endToken)
+        ));
+    }
+
+    private static Optional<Json5Member> tryParseMember(TokenIterator tokens) {
+        //  JSON5Member :
+        //      JSON5MemberName `:` JSON5Value
+
+        var memberName = tryParseMemberName(tokens);
+        if (memberName.isEmpty()) {
+            return Optional.empty();
+        }
+
+        var colonToken = tokens.peek();
+        if (!colonToken.is(Json5TokenType.PUNCTUATOR_COLON)) {
+            throw unexpectedTokenError("':'", tokens);
+        }
+        tokens.skip();
+
+        var value = parseValue(tokens);
+
+        var sourceRange = sourceRange(
+            memberName.get().sourceRange(),
+            value.sourceRange()
+        );
+
+        return Optional.of(new Json5Member(memberName.get(), value, sourceRange));
+    }
+
+    private static Optional<Json5MemberName> tryParseMemberName(TokenIterator tokens) {
+        //  JSON5MemberName :
+        //      JSON5Identifier
+        //      JSON5String
+
+        var token = tokens.peek();
+        if (token.tokenType() == Json5TokenType.IDENTIFIER) {
+            tokens.skip();
+            // TODO: decode Unicode escape sequence
+            var name = token.buffer().toString();
+            return Optional.of(new Json5MemberName(name, token.sourceRange()));
+        } else {
+            return Optional.empty();
+        }
     }
 
     private static Optional<Json5Value> tryParseArray(TokenIterator tokens) {
@@ -237,6 +299,9 @@ public class Json5Parser {
 
             case PUNCTUATOR_SQUARE_CLOSE ->
                 "']'";
+
+            case PUNCTUATOR_COLON ->
+                "':'";
 
             case PUNCTUATOR_COMMA ->
                 "','";

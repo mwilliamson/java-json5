@@ -70,6 +70,147 @@ public class Json5ParserTests {
     }
 
     @Test
+    public void canParseObjectWithOneMemberAndNoTrailingComma() {
+        var result = Json5Parser.parseText("{foo: true}");
+
+        assertThat(result, isJson5Object(
+            isSequence(
+                isJson5Member(
+                    isJson5MemberName("foo", isJson5SourceRange(1, 4)),
+                    isJson5Boolean(true, isJson5SourceRange(6, 10)),
+                    isJson5SourceRange(1, 10)
+                )
+            ),
+            isJson5SourceRange(0, 11)
+        ));
+    }
+
+    @Test
+    public void canParseObjectWithOneMemberAndTrailingComma() {
+        var result = Json5Parser.parseText("{foo: true,}");
+
+        assertThat(result, isJson5Object(
+            isSequence(
+                isJson5Member(
+                    isJson5MemberName("foo", isJson5SourceRange(1, 4)),
+                    isJson5Boolean(true, isJson5SourceRange(6, 10)),
+                    isJson5SourceRange(1, 10)
+                )
+            ),
+            isJson5SourceRange(0, 12)
+        ));
+    }
+
+    @Test
+    public void canParseObjectWithMultipleMembersAndNoTrailingComma() {
+        var result = Json5Parser.parseText("{foo:true,bar:false,baz:null}");
+
+        assertThat(result, isJson5Object(
+            isSequence(
+                isJson5Member(
+                    isJson5MemberName("foo", isJson5SourceRange(1, 4)),
+                    isJson5Boolean(true, isJson5SourceRange(5, 9)),
+                    isJson5SourceRange(1, 9)
+                ),
+                isJson5Member(
+                    isJson5MemberName("bar", isJson5SourceRange(10, 13)),
+                    isJson5Boolean(false, isJson5SourceRange(14, 19)),
+                    isJson5SourceRange(10, 19)
+                ),
+                isJson5Member(
+                    isJson5MemberName("baz", isJson5SourceRange(20, 23)),
+                    isJson5Null(isJson5SourceRange(24, 28)),
+                    isJson5SourceRange(20, 28)
+                )
+            ),
+            isJson5SourceRange(0, 29)
+        ));
+    }
+
+    @Test
+    public void canParseObjectWithMultipleMembersAndTrailingComma() {
+        var result = Json5Parser.parseText("{foo:true,bar:false,baz:null,}");
+
+
+        assertThat(result, isJson5Object(
+            isSequence(
+                isJson5Member(
+                    isJson5MemberName("foo", isJson5SourceRange(1, 4)),
+                    isJson5Boolean(true, isJson5SourceRange(5, 9)),
+                    isJson5SourceRange(1, 9)
+                ),
+                isJson5Member(
+                    isJson5MemberName("bar", isJson5SourceRange(10, 13)),
+                    isJson5Boolean(false, isJson5SourceRange(14, 19)),
+                    isJson5SourceRange(10, 19)
+                ),
+                isJson5Member(
+                    isJson5MemberName("baz", isJson5SourceRange(20, 23)),
+                    isJson5Null(isJson5SourceRange(24, 28)),
+                    isJson5SourceRange(20, 28)
+                )
+            ),
+            isJson5SourceRange(0, 30)
+        ));
+    }
+
+    @Test
+    public void whenObjectHasTokenThatIsNeitherMemberNameNorClosingBraceThenErrorIsThrown() {
+        var error = assertThrows(
+            Json5ParseError.class,
+            () -> Json5Parser.parseText("{]}")
+        );
+
+        assertThat(
+            error.getMessage(),
+            equalTo("Expected JSON member or '}', but was ']'")
+        );
+        assertThat(error.sourceRange(), isJson5SourceRange(1, 2));
+    }
+
+    @Test
+    public void whenObjectMemberIsMissingColonThenErrorIsThrown() {
+        var error = assertThrows(
+            Json5ParseError.class,
+            () -> Json5Parser.parseText("{foo,}")
+        );
+
+        assertThat(
+            error.getMessage(),
+            equalTo("Expected ':', but was ','")
+        );
+        assertThat(error.sourceRange(), isJson5SourceRange(4, 5));
+    }
+
+    @Test
+    public void whenObjectHasMemberValueThatIsNeitherValueNorClosingBraceThenErrorIsThrown() {
+        var error = assertThrows(
+            Json5ParseError.class,
+            () -> Json5Parser.parseText("{foo:]}")
+        );
+
+        assertThat(
+            error.getMessage(),
+            equalTo("Expected JSON value, but was ']'")
+        );
+        assertThat(error.sourceRange(), isJson5SourceRange(5, 6));
+    }
+
+    @Test
+    public void whenObjectHasPostMemberTokenThatIsNeitherCommaNorClosingBraceThenErrorIsThrown() {
+        var error = assertThrows(
+            Json5ParseError.class,
+            () -> Json5Parser.parseText("{foo:null]}")
+        );
+
+        assertThat(
+            error.getMessage(),
+            equalTo("Expected ',' or '}', but was ']'")
+        );
+        assertThat(error.sourceRange(), isJson5SourceRange(9, 10));
+    }
+
+    @Test
     public void whenObjectIsMissingClosingBraceThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,
@@ -78,7 +219,7 @@ public class Json5ParserTests {
 
         assertThat(
             error.getMessage(),
-            equalTo("Expected JSON value or '}', but was end of document")
+            equalTo("Expected JSON member or '}', but was end of document")
         );
     }
 

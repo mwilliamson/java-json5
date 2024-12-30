@@ -60,6 +60,28 @@ public class Json5ValueMatchers {
         );
     }
 
+    public static Matcher<Json5Member> isJson5Member(
+        Matcher<Json5MemberName> name,
+        Matcher<Json5Value> value,
+        Matcher<Json5SourceRange> sourceRange
+    ) {
+        return allOf(
+            has("name", x -> x.name(), name),
+            has("value", x -> x.value(), value),
+            has("sourceRange", x -> x.sourceRange(), sourceRange)
+        );
+    }
+
+    public static Matcher<Json5MemberName> isJson5MemberName(
+        String value,
+        Matcher<Json5SourceRange> sourceRange
+    ) {
+        return allOf(
+            has("value", x -> x.value(), equalTo(value)),
+            has("sourceRange", x -> x.sourceRange(), sourceRange)
+        );
+    }
+
     public static Matcher<Json5Value> isJson5Array(
         Matcher<Iterable<? extends Json5Value>> elements,
         Matcher<Json5SourceRange> sourceRange
