@@ -241,8 +241,20 @@ class Json5Tokenizer {
         //     UnicodeConnectorPunctuation
         //     <ZWNJ>
         //     <ZWJ>
+        //
+        // UnicodeCombiningMark ::
+        //     any character in the Unicode categories “Non-spacing mark (Mn)”
+        //     or “Combining spacing mark (Mc)”
 
         if (trySkipIdentifierStart(codePoints)) {
+            return true;
+        }
+
+        var codePoint = codePoints.peek();
+        var mask = (1 << Character.NON_SPACING_MARK) |
+            (1 << Character.COMBINING_SPACING_MARK);
+        if (((mask >> Character.getType(codePoint)) & 1) != 0) {
+            codePoints.skip();
             return true;
         } else {
             return false;
