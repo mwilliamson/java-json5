@@ -128,6 +128,19 @@ public class Json5TokenTests {
     }
 
     @Test
+    public void numberHexTokenIsDescribedLiterally() {
+        var token = new Json5Token(
+            Json5TokenType.NUMBER_HEX,
+            CharBuffer.wrap("0x42"),
+            new Json5SourceRange(0, 0)
+        );
+
+        var result = token.describe();
+
+        assertThat(result, equalTo("number '0x42'"));
+    }
+
+    @Test
     public void endTokenIsDescribedAsEndOfDocument() {
         var token = new Json5Token(
             Json5TokenType.END,
