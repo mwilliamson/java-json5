@@ -68,6 +68,20 @@ public class Json5ParserTests {
     }
 
     @Test
+    public void canParseDoubleQuotedStringContainingSingleQuote() {
+        var result = Json5Parser.parseText("\"'\"");
+
+        assertThat(result, isJson5String("'", isJson5SourceRange(0, 3)));
+    }
+
+    @Test
+    public void canParseSingleQuotedStringContainingDoubleQuote() {
+        var result = Json5Parser.parseText("'\"'");
+
+        assertThat(result, isJson5String("\"", isJson5SourceRange(0, 3)));
+    }
+
+    @Test
     public void canParseDoubleQuotedStringContainingLineSeparator() {
         var result = Json5Parser.parseText("\"\u2028\"");
 

@@ -372,14 +372,22 @@ class Json5Tokenizer {
     }
 
     private static boolean trySkipJson5DoubleStringCharacter(CodePointIterator codePoints) {
-        return trySkipJson5StringCharacter(codePoints);
+        return trySkipJson5StringCharacter(codePoints, StringType.DOUBLE_STRING);
     }
 
     private static boolean trySkipJson5SingleStringCharacter(CodePointIterator codePoints) {
-        return trySkipJson5StringCharacter(codePoints);
+        return trySkipJson5StringCharacter(codePoints, StringType.SINGLE_STRING);
     }
 
-    private static boolean trySkipJson5StringCharacter(CodePointIterator codePoints) {
+    private enum StringType {
+        DOUBLE_STRING,
+        SINGLE_STRING,
+    }
+
+    private static boolean trySkipJson5StringCharacter(
+        CodePointIterator codePoints,
+        StringType stringType
+    ) {
         // JSON5DoubleStringCharacter ::
         //     SourceCharacter but not one of `"` or `\` or LineTerminator
         //     `\` EscapeSequence
@@ -403,16 +411,25 @@ class Json5Tokenizer {
         var codePoint = codePoints.peek();
         switch (codePoint) {
             case '"':
+                if (stringType == StringType.DOUBLE_STRING) {
+                    return false;
+                }
+                break;
+
             case '\'':
+                if (stringType == StringType.SINGLE_STRING) {
+                    return false;
+                }
+                break;
+
             case '\\':
             case '\n':
             case '\r':
                 return false;
-
-            default:
-                codePoints.skip();
-                return true;
         }
+
+        codePoints.skip();
+        return true;
     }
 
     private static void skipUnicodeEscapeSequence(CodePointIterator codePoints) {
