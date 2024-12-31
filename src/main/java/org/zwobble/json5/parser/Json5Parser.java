@@ -142,17 +142,7 @@ public class Json5Parser {
             while (index < stringCharacters.remaining()) {
                 var character = stringCharacters.charAt(index);
                 if (character == '\\') {
-                    if (stringCharacters.charAt(index + 1) == '0') {
-                        stringValue.append('\0');
-                        index += 2;
-                    } else if (
-                        stringCharacters.charAt(index + 1) == '\r' &&
-                            stringCharacters.charAt(index + 2) == '\n'
-                    ) {
-                        index += 3;
-                    } else {
-                        index += 2;
-                    }
+                    index = parseEscapeSequenceOrLineContinuation(stringCharacters, index, stringValue);
                 } else {
                     stringValue.append(character);
                     index += 1;
@@ -163,6 +153,44 @@ public class Json5Parser {
         } else {
             return Optional.empty();
         }
+    }
+
+    private static int parseEscapeSequenceOrLineContinuation(
+        CharBuffer stringCharacters,
+        int index,
+        StringBuilder stringValue
+    ) {
+        // EscapeSequence ::
+        //     CharacterEscapeSequence
+        //     `0` [lookahead ∉ DecimalDigit]
+        //     HexEscapeSequence
+        //     UnicodeEscapeSequence
+        //
+        // HexEscapeSequence ::
+        //     `x` HexDigit HexDigit
+        //
+        // UnicodeEscapeSequence ::
+        //     `u` HexDigit HexDigit HexDigit HexDigit
+        //
+        // LineTerminatorSequence ::
+        //     <LF>
+        //     <CR> [lookahead ∉ <LF> ]
+        //     <LS>
+        //     <PS>
+        //     <CR> <LF>
+
+        if (stringCharacters.charAt(index + 1) == '0') {
+            stringValue.append('\0');
+            index += 2;
+        } else if (
+            stringCharacters.charAt(index + 1) == '\r' &&
+                stringCharacters.charAt(index + 2) == '\n'
+        ) {
+            index += 3;
+        } else {
+            index += 2;
+        }
+        return index;
     }
 
     private static Optional<Json5Value> tryParseNumber(TokenIterator tokens) {
