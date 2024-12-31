@@ -67,6 +67,34 @@ public class Json5ParserTests {
         assertThat(result, isJson5String("abc123", isJson5SourceRange(0, 8)));
     }
 
+    @Test
+    public void canParseDoubleQuotedStringContainingLineSeparator() {
+        var result = Json5Parser.parseText("\"\u2028\"");
+
+        assertThat(result, isJson5String("\u2028", isJson5SourceRange(0, 3)));
+    }
+
+    @Test
+    public void canParseSingleQuotedStringContainingLineSeparator() {
+        var result = Json5Parser.parseText("'\u2028'");
+
+        assertThat(result, isJson5String("\u2028", isJson5SourceRange(0, 3)));
+    }
+
+    @Test
+    public void canParseDoubleQuotedStringContainingParagraphSeparator() {
+        var result = Json5Parser.parseText("\"\u2029\"");
+
+        assertThat(result, isJson5String("\u2029", isJson5SourceRange(0, 3)));
+    }
+
+    @Test
+    public void canParseSingleQuotedStringContainingParagraphSeparator() {
+        var result = Json5Parser.parseText("'\u2029'");
+
+        assertThat(result, isJson5String("\u2029", isJson5SourceRange(0, 3)));
+    }
+
     // == Numbers ==
 
     @Test
