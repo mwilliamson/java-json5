@@ -497,7 +497,6 @@ class Json5Tokenizer {
     private static void skipUnicodeEscapeSequence(CodePointIterator codePoints) {
         // UnicodeEscapeSequence ::
         //     `u` HexDigit HexDigit HexDigit HexDigit
-        //
 
         codePoints.skip('u');
         skipHexDigit(codePoints);
