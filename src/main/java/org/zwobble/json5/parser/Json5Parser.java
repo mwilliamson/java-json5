@@ -133,7 +133,8 @@ public class Json5Parser {
         var token = tokens.peek();
         if (token.is(Json5TokenType.STRING)) {
             tokens.skip();
-            return Optional.of(new Json5String("", token.sourceRange()));
+            var stringValue = token.buffer().subSequence(1, token.buffer().length() - 1).toString();
+            return Optional.of(new Json5String(stringValue, token.sourceRange()));
         } else {
             return Optional.empty();
         }

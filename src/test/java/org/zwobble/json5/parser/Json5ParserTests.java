@@ -53,6 +53,20 @@ public class Json5ParserTests {
         assertThat(result, isJson5String("", isJson5SourceRange(0, 2)));
     }
 
+    @Test
+    public void canParseDoubleQuotedStringContainingAsciiCharacters() {
+        var result = Json5Parser.parseText("\"abc123\"");
+
+        assertThat(result, isJson5String("abc123", isJson5SourceRange(0, 8)));
+    }
+
+    @Test
+    public void canParseSingleQuotedStringContainingAsciiCharacters() {
+        var result = Json5Parser.parseText("'abc123'");
+
+        assertThat(result, isJson5String("abc123", isJson5SourceRange(0, 8)));
+    }
+
     // == Numbers ==
 
     @Test

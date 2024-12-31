@@ -341,22 +341,68 @@ class Json5Tokenizer {
         // JSON5String ::
         //     `"` JSON5DoubleStringCharacters? `"`
         //     `'` JSON5SingleStringCharacters? `'`
+        //
+        // JSON5DoubleStringCharacters ::
+        //     JSON5DoubleStringCharacter JSON5DoubleStringCharacters?
+        //
+        // JSON5SingleStringCharacters ::
+        //     JSON5SingleStringCharacter JSON5SingleStringCharacters?
 
         if (codePoints.trySkip('"')) {
+            while (trySkipJson5DoubleStringCharacter(codePoints)) {
+            }
             if (codePoints.trySkip('"')) {
                 return Optional.of(createToken(codePoints, Json5TokenType.STRING));
             } else {
+                // TODO: handle unclosed string
                 throw new UnsupportedOperationException("TODO");
             }
         } else if (codePoints.trySkip('\'')) {
+            while (trySkipJson5SingleStringCharacter(codePoints)) {
+            }
             if (codePoints.trySkip('\'')) {
                 return Optional.of(createToken(codePoints, Json5TokenType.STRING));
             } else {
+                // TODO: handle unclosed string
                 throw new UnsupportedOperationException("TODO");
             }
         } else {
             return Optional.empty();
         }
+    }
+
+    private static boolean trySkipJson5DoubleStringCharacter(CodePointIterator codePoints) {
+        // JSON5DoubleStringCharacter ::
+        //     SourceCharacter but not one of `"` or `\` or LineTerminator
+        //     `\` EscapeSequence
+        //     LineContinuation
+        //     U+2028
+        //     U+2029
+
+        var codePoint = codePoints.peek();
+        if (!(codePoint == '"' || codePoint == '\\' || isLineTerminator(codePoint))) {
+            codePoints.skip();
+            return true;
+        }
+
+        return false;
+    }
+
+    private static boolean trySkipJson5SingleStringCharacter(CodePointIterator codePoints) {
+        // JSON5SingleStringCharacter ::
+        //     SourceCharacter but not one of `'` or `\` or LineTerminator
+        //     `\` EscapeSequence
+        //     LineContinuation
+        //     U+2028
+        //     U+2029
+
+        var codePoint = codePoints.peek();
+        if (!(codePoint == '\'' || codePoint == '\\' || isLineTerminator(codePoint))) {
+            codePoints.skip();
+            return true;
+        }
+
+        return false;
     }
 
     private static void skipUnicodeEscapeSequence(CodePointIterator codePoints) {
