@@ -456,6 +456,12 @@ class Json5Tokenizer {
         //     HexEscapeSequence
         //     UnicodeEscapeSequence
         //
+        // HexEscapeSequence ::
+        //     `x` HexDigit HexDigit
+        //
+        // UnicodeEscapeSequence ::
+        //     `u` HexDigit HexDigit HexDigit HexDigit
+        //
         // LineTerminatorSequence ::
         //     <LF>
         //     <CR> [lookahead ∉ <LF> ]
@@ -474,6 +480,12 @@ class Json5Tokenizer {
                         codePoints.codePointSourceRange()
                     );
                 }
+                return true;
+
+            case 'x':
+                codePoints.skip();
+                skipHexDigit(codePoints);
+                skipHexDigit(codePoints);
                 return true;
 
             // LineTerminatorSequence

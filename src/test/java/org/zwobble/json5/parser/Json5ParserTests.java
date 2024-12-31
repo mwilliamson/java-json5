@@ -131,6 +131,13 @@ public class Json5ParserTests {
     }
 
     @Test
+    public void canParseStringContainingHexEscapeSequence() {
+        var result = Json5Parser.parseText("\"\\x5b\"");
+
+        assertThat(result, isJson5String("[", isJson5SourceRange(0, 6)));
+    }
+
+    @Test
     public void canParseStringContainingLineContinuationWithLineFeed() {
         var result = Json5Parser.parseText("\"abc\\\ndef\"");
 

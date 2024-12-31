@@ -179,11 +179,18 @@ public class Json5Parser {
         //     <PS>
         //     <CR> <LF>
 
-        if (stringCharacters.charAt(index + 1) == '0') {
+        var character1 = stringCharacters.charAt(index + 1);
+        if (character1 == '0') {
             stringValue.append('\0');
             return index + 2;
+        } else if (character1 == 'x') {
+            stringValue.appendCodePoint(
+                (parseHexDigit(stringCharacters.charAt(index + 2)) << 4) +
+                    parseHexDigit(stringCharacters.charAt(index + 3))
+            );
+            return index + 4;
         } else if (
-            stringCharacters.charAt(index + 1) == '\r' &&
+            character1 == '\r' &&
                 stringCharacters.charAt(index + 2) == '\n'
         ) {
             return index + 3;
