@@ -102,6 +102,19 @@ public class Json5TokenTests {
     }
 
     @Test
+    public void stringTokenIsDescribedLiterally() {
+        var token = new Json5Token(
+            Json5TokenType.STRING,
+            CharBuffer.wrap("\"foo\""),
+            new Json5SourceRange(0, 0)
+        );
+
+        var result = token.describe();
+
+        assertThat(result, equalTo("string \"foo\""));
+    }
+
+    @Test
     public void endTokenIsDescribedAsEndOfDocument() {
         var token = new Json5Token(
             Json5TokenType.END,

@@ -20,7 +20,7 @@ record Json5Token(
     String describe() {
         return switch (this.tokenType()) {
             case IDENTIFIER ->
-                String.format("identifier '%s'", this.buffer());
+                String.format("identifier '%s'", this.buffer);
 
             case PUNCTUATOR_BRACE_OPEN ->
                 "'{'";
@@ -41,7 +41,7 @@ record Json5Token(
                 "','";
 
             case STRING ->
-                throw new UnsupportedOperationException("TODO");
+                String.format("string %s", this.buffer);
 
             case NUMBER_DECIMAL ->
                 throw new UnsupportedOperationException("TODO");
