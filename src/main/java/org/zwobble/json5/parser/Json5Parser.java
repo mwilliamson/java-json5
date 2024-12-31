@@ -134,25 +134,31 @@ public class Json5Parser {
         if (token.is(Json5TokenType.STRING)) {
             tokens.skip();
 
-            var stringCharacters = token.buffer()
-                .subSequence(1, token.buffer().length() - 1);
+            var stringValue = parseStringValue(token);
 
-            var stringValue = new StringBuilder();
-            var index = 0;
-            while (index < stringCharacters.remaining()) {
-                var character = stringCharacters.charAt(index);
-                if (character == '\\') {
-                    index = parseEscapeSequenceOrLineContinuation(stringCharacters, index, stringValue);
-                } else {
-                    stringValue.append(character);
-                    index += 1;
-                }
-            }
-
-            return Optional.of(new Json5String(stringValue.toString(), token.sourceRange()));
+            return Optional.of(new Json5String(stringValue, token.sourceRange()));
         } else {
             return Optional.empty();
         }
+    }
+
+    private static String parseStringValue(Json5Token token) {
+        var stringCharacters = token.buffer()
+            .subSequence(1, token.buffer().length() - 1);
+
+        var stringValue = new StringBuilder();
+        var index = 0;
+        while (index < stringCharacters.remaining()) {
+            var character = stringCharacters.charAt(index);
+            if (character == '\\') {
+                index = parseEscapeSequenceOrLineContinuation(stringCharacters, index, stringValue);
+            } else {
+                stringValue.append(character);
+                index += 1;
+            }
+        }
+
+        return stringValue.toString();
     }
 
     private static int parseEscapeSequenceOrLineContinuation(
@@ -399,12 +405,22 @@ public class Json5Parser {
         //      JSON5String
 
         var token = tokens.peek();
-        if (token.tokenType() == Json5TokenType.IDENTIFIER) {
-            tokens.skip();
-            var name = parseIdentifier(token.buffer());
-            return Optional.of(new Json5MemberName(name, token.sourceRange()));
-        } else {
-            return Optional.empty();
+        switch (token.tokenType()) {
+            case IDENTIFIER -> {
+                tokens.skip();
+                var name = parseIdentifier(token.buffer());
+                return Optional.of(new Json5MemberName(name, token.sourceRange()));
+            }
+
+            case STRING -> {
+                tokens.skip();
+                var name = parseStringValue(token);
+                return Optional.of(new Json5MemberName(name, token.sourceRange()));
+            }
+
+            default -> {
+                return Optional.empty();
+            }
         }
     }
 

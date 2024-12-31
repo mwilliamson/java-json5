@@ -1084,6 +1084,38 @@ public class Json5ParserTests {
         ));
     }
 
+    @Test
+    public void memberNameCanBeDoubleQuotedString() {
+        var result = Json5Parser.parseText("{\"foo\": true}");
+
+        assertThat(result, isJson5Object(
+            isSequence(
+                isJson5Member(
+                    isJson5MemberName("foo", isJson5SourceRange(1, 6)),
+                    isJson5Boolean(true, isJson5SourceRange(8, 12)),
+                    isJson5SourceRange(1, 12)
+                )
+            ),
+            isJson5SourceRange(0, 13)
+        ));
+    }
+
+    @Test
+    public void memberNameCanBeSingleQuotedString() {
+        var result = Json5Parser.parseText("{'foo': true}");
+
+        assertThat(result, isJson5Object(
+            isSequence(
+                isJson5Member(
+                    isJson5MemberName("foo", isJson5SourceRange(1, 6)),
+                    isJson5Boolean(true, isJson5SourceRange(8, 12)),
+                    isJson5SourceRange(1, 12)
+                )
+            ),
+            isJson5SourceRange(0, 13)
+        ));
+    }
+
     // == Arrays ==
 
     @Test
