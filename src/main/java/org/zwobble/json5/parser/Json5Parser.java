@@ -486,55 +486,9 @@ public class Json5Parser {
         var token = tokens.peek();
         return Json5ParseError.unexpectedTextError(
             expected,
-            describeToken(token),
+            token.describe(),
             token.sourceRange()
         );
-    }
-
-    static String describeToken(Json5Token tokens) {
-        return switch (tokens.tokenType()) {
-            case IDENTIFIER ->
-                String.format("identifier '%s'", tokens.buffer());
-
-            case PUNCTUATOR_BRACE_OPEN ->
-                "'{'";
-
-            case PUNCTUATOR_BRACE_CLOSE ->
-                "'}'";
-
-            case PUNCTUATOR_SQUARE_OPEN ->
-                "'['";
-
-            case PUNCTUATOR_SQUARE_CLOSE ->
-                "']'";
-
-            case PUNCTUATOR_COLON ->
-                "':'";
-
-            case PUNCTUATOR_COMMA ->
-                "','";
-
-            case STRING ->
-                throw new UnsupportedOperationException("TODO");
-
-            case NUMBER_DECIMAL ->
-                throw new UnsupportedOperationException("TODO");
-
-            case NUMBER_HEX ->
-                throw new UnsupportedOperationException("TODO");
-
-            case NUMBER_POSITIVE_INFINITY ->
-                throw new UnsupportedOperationException("TODO");
-
-            case NUMBER_NEGATIVE_INFINITY ->
-                throw new UnsupportedOperationException("TODO");
-
-            case NUMBER_NAN ->
-                throw new UnsupportedOperationException("TODO");
-
-            case END ->
-                "end of document";
-        };
     }
 
     private static Json5SourceRange sourceRange(

@@ -1,14 +1,12 @@
 package org.zwobble.json5.parser;
 
 import org.junit.jupiter.api.Test;
-import org.zwobble.json5.sources.Json5SourceRange;
 
 import java.math.BigDecimal;
-import java.nio.CharBuffer;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.zwobble.json5.sources.Json5SourceRangeMatchers.isJson5SourceRange;
 import static org.zwobble.json5.parser.values.Json5ValueMatchers.*;
+import static org.zwobble.json5.sources.Json5SourceRangeMatchers.isJson5SourceRange;
 import static org.zwobble.precisely.AssertThat.assertThat;
 import static org.zwobble.precisely.Matchers.equalTo;
 import static org.zwobble.precisely.Matchers.isSequence;
@@ -1335,21 +1333,5 @@ public class Json5ParserTests {
         var result = Json5Parser.parseText("[]//");
 
         assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(0, 2)));
-    }
-
-    // == Token descriptions ==
-
-    @Test
-    public void identifierTokenIsDescribedLiterally() {
-        var token = new Json5Token(
-            Json5TokenType.IDENTIFIER,
-            CharBuffer.wrap("foo"),
-            new Json5SourceRange(0, 0)
-        );
-
-        var result = Json5Parser.describeToken(token);
-
-        // TODO: handle identifiers that require escaping
-        assertThat(result, equalTo("identifier 'foo'"));
     }
 }
