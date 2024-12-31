@@ -354,8 +354,11 @@ class Json5Tokenizer {
             if (codePoints.trySkip('"')) {
                 return Optional.of(createToken(codePoints, Json5TokenType.STRING));
             } else {
-                // TODO: handle unclosed string
-                throw new UnsupportedOperationException("TODO");
+                throw Json5ParseError.unexpectedTextError(
+                    "string character or '\"'",
+                    describeCodePoint(codePoints.peek()),
+                    codePoints.codePointSourceRange()
+                );
             }
         } else if (codePoints.trySkip('\'')) {
             while (trySkipJson5SingleStringCharacter(codePoints)) {
@@ -363,8 +366,11 @@ class Json5Tokenizer {
             if (codePoints.trySkip('\'')) {
                 return Optional.of(createToken(codePoints, Json5TokenType.STRING));
             } else {
-                // TODO: handle unclosed string
-                throw new UnsupportedOperationException("TODO");
+                throw Json5ParseError.unexpectedTextError(
+                    "string character or '\\''",
+                    describeCodePoint(codePoints.peek()),
+                    codePoints.codePointSourceRange()
+                );
             }
         } else {
             return Optional.empty();
@@ -425,6 +431,7 @@ class Json5Tokenizer {
             case '\\':
             case '\n':
             case '\r':
+            case -1:
                 return false;
         }
 

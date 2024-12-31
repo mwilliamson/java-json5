@@ -109,6 +109,34 @@ public class Json5ParserTests {
         assertThat(result, isJson5String("\u2029", isJson5SourceRange(0, 3)));
     }
 
+    @Test
+    public void whenDoubleQuotedStringIsUnclosedThenErrorIsThrown() {
+        var error = assertThrows(
+            Json5ParseError.class,
+            () -> Json5Parser.parseText("\"")
+        );
+
+        assertThat(
+            error.getMessage(),
+            equalTo("Expected string character or '\"', but was end of document")
+        );
+        assertThat(error.sourceRange(), isJson5SourceRange(1, 1));
+    }
+
+    @Test
+    public void whenSingleQuotedStringIsUnclosedThenErrorIsThrown() {
+        var error = assertThrows(
+            Json5ParseError.class,
+            () -> Json5Parser.parseText("'")
+        );
+
+        assertThat(
+            error.getMessage(),
+            equalTo("Expected string character or '\\'', but was end of document")
+        );
+        assertThat(error.sourceRange(), isJson5SourceRange(1, 1));
+    }
+
     // == Numbers ==
 
     @Test
