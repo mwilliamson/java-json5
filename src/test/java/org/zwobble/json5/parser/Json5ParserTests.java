@@ -82,6 +82,76 @@ public class Json5ParserTests {
     }
 
     @Test
+    public void canParseStringContainingEscapedSingleQuote() {
+        var result = Json5Parser.parseText("\"\\'\"");
+
+        assertThat(result, isJson5String("'", isJson5SourceRange(0, 4)));
+    }
+
+    @Test
+    public void canParseStringContainingEscapedDoubleQuote() {
+        var result = Json5Parser.parseText("\"\\\"\"");
+
+        assertThat(result, isJson5String("\"", isJson5SourceRange(0, 4)));
+    }
+
+    @Test
+    public void canParseStringContainingEscapedBackslash() {
+        var result = Json5Parser.parseText("\"\\\\\"");
+
+        assertThat(result, isJson5String("\\", isJson5SourceRange(0, 4)));
+    }
+
+    @Test
+    public void canParseStringContainingEscapedBackspace() {
+        var result = Json5Parser.parseText("\"\\b\"");
+
+        assertThat(result, isJson5String("\b", isJson5SourceRange(0, 4)));
+    }
+
+    @Test
+    public void canParseStringContainingEscapedFormFeed() {
+        var result = Json5Parser.parseText("\"\\f\"");
+
+        assertThat(result, isJson5String("\f", isJson5SourceRange(0, 4)));
+    }
+
+    @Test
+    public void canParseStringContainingEscapedLineFeed() {
+        var result = Json5Parser.parseText("\"\\n\"");
+
+        assertThat(result, isJson5String("\n", isJson5SourceRange(0, 4)));
+    }
+
+    @Test
+    public void canParseStringContainingEscapedCarriageReturn() {
+        var result = Json5Parser.parseText("\"\\r\"");
+
+        assertThat(result, isJson5String("\r", isJson5SourceRange(0, 4)));
+    }
+
+    @Test
+    public void canParseStringContainingEscapedHorizontalTab() {
+        var result = Json5Parser.parseText("\"\\t\"");
+
+        assertThat(result, isJson5String("\t", isJson5SourceRange(0, 4)));
+    }
+
+    @Test
+    public void canParseStringContainingEscapedVerticalTab() {
+        var result = Json5Parser.parseText("\"\\v\"");
+
+        assertThat(result, isJson5String("\u000b", isJson5SourceRange(0, 4)));
+    }
+
+    @Test
+    public void canParseStringContainingEscapedNonEscapeCharacter() {
+        var result = Json5Parser.parseText("\"\\a\"");
+
+        assertThat(result, isJson5String("a", isJson5SourceRange(0, 4)));
+    }
+
+    @Test
     public void canParseDoubleQuotedStringContainingLineSeparator() {
         var result = Json5Parser.parseText("\"\u2028\"");
 

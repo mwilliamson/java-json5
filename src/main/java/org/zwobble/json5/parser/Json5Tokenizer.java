@@ -459,6 +459,12 @@ class Json5Tokenizer {
         //     HexEscapeSequence
         //     UnicodeEscapeSequence
         //
+        // SingleEscapeCharacter :: one of
+        //     `'` `"` `\` `b` `f` `n` `r` `t` `v`
+        //
+        // NonEscapeCharacter ::
+        //     SourceCharacter but not one of EscapeCharacter or LineTerminator
+        //
         // HexEscapeSequence ::
         //     `x` HexDigit HexDigit
         //
@@ -473,6 +479,19 @@ class Json5Tokenizer {
         //     <CR> <LF>
 
         switch (codePoints.peek()) {
+            // LineTerminatorSequence
+
+            case '\n':
+            case '\u2028':
+            case '\u2029':
+                codePoints.skip();
+                return true;
+
+            case '\r':
+                codePoints.skip();
+                codePoints.trySkip('\n');
+                return true;
+
             // EscapeSequence
 
             case '0':
@@ -499,21 +518,12 @@ class Json5Tokenizer {
                 skipHexDigit(codePoints);
                 return true;
 
-            // LineTerminatorSequence
-
-            case '\n':
-            case '\u2028':
-            case '\u2029':
-                codePoints.skip();
-                return true;
-
-            case '\r':
-                codePoints.skip();
-                codePoints.trySkip('\n');
-                return true;
+            case -1:
+                return false;
 
             default:
-                return false;
+                codePoints.skip();
+                return true;
         }
     }
 

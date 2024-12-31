@@ -180,30 +180,66 @@ public class Json5Parser {
         //     <CR> <LF>
 
         var character1 = stringCharacters.charAt(index + 1);
-        if (character1 == '0') {
-            stringValue.append('\0');
-            return index + 2;
-        } else if (character1 == 'x') {
-            stringValue.appendCodePoint(
-                (parseHexDigit(stringCharacters.charAt(index + 2)) << 4) +
-                    parseHexDigit(stringCharacters.charAt(index + 3))
-            );
-            return index + 4;
-        } else if (character1 == 'u') {
-            stringValue.appendCodePoint(
-                (parseHexDigit(stringCharacters.charAt(index + 2)) << 12) +
-                    (parseHexDigit(stringCharacters.charAt(index + 3)) << 8) +
-                    (parseHexDigit(stringCharacters.charAt(index + 4)) << 4) +
-                    parseHexDigit(stringCharacters.charAt(index + 5))
-            );
-            return index + 6;
-        } else if (
-            character1 == '\r' &&
-                stringCharacters.charAt(index + 2) == '\n'
-        ) {
-            return index + 3;
-        } else {
-            return index + 2;
+        switch (character1) {
+            case '\n':
+            case '\u2028':
+            case '\u2029':
+                return index + 2;
+
+            case '\r':
+                if (stringCharacters.charAt(index + 2) == '\n') {
+                    return index + 3;
+                } else {
+                    return index + 2;
+                }
+
+            case 'b':
+                stringValue.append('\b');
+                return index + 2;
+
+            case 'f':
+                stringValue.append('\f');
+                return index + 2;
+
+            case 'n':
+                stringValue.append('\n');
+                return index + 2;
+
+            case 'r':
+                stringValue.append('\r');
+                return index + 2;
+
+            case 't':
+                stringValue.append('\t');
+                return index + 2;
+
+            case 'v':
+                stringValue.append('\u000b');
+                return index + 2;
+
+            case '0':
+                stringValue.append('\0');
+                return index + 2;
+
+            case 'x':
+                stringValue.appendCodePoint(
+                    (parseHexDigit(stringCharacters.charAt(index + 2)) << 4) +
+                        parseHexDigit(stringCharacters.charAt(index + 3))
+                );
+                return index + 4;
+
+            case 'u':
+                stringValue.appendCodePoint(
+                    (parseHexDigit(stringCharacters.charAt(index + 2)) << 12) +
+                        (parseHexDigit(stringCharacters.charAt(index + 3)) << 8) +
+                        (parseHexDigit(stringCharacters.charAt(index + 4)) << 4) +
+                        parseHexDigit(stringCharacters.charAt(index + 5))
+                );
+                return index + 6;
+
+            default:
+                stringValue.append(stringCharacters.charAt(index + 1));
+                return index + 2;
         }
     }
 
