@@ -338,7 +338,7 @@ public class Json5ParserTests {
     }
 
     @Test
-    public void canParseIntegerWithoutSign() {
+    public void canParseDecimalIntegerWithoutSign() {
         var result = Json5Parser.parseText("123");
 
         assertThat(result, isJson5NumberFinite(
@@ -348,7 +348,7 @@ public class Json5ParserTests {
     }
 
     @Test
-    public void canParseIntegerWithPositiveSign() {
+    public void canParseDecimalIntegerWithPositiveSign() {
         var result = Json5Parser.parseText("+123");
 
         assertThat(result, isJson5NumberFinite(
@@ -358,7 +358,7 @@ public class Json5ParserTests {
     }
 
     @Test
-    public void canParseIntegerWithNegativeSign() {
+    public void canParseDecimalIntegerWithNegativeSign() {
         var result = Json5Parser.parseText("-123");
 
         assertThat(result, isJson5NumberFinite(
@@ -596,12 +596,32 @@ public class Json5ParserTests {
     }
 
     @Test
-    public void hexLiteral() {
+    public void canParseHexIntegerWithoutSign() {
         var result = Json5Parser.parseText("0x19afAFcD");
 
         assertThat(result, isJson5NumberFinite(
-            BigDecimal.valueOf(0x19afafcd),
+            BigDecimal.valueOf(0x19afAFcD),
             isJson5SourceRange(0, 10)
+        ));
+    }
+
+    @Test
+    public void canParseHexIntegerWithPositiveSign() {
+        var result = Json5Parser.parseText("+0x19afAFcD");
+
+        assertThat(result, isJson5NumberFinite(
+            BigDecimal.valueOf(0x19afAFcD),
+            isJson5SourceRange(0, 11)
+        ));
+    }
+
+    @Test
+    public void canParseHexIntegerWithNegativeSign() {
+        var result = Json5Parser.parseText("-0x19afAFcD");
+
+        assertThat(result, isJson5NumberFinite(
+            BigDecimal.valueOf(-0x19afAFcD),
+            isJson5SourceRange(0, 11)
         ));
     }
 

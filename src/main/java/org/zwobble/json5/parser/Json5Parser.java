@@ -277,10 +277,23 @@ public class Json5Parser {
             }
             case NUMBER_HEX -> {
                 tokens.skip();
-                var integer = new BigInteger(
-                    token.buffer().toString().substring(2),
+
+                var hasSign = false;
+                var isNegative = false;
+
+                var buffer = token.buffer();
+                if (buffer.charAt(0) == '+') {
+                    hasSign = true;
+                } else if (buffer.charAt(0) == '-') {
+                    hasSign = true;
+                    isNegative = true;
+                }
+
+                var unsignedInteger = new BigInteger(
+                    token.buffer().toString().substring(hasSign ? 3 : 2),
                     16
                 );
+                var integer = isNegative ? unsignedInteger.negate() : unsignedInteger;
                 return Optional.of(new Json5NumberFinite(
                     new BigDecimal(integer),
                     token.sourceRange()
