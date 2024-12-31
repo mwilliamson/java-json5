@@ -133,8 +133,22 @@ public class Json5Parser {
         var token = tokens.peek();
         if (token.is(Json5TokenType.STRING)) {
             tokens.skip();
-            var stringValue = token.buffer().subSequence(1, token.buffer().length() - 1).toString();
-            return Optional.of(new Json5String(stringValue, token.sourceRange()));
+
+            var stringCharacters = token.buffer()
+                .subSequence(1, token.buffer().length() - 1);
+
+            var stringValue = new StringBuilder();
+            while (stringCharacters.hasRemaining()) {
+                var character = stringCharacters.charAt(0);
+                if (character == '\\') {
+                    stringCharacters.position(stringCharacters.position() + 2);
+                } else {
+                    stringValue.append(character);
+                    stringCharacters.position(stringCharacters.position() + 1);
+                }
+            }
+
+            return Optional.of(new Json5String(stringValue.toString(), token.sourceRange()));
         } else {
             return Optional.empty();
         }

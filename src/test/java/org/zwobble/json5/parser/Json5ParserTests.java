@@ -110,6 +110,13 @@ public class Json5ParserTests {
     }
 
     @Test
+    public void canParseStringContainingLineContinuationWithLineFeed() {
+        var result = Json5Parser.parseText("\"abc\\\ndef\"");
+
+        assertThat(result, isJson5String("abcdef", isJson5SourceRange(0, 10)));
+    }
+
+    @Test
     public void whenDoubleQuotedStringIsUnclosedThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,

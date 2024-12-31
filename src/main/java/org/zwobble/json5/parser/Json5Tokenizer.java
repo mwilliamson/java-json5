@@ -408,6 +408,9 @@ class Json5Tokenizer {
         //     U+2028
         //     U+2029
         //
+        // LineContinuation ::
+        //     `\` LineTerminatorSequence
+        //
         // LineTerminator ::
         //     <LF>
         //     <CR>
@@ -429,6 +432,13 @@ class Json5Tokenizer {
                 break;
 
             case '\\':
+                codePoints.skip();
+                if (trySkipLineTerminatorSequence(codePoints)) {
+                    return true;
+                } else {
+                    throw new UnsupportedOperationException("TODO");
+                }
+
             case '\n':
             case '\r':
             case -1:
@@ -437,6 +447,22 @@ class Json5Tokenizer {
 
         codePoints.skip();
         return true;
+    }
+
+    private static boolean trySkipLineTerminatorSequence(CodePointIterator codePoints) {
+        // LineTerminatorSequence ::
+        //     <LF>
+        //     <CR> [lookahead ∉ <LF> ]
+        //     <LS>
+        //     <PS>
+        //     <CR> <LF>
+
+        if (codePoints.peek() == '\n') {
+            codePoints.skip();
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private static void skipUnicodeEscapeSequence(CodePointIterator codePoints) {
