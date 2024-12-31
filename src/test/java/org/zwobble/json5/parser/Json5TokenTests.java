@@ -115,6 +115,19 @@ public class Json5TokenTests {
     }
 
     @Test
+    public void numberDecimalTokenIsDescribedLiterally() {
+        var token = new Json5Token(
+            Json5TokenType.NUMBER_DECIMAL,
+            CharBuffer.wrap("42"),
+            new Json5SourceRange(0, 0)
+        );
+
+        var result = token.describe();
+
+        assertThat(result, equalTo("number '42'"));
+    }
+
+    @Test
     public void endTokenIsDescribedAsEndOfDocument() {
         var token = new Json5Token(
             Json5TokenType.END,

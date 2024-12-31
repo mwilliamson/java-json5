@@ -44,7 +44,7 @@ record Json5Token(
                 String.format("string %s", this.buffer);
 
             case NUMBER_DECIMAL ->
-                throw new UnsupportedOperationException("TODO");
+                String.format("number '%s'", this.buffer);
 
             case NUMBER_HEX ->
                 throw new UnsupportedOperationException("TODO");
