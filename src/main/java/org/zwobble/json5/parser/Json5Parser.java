@@ -491,10 +491,10 @@ public class Json5Parser {
         );
     }
 
-    private static String describeToken(Json5Token tokens) {
+    static String describeToken(Json5Token tokens) {
         return switch (tokens.tokenType()) {
             case IDENTIFIER ->
-                throw new UnsupportedOperationException("TODO");
+                String.format("identifier '%s'", tokens.buffer());
 
             case PUNCTUATOR_BRACE_OPEN ->
                 "'{'";
