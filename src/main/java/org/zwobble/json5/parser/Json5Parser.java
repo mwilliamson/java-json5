@@ -138,13 +138,21 @@ public class Json5Parser {
                 .subSequence(1, token.buffer().length() - 1);
 
             var stringValue = new StringBuilder();
-            while (stringCharacters.hasRemaining()) {
-                var character = stringCharacters.charAt(0);
+            var index = 0;
+            while (index < stringCharacters.remaining()) {
+                var character = stringCharacters.charAt(index);
                 if (character == '\\') {
-                    stringCharacters.position(stringCharacters.position() + 2);
+                    if (
+                        stringCharacters.charAt(index + 1) == '\r' &&
+                            stringCharacters.charAt(index + 2) == '\n'
+                    ) {
+                        index += 3;
+                    } else {
+                        index += 2;
+                    }
                 } else {
                     stringValue.append(character);
-                    stringCharacters.position(stringCharacters.position() + 1);
+                    index += 1;
                 }
             }
 

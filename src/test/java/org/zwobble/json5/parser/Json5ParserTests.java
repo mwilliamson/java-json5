@@ -117,6 +117,48 @@ public class Json5ParserTests {
     }
 
     @Test
+    public void canParseStringContainingLineContinuationWithCarriageReturnNoLineFeed() {
+        var result = Json5Parser.parseText("\"abc\\\rdef\"");
+
+        assertThat(result, isJson5String("abcdef", isJson5SourceRange(0, 10)));
+    }
+
+    @Test
+    public void canParseStringContainingLineContinuationWithCarriageReturnThenLineFeed() {
+        var result = Json5Parser.parseText("\"abc\\\r\ndef\"");
+
+        assertThat(result, isJson5String("abcdef", isJson5SourceRange(0, 11)));
+    }
+
+    @Test
+    public void canParseStringContainingLineContinuationWithLineSeparator() {
+        var result = Json5Parser.parseText("\"abc\\\u2028def\"");
+
+        assertThat(result, isJson5String("abcdef", isJson5SourceRange(0, 10)));
+    }
+
+    @Test
+    public void canParseStringContainingLineContinuationWithParagraphSeparator() {
+        var result = Json5Parser.parseText("\"abc\\\u2029def\"");
+
+        assertThat(result, isJson5String("abcdef", isJson5SourceRange(0, 10)));
+    }
+
+    @Test
+    public void whenStringContainsLineFeedAfterLineContinuationThenErrorIsThrown() {
+        var error = assertThrows(
+            Json5ParseError.class,
+            () -> Json5Parser.parseText("\"\\\n\n\"")
+        );
+
+        assertThat(
+            error.getMessage(),
+            equalTo("Expected string character or '\"', but was '\n'")
+        );
+        assertThat(error.sourceRange(), isJson5SourceRange(3, 4));
+    }
+
+    @Test
     public void whenDoubleQuotedStringIsUnclosedThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,

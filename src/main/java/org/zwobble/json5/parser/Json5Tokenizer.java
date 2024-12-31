@@ -457,11 +457,20 @@ class Json5Tokenizer {
         //     <PS>
         //     <CR> <LF>
 
-        if (codePoints.peek() == '\n') {
-            codePoints.skip();
-            return true;
-        } else {
-            return false;
+        switch (codePoints.peek()) {
+            case '\n':
+            case '\u2028':
+            case '\u2029':
+                codePoints.skip();
+                return true;
+
+            case '\r':
+                codePoints.skip();
+                codePoints.trySkip('\n');
+                return true;
+
+            default:
+                return false;
         }
     }
 
