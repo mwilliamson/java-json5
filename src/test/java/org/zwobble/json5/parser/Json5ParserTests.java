@@ -138,6 +138,13 @@ public class Json5ParserTests {
     }
 
     @Test
+    public void canParseStringContainingUnicodeEscapeSequence() {
+        var result = Json5Parser.parseText("\"\\u03c0\"");
+
+        assertThat(result, isJson5String("\u03c0", isJson5SourceRange(0, 8)));
+    }
+
+    @Test
     public void canParseStringContainingLineContinuationWithLineFeed() {
         var result = Json5Parser.parseText("\"abc\\\ndef\"");
 
@@ -836,12 +843,12 @@ public class Json5ParserTests {
 
     @Test
     public void memberNameCanStartWithUnicodeEscapeSequence() {
-        var result = Json5Parser.parseText("{\\u0020foo: true}");
+        var result = Json5Parser.parseText("{\\u03c0foo: true}");
 
         assertThat(result, isJson5Object(
             isSequence(
                 isJson5Member(
-                    isJson5MemberName(" foo", isJson5SourceRange(1, 10)),
+                    isJson5MemberName("\u03c0foo", isJson5SourceRange(1, 10)),
                     isJson5Boolean(true, isJson5SourceRange(12, 16)),
                     isJson5SourceRange(1, 16)
                 )
@@ -852,12 +859,12 @@ public class Json5ParserTests {
 
     @Test
     public void memberNameCanContainUnicodeEscapeSequence() {
-        var result = Json5Parser.parseText("{foo\\u0020: true}");
+        var result = Json5Parser.parseText("{foo\\u03c0: true}");
 
         assertThat(result, isJson5Object(
             isSequence(
                 isJson5Member(
-                    isJson5MemberName("foo ", isJson5SourceRange(1, 10)),
+                    isJson5MemberName("foo\u03c0", isJson5SourceRange(1, 10)),
                     isJson5Boolean(true, isJson5SourceRange(12, 16)),
                     isJson5SourceRange(1, 16)
                 )

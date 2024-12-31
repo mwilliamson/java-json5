@@ -189,6 +189,14 @@ public class Json5Parser {
                     parseHexDigit(stringCharacters.charAt(index + 3))
             );
             return index + 4;
+        } else if (character1 == 'u') {
+            stringValue.appendCodePoint(
+                (parseHexDigit(stringCharacters.charAt(index + 2)) << 12) +
+                    (parseHexDigit(stringCharacters.charAt(index + 3)) << 8) +
+                    (parseHexDigit(stringCharacters.charAt(index + 4)) << 4) +
+                    parseHexDigit(stringCharacters.charAt(index + 5))
+            );
+            return index + 6;
         } else if (
             character1 == '\r' &&
                 stringCharacters.charAt(index + 2) == '\n'

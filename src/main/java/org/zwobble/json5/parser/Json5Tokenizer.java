@@ -488,6 +488,14 @@ class Json5Tokenizer {
                 skipHexDigit(codePoints);
                 return true;
 
+            case 'u':
+                codePoints.skip();
+                skipHexDigit(codePoints);
+                skipHexDigit(codePoints);
+                skipHexDigit(codePoints);
+                skipHexDigit(codePoints);
+                return true;
+
             // LineTerminatorSequence
 
             case '\n':
