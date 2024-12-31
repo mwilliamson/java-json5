@@ -22,4 +22,95 @@ public class Json5TokenTests {
         // TODO: handle identifiers that require escaping
         assertThat(result, equalTo("identifier 'foo'"));
     }
+
+    @Test
+    public void braceOpenTokenIsDescribedLiterally() {
+        var token = new Json5Token(
+            Json5TokenType.PUNCTUATOR_BRACE_OPEN,
+            CharBuffer.wrap("{"),
+            new Json5SourceRange(0, 0)
+        );
+
+        var result = token.describe();
+
+        assertThat(result, equalTo("'{'"));
+    }
+
+    @Test
+    public void braceCloseTokenIsDescribedLiterally() {
+        var token = new Json5Token(
+            Json5TokenType.PUNCTUATOR_BRACE_CLOSE,
+            CharBuffer.wrap("}"),
+            new Json5SourceRange(0, 0)
+        );
+
+        var result = token.describe();
+
+        assertThat(result, equalTo("'}'"));
+    }
+
+    @Test
+    public void squareOpenTokenIsDescribedLiterally() {
+        var token = new Json5Token(
+            Json5TokenType.PUNCTUATOR_SQUARE_OPEN,
+            CharBuffer.wrap("["),
+            new Json5SourceRange(0, 0)
+        );
+
+        var result = token.describe();
+
+        assertThat(result, equalTo("'['"));
+    }
+
+    @Test
+    public void squareCloseTokenIsDescribedLiterally() {
+        var token = new Json5Token(
+            Json5TokenType.PUNCTUATOR_SQUARE_CLOSE,
+            CharBuffer.wrap("]"),
+            new Json5SourceRange(0, 0)
+        );
+
+        var result = token.describe();
+
+        assertThat(result, equalTo("']'"));
+    }
+
+    @Test
+    public void colonTokenIsDescribedLiterally() {
+        var token = new Json5Token(
+            Json5TokenType.PUNCTUATOR_COLON,
+            CharBuffer.wrap(":"),
+            new Json5SourceRange(0, 0)
+        );
+
+        var result = token.describe();
+
+        assertThat(result, equalTo("':'"));
+    }
+
+    @Test
+    public void commaTokenIsDescribedLiterally() {
+        var token = new Json5Token(
+            Json5TokenType.PUNCTUATOR_COMMA,
+            CharBuffer.wrap(","),
+            new Json5SourceRange(0, 0)
+        );
+
+        var result = token.describe();
+
+        assertThat(result, equalTo("','"));
+    }
+
+    @Test
+    public void endTokenIsDescribedAsEndOfDocument() {
+        var token = new Json5Token(
+            Json5TokenType.END,
+            CharBuffer.wrap(""),
+            new Json5SourceRange(0, 0)
+        );
+
+        var result = token.describe();
+
+        assertThat(result, equalTo("end of document"));
+    }
 }
