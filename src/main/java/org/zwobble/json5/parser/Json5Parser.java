@@ -181,16 +181,15 @@ public class Json5Parser {
 
         if (stringCharacters.charAt(index + 1) == '0') {
             stringValue.append('\0');
-            index += 2;
+            return index + 2;
         } else if (
             stringCharacters.charAt(index + 1) == '\r' &&
                 stringCharacters.charAt(index + 2) == '\n'
         ) {
-            index += 3;
+            return index + 3;
         } else {
-            index += 2;
+            return index + 2;
         }
-        return index;
     }
 
     private static Optional<Json5Value> tryParseNumber(TokenIterator tokens) {
