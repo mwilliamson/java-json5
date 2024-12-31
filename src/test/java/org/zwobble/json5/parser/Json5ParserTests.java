@@ -194,6 +194,20 @@ public class Json5ParserTests {
     }
 
     @Test
+    public void whenUnclosedStringEndsWithBackslashThenErrorIsThrown() {
+        var error = assertThrows(
+            Json5ParseError.class,
+            () -> Json5Parser.parseText("\"\\")
+        );
+
+        assertThat(
+            error.getMessage(),
+            equalTo("Expected escape sequence or line terminator, but was end of document")
+        );
+        assertThat(error.sourceRange(), isJson5SourceRange(2, 2));
+    }
+
+    @Test
     public void whenDoubleQuotedStringIsUnclosedThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,

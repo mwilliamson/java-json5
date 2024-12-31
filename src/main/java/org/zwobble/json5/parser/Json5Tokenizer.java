@@ -436,7 +436,10 @@ class Json5Tokenizer {
                 if (trySkipEscapeSequenceOrLineTerminatorSequence(codePoints)) {
                     return true;
                 } else {
-                    throw new UnsupportedOperationException("TODO");
+                    throw new Json5ParseError(
+                        "Expected escape sequence or line terminator, but was " + describeCodePoint(codePoints.peek()),
+                        codePoints.codePointSourceRange()
+                    );
                 }
 
             case '\n':
