@@ -142,7 +142,10 @@ public class Json5Parser {
             while (index < stringCharacters.remaining()) {
                 var character = stringCharacters.charAt(index);
                 if (character == '\\') {
-                    if (
+                    if (stringCharacters.charAt(index + 1) == '0') {
+                        stringValue.append('\0');
+                        index += 2;
+                    } else if (
                         stringCharacters.charAt(index + 1) == '\r' &&
                             stringCharacters.charAt(index + 2) == '\n'
                     ) {

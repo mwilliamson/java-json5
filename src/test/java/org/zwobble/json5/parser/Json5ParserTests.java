@@ -110,6 +110,27 @@ public class Json5ParserTests {
     }
 
     @Test
+    public void canParseStringContainingNullEscapeSequenceNotFollowedByDecimalDigit() {
+        var result = Json5Parser.parseText("\"\\0\"");
+
+        assertThat(result, isJson5String("\0", isJson5SourceRange(0, 4)));
+    }
+
+    @Test
+    public void whenStringContainsNullEscapeSequenceThenDecimalDigitThenErrorIsThrown() {
+        var error = assertThrows(
+            Json5ParseError.class,
+            () -> Json5Parser.parseText("\"\\01\"")
+        );
+
+        assertThat(
+            error.getMessage(),
+            equalTo("'\\0' cannot be followed by decimal digit")
+        );
+        assertThat(error.sourceRange(), isJson5SourceRange(3, 4));
+    }
+
+    @Test
     public void canParseStringContainingLineContinuationWithLineFeed() {
         var result = Json5Parser.parseText("\"abc\\\ndef\"");
 

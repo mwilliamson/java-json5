@@ -433,7 +433,7 @@ class Json5Tokenizer {
 
             case '\\':
                 codePoints.skip();
-                if (trySkipLineTerminatorSequence(codePoints)) {
+                if (trySkipEscapeSequenceOrLineTerminatorSequence(codePoints)) {
                     return true;
                 } else {
                     throw new UnsupportedOperationException("TODO");
@@ -449,7 +449,13 @@ class Json5Tokenizer {
         return true;
     }
 
-    private static boolean trySkipLineTerminatorSequence(CodePointIterator codePoints) {
+    private static boolean trySkipEscapeSequenceOrLineTerminatorSequence(CodePointIterator codePoints) {
+        // EscapeSequence ::
+        //     CharacterEscapeSequence
+        //     `0` [lookahead ∉ DecimalDigit]
+        //     HexEscapeSequence
+        //     UnicodeEscapeSequence
+        //
         // LineTerminatorSequence ::
         //     <LF>
         //     <CR> [lookahead ∉ <LF> ]
@@ -458,6 +464,20 @@ class Json5Tokenizer {
         //     <CR> <LF>
 
         switch (codePoints.peek()) {
+            // EscapeSequence
+
+            case '0':
+                codePoints.skip();
+                if (isDecimalDigit(codePoints.peek())) {
+                    throw new Json5ParseError(
+                        "'\\0' cannot be followed by decimal digit",
+                        codePoints.codePointSourceRange()
+                    );
+                }
+                return true;
+
+            // LineTerminatorSequence
+
             case '\n':
             case '\u2028':
             case '\u2029':
