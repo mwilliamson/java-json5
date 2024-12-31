@@ -43,17 +43,8 @@ record Json5Token(
             case STRING ->
                 String.format("string %s", this.buffer);
 
-            case NUMBER_DECIMAL, NUMBER_HEX ->
+            case NUMBER_DECIMAL, NUMBER_HEX, NUMBER_POSITIVE_INFINITY, NUMBER_NEGATIVE_INFINITY, NUMBER_NAN ->
                 String.format("number '%s'", this.buffer);
-
-            case NUMBER_POSITIVE_INFINITY ->
-                throw new UnsupportedOperationException("TODO");
-
-            case NUMBER_NEGATIVE_INFINITY ->
-                throw new UnsupportedOperationException("TODO");
-
-            case NUMBER_NAN ->
-                throw new UnsupportedOperationException("TODO");
 
             case END ->
                 "end of document";

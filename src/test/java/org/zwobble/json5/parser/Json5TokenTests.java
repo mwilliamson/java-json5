@@ -141,6 +141,45 @@ public class Json5TokenTests {
     }
 
     @Test
+    public void numberPositiveInfinityTokenIsDescribedLiterally() {
+        var token = new Json5Token(
+            Json5TokenType.NUMBER_POSITIVE_INFINITY,
+            CharBuffer.wrap("Infinity"),
+            new Json5SourceRange(0, 0)
+        );
+
+        var result = token.describe();
+
+        assertThat(result, equalTo("number 'Infinity'"));
+    }
+
+    @Test
+    public void numberNegativeInfinityTokenIsDescribedLiterally() {
+        var token = new Json5Token(
+            Json5TokenType.NUMBER_NEGATIVE_INFINITY,
+            CharBuffer.wrap("-Infinity"),
+            new Json5SourceRange(0, 0)
+        );
+
+        var result = token.describe();
+
+        assertThat(result, equalTo("number '-Infinity'"));
+    }
+
+    @Test
+    public void numberNaNTokenIsDescribedLiterally() {
+        var token = new Json5Token(
+            Json5TokenType.NUMBER_NAN,
+            CharBuffer.wrap("NaN"),
+            new Json5SourceRange(0, 0)
+        );
+
+        var result = token.describe();
+
+        assertThat(result, equalTo("number 'NaN'"));
+    }
+
+    @Test
     public void endTokenIsDescribedAsEndOfDocument() {
         var token = new Json5Token(
             Json5TokenType.END,
