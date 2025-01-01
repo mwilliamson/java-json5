@@ -9,8 +9,8 @@ public class Json5SourcePositionMatchers {
     }
 
     public static Matcher<Json5SourcePosition> isJson5SourcePosition(
-        int codePointIndex
+        int characterIndex
     ) {
-        return has("codePointIndex", x -> x.codePointIndex(), equalTo(codePointIndex));
+        return has("characterIndex", x -> x.characterIndex(), equalTo(characterIndex));
     }
 }

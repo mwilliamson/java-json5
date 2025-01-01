@@ -1,13 +1,13 @@
 package org.zwobble.json5.sources;
 
 public class Json5SourcePosition {
-    private final int codePointIndex;
+    private final int characterIndex;
 
-    public Json5SourcePosition(int codePointIndex) {
-        this.codePointIndex = codePointIndex;
+    public Json5SourcePosition(int characterIndex) {
+        this.characterIndex = characterIndex;
     }
 
-    public int codePointIndex() {
-        return codePointIndex;
+    public int characterIndex() {
+        return characterIndex;
     }
 }

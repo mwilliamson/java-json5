@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.zwobble.json5.values.Json5ValueMatchers.*;
 import static org.zwobble.json5.sources.Json5SourceRangeMatchers.isJson5SourceRange;
+import static org.zwobble.json5.values.Json5ValueMatchers.*;
 import static org.zwobble.precisely.AssertThat.assertThat;
 import static org.zwobble.precisely.Matchers.equalTo;
 import static org.zwobble.precisely.Matchers.isSequence;
@@ -1380,5 +1380,24 @@ public class Json5ParserTests {
             equalTo("Expected JSON5 token, but was '='")
         );
         assertThat(error.sourceRange(), isJson5SourceRange(0, 1));
+    }
+
+    @Test
+    public void whenSurrogatePairsAreUsedThenCharacterIndexCountsEachSurrogateAsOneCharacter() {
+        var result = Json5Parser.parseText("[\"\uD83E\uDD67\", true]");
+
+        assertThat(result, isJson5Array(
+            isSequence(
+                isJson5String(
+                    "\uD83E\uDD67",
+                    isJson5SourceRange(1, 5)
+                ),
+                isJson5Boolean(
+                    true,
+                    isJson5SourceRange(7, 11)
+                )
+            ),
+            isJson5SourceRange(0, 12)
+        ));
     }
 }

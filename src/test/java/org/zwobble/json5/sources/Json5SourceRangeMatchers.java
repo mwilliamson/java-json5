@@ -10,12 +10,12 @@ public class Json5SourceRangeMatchers {
     }
 
     public static Matcher<Json5SourceRange> isJson5SourceRange(
-        int startCodePointIndex,
-        int endCodePointIndex
+        int startCharacterIndex,
+        int endCharacterIndex
     ) {
         return allOf(
-            has("startCodePointIndex", x -> x.start(), isJson5SourcePosition(startCodePointIndex)),
-            has("endCodePointIndex", x -> x.end(), isJson5SourcePosition(endCodePointIndex))
+            has("start", x -> x.start(), isJson5SourcePosition(startCharacterIndex)),
+            has("end", x -> x.end(), isJson5SourcePosition(endCharacterIndex))
         );
     }
 }

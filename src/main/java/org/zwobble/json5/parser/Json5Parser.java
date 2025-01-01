@@ -227,19 +227,17 @@ public class Json5Parser {
                 return index + 2;
 
             case 'x':
-                stringValue.appendCodePoint(
-                    (parseHexDigit(stringCharacters.charAt(index + 2)) << 4) +
-                        parseHexDigit(stringCharacters.charAt(index + 3))
-                );
+                var hexCodeUnit = (parseHexDigit(stringCharacters.charAt(index + 2)) << 4) +
+                    parseHexDigit(stringCharacters.charAt(index + 3));
+                stringValue.append((char)hexCodeUnit);
                 return index + 4;
 
             case 'u':
-                stringValue.appendCodePoint(
-                    (parseHexDigit(stringCharacters.charAt(index + 2)) << 12) +
-                        (parseHexDigit(stringCharacters.charAt(index + 3)) << 8) +
-                        (parseHexDigit(stringCharacters.charAt(index + 4)) << 4) +
-                        parseHexDigit(stringCharacters.charAt(index + 5))
-                );
+                var unicodeCodeUnit = (parseHexDigit(stringCharacters.charAt(index + 2)) << 12) +
+                    (parseHexDigit(stringCharacters.charAt(index + 3)) << 8) +
+                    (parseHexDigit(stringCharacters.charAt(index + 4)) << 4) +
+                    parseHexDigit(stringCharacters.charAt(index + 5));
+                stringValue.append((char) unicodeCodeUnit);
                 return index + 6;
 
             default:

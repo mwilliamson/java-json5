@@ -13,7 +13,7 @@ class Json5Tokenizer {
     }
 
     static List<Json5Token> tokenize(String text) {
-        var iterator = new CodePointIterator(text);
+        var iterator = new CharacterIterator(text);
         var tokens = new ArrayList<Json5Token>();
 
         while (!iterator.isEnd()) {
@@ -36,8 +36,8 @@ class Json5Tokenizer {
                 } else {
                     throw Json5ParseError.unexpectedTextError(
                         "JSON5 token",
-                        describeCodePoint(iterator.peek()),
-                        iterator.codePointSourceRange()
+                        describeCharacter(iterator.peek()),
+                        iterator.characterSourceRange()
                     );
                 }
             }
@@ -46,18 +46,18 @@ class Json5Tokenizer {
         return tokens;
     }
 
-    private static boolean trySkipWhiteSpace(CodePointIterator codePoints) {
+    private static boolean trySkipWhiteSpace(CharacterIterator characters) {
         var whitespace = false;
 
-        while (isWhiteSpace(codePoints.peek())) {
-            codePoints.skip();
+        while (isWhiteSpace(characters.peek())) {
+            characters.skip();
             whitespace = true;
         }
 
         return whitespace;
     }
 
-    private static boolean isWhiteSpace(int codePoint) {
+    private static boolean isWhiteSpace(int character) {
         // WhiteSpace ::
         //     <TAB>
         //     <VT>
@@ -67,48 +67,48 @@ class Json5Tokenizer {
         //     <BOM>
         //     <USP>
 
-        return codePoint == '\t' ||
-            codePoint == 0xb ||
-            codePoint == '\f' ||
-            codePoint == ' ' ||
-            codePoint == 0xa0 ||
-            codePoint == 0xfeff ||
-            Character.getType(codePoint) == Character.SPACE_SEPARATOR;
+        return character == '\t' ||
+            character == 0xb ||
+            character == '\f' ||
+            character == ' ' ||
+            character == 0xa0 ||
+            character == 0xfeff ||
+            Character.getType(character) == Character.SPACE_SEPARATOR;
     }
 
-    private static boolean trySkipLineTerminators(CodePointIterator codePoints) {
+    private static boolean trySkipLineTerminators(CharacterIterator characters) {
         var skipped = false;
 
-        while (isLineTerminator(codePoints.peek())) {
-            codePoints.skip();
+        while (isLineTerminator(characters.peek())) {
+            characters.skip();
             skipped = true;
         }
 
         return skipped;
     }
 
-    private static boolean isLineTerminator(int codePoint) {
+    private static boolean isLineTerminator(int character) {
         // LineTerminator ::
         //     <LF>
         //     <CR>
         //     <LS>
         //     <PS>
 
-        return codePoint == '\n' ||
-            codePoint == '\r' ||
-            codePoint == '\u2028' ||
-            codePoint == '\u2029';
+        return character == '\n' ||
+            character == '\r' ||
+            character == '\u2028' ||
+            character == '\u2029';
     }
 
-    private static boolean trySkipComment(CodePointIterator codePoints) {
+    private static boolean trySkipComment(CharacterIterator characters) {
         // Comment ::
         //     MultiLineComment
         //     SingleLineComment
 
-        return trySkipMultiLineComment(codePoints) || trySkipSingleLineComment(codePoints);
+        return trySkipMultiLineComment(characters) || trySkipSingleLineComment(characters);
     }
 
-    private static boolean trySkipMultiLineComment(CodePointIterator codePoints) {
+    private static boolean trySkipMultiLineComment(CharacterIterator characters) {
         // MultiLineComment ::
         //     `/*` MultiLineCommentChars? `*/`
         //
@@ -130,19 +130,19 @@ class Json5Tokenizer {
         // then the entire comment is considered to be a LineTerminator for
         // purposes of parsing by the syntactic grammar.
 
-        if (!codePoints.trySkip(BUFFER_FORWARD_SLASH_ASTERISK)) {
+        if (!characters.trySkip(BUFFER_FORWARD_SLASH_ASTERISK)) {
             return false;
         }
 
-        while (!codePoints.trySkip(BUFFER_ASTERISK_FORWARD_SLASH)) {
-            if (codePoints.isEnd()) {
+        while (!characters.trySkip(BUFFER_ASTERISK_FORWARD_SLASH)) {
+            if (characters.isEnd()) {
                 var sourceRange = new Json5SourceRange(
-                    codePoints.position(),
-                    codePoints.position()
+                    characters.position(),
+                    characters.position()
                 );
                 throw Json5ParseError.unexpectedTextError("'*/'", "end of document", sourceRange);
             }
-            codePoints.skip();
+            characters.skip();
         }
 
         return true;
@@ -151,7 +151,7 @@ class Json5Tokenizer {
     private static final CharBuffer BUFFER_FORWARD_SLASH_ASTERISK = CharBuffer.wrap("/*");
     private static final CharBuffer BUFFER_ASTERISK_FORWARD_SLASH = CharBuffer.wrap("*/");
 
-    private static boolean trySkipSingleLineComment(CodePointIterator codePoints) {
+    private static boolean trySkipSingleLineComment(CharacterIterator characters) {
         // SingleLineComment ::
         //     `//` SingleLineCommentChars?
         //
@@ -161,12 +161,12 @@ class Json5Tokenizer {
         // SingleLineCommentChar ::
         //     SourceCharacter but not LineTerminator
 
-        if (!codePoints.trySkip(BUFFER_DOUBLE_FORWARD_SLASH)) {
+        if (!characters.trySkip(BUFFER_DOUBLE_FORWARD_SLASH)) {
             return false;
         }
 
-        while (!isLineTerminator(codePoints.peek()) && !codePoints.isEnd()) {
-            codePoints.skip();
+        while (!isLineTerminator(characters.peek()) && !characters.isEnd()) {
+            characters.skip();
         }
 
         return true;
@@ -174,29 +174,29 @@ class Json5Tokenizer {
 
     private static final CharBuffer BUFFER_DOUBLE_FORWARD_SLASH = CharBuffer.wrap("//");
 
-    private static Optional<Json5Token> tokenizeJson5Token(CodePointIterator codePoints) {
+    private static Optional<Json5Token> tokenizeJson5Token(CharacterIterator characters) {
         // JSON5Token ::
         //     JSON5Identifier
         //     JSON5Punctuator
         //     JSON5String
         //     JSON5Number
 
-        var json5Identifier = tokenizeJson5Identifier(codePoints);
+        var json5Identifier = tokenizeJson5Identifier(characters);
         if (json5Identifier.isPresent()) {
             return json5Identifier;
         }
 
-        var json5Punctuator = tokenizeJson5Punctuator(codePoints);
+        var json5Punctuator = tokenizeJson5Punctuator(characters);
         if (json5Punctuator.isPresent()) {
             return json5Punctuator;
         }
 
-        var json5String = tokenizeJson5String(codePoints);
+        var json5String = tokenizeJson5String(characters);
         if (json5String.isPresent()) {
             return json5String;
         }
 
-        var json5Number = tokenizeJson5Number(codePoints);
+        var json5Number = tokenizeJson5Number(characters);
         if (json5Number.isPresent()) {
             return json5Number;
         }
@@ -204,7 +204,7 @@ class Json5Tokenizer {
         return Optional.empty();
     }
 
-    private static Optional<Json5Token> tokenizeJson5Identifier(CodePointIterator codePoints) {
+    private static Optional<Json5Token> tokenizeJson5Identifier(CharacterIterator characters) {
         // JSON5Identifier ::
         //     IdentifierName
         //
@@ -212,49 +212,49 @@ class Json5Tokenizer {
         //     IdentifierStart
         //     IdentifierName IdentifierPart
 
-        if (!trySkipIdentifierStart(codePoints)) {
+        if (!trySkipIdentifierStart(characters)) {
             return Optional.empty();
         }
 
-        while (trySkipIdentifierPart(codePoints)) {
+        while (trySkipIdentifierPart(characters)) {
         }
 
-        var token = createToken(codePoints, Json5TokenType.IDENTIFIER);
+        var token = createToken(characters, Json5TokenType.IDENTIFIER);
 
         return Optional.of(token);
     }
 
-    private static boolean trySkipIdentifierStart(CodePointIterator codePoints) {
+    private static boolean trySkipIdentifierStart(CharacterIterator characters) {
         // IdentifierStart ::
         //     UnicodeLetter
         //     `$`
         //     `_`
         //     `\` UnicodeEscapeSequence
 
-        var first = codePoints.peek();
+        var first = characters.peek();
         if (isUnicodeLetter(first) || first == '$' || first == '_') {
-            codePoints.skip();
+            characters.skip();
             return true;
         } else if (first == '\\') {
-            codePoints.skip();
-            skipUnicodeEscapeSequence(codePoints);
+            characters.skip();
+            skipUnicodeEscapeSequence(characters);
             return true;
         } else {
             return false;
         }
     }
 
-    private static boolean isIdentifierStart(CodePointIterator codePoints) {
-        var index = codePoints.codePointIndex;
-        if (trySkipIdentifierStart(codePoints)) {
-            codePoints.codePointIndex = index;
+    private static boolean isIdentifierStart(CharacterIterator characters) {
+        var index = characters.characterIndex;
+        if (trySkipIdentifierStart(characters)) {
+            characters.characterIndex = index;
             return true;
         } else {
             return false;
         }
     }
 
-    private static boolean trySkipIdentifierPart(CodePointIterator codePoints) {
+    private static boolean trySkipIdentifierPart(CharacterIterator characters) {
         // IdentifierPart ::
         //     IdentifierStart
         //     UnicodeCombiningMark
@@ -273,27 +273,27 @@ class Json5Tokenizer {
         // UnicodeConnectorPunctuation ::
         //     any character in the Unicode category “Connector punctuation (Pc)”
 
-        if (trySkipIdentifierStart(codePoints)) {
+        if (trySkipIdentifierStart(characters)) {
             return true;
         }
 
-        var codePoint = codePoints.peek();
+        var character = characters.peek();
         var mask = (1 << Character.NON_SPACING_MARK) |
             (1 << Character.COMBINING_SPACING_MARK) |
             (1 << Character.DECIMAL_DIGIT_NUMBER) |
             (1 << Character.CONNECTOR_PUNCTUATION);
-        if (((mask >> Character.getType(codePoint)) & 1) != 0) {
-            codePoints.skip();
+        if (((mask >> Character.getType(character)) & 1) != 0) {
+            characters.skip();
             return true;
-        } else if (codePoint == 0x200c || codePoint == 0x200d) {
-            codePoints.skip();
+        } else if (character == 0x200c || character == 0x200d) {
+            characters.skip();
             return true;
         } else {
             return false;
         }
     }
 
-    private static boolean isUnicodeLetter(int codePoint) {
+    private static boolean isUnicodeLetter(int character) {
         // UnicodeLetter ::
         //     any character in the Unicode categories “Uppercase letter (Lu)”,
         //     “Lowercase letter (Ll)”, “Titlecase letter (Lt)”, “Modifier
@@ -305,15 +305,15 @@ class Json5Tokenizer {
             (1 << Character.MODIFIER_LETTER) |
             (1 << Character.OTHER_LETTER) |
             (1 << Character.LETTER_NUMBER);
-        return ((mask >> Character.getType(codePoint)) & 1) != 0;
+        return ((mask >> Character.getType(character)) & 1) != 0;
     }
 
-    private static Optional<Json5Token> tokenizeJson5Punctuator(CodePointIterator codePoints) {
+    private static Optional<Json5Token> tokenizeJson5Punctuator(CharacterIterator characters) {
         // JSON5Punctuator :: one of
         //     `{` `}` `[` `]` `:` `,`
 
         Json5TokenType tokenType;
-        switch (codePoints.peek()) {
+        switch (characters.peek()) {
             case '{':
                 tokenType = Json5TokenType.PUNCTUATOR_BRACE_OPEN;
                 break;
@@ -342,13 +342,13 @@ class Json5Tokenizer {
                 return Optional.empty();
         }
 
-        codePoints.skip();
+        characters.skip();
 
-        var token = createToken(codePoints, tokenType);
+        var token = createToken(characters, tokenType);
         return Optional.of(token);
     }
 
-    private static Optional<Json5Token> tokenizeJson5String(CodePointIterator codePoints) {
+    private static Optional<Json5Token> tokenizeJson5String(CharacterIterator characters) {
         // JSON5String ::
         //     `"` JSON5DoubleStringCharacters? `"`
         //     `'` JSON5SingleStringCharacters? `'`
@@ -359,28 +359,28 @@ class Json5Tokenizer {
         // JSON5SingleStringCharacters ::
         //     JSON5SingleStringCharacter JSON5SingleStringCharacters?
 
-        if (codePoints.trySkip('"')) {
-            while (trySkipJson5DoubleStringCharacter(codePoints)) {
+        if (characters.trySkip('"')) {
+            while (trySkipJson5DoubleStringCharacter(characters)) {
             }
-            if (codePoints.trySkip('"')) {
-                return Optional.of(createToken(codePoints, Json5TokenType.STRING));
+            if (characters.trySkip('"')) {
+                return Optional.of(createToken(characters, Json5TokenType.STRING));
             } else {
                 throw Json5ParseError.unexpectedTextError(
                     "string character or '\"'",
-                    describeCodePoint(codePoints.peek()),
-                    codePoints.codePointSourceRange()
+                    describeCharacter(characters.peek()),
+                    characters.characterSourceRange()
                 );
             }
-        } else if (codePoints.trySkip('\'')) {
-            while (trySkipJson5SingleStringCharacter(codePoints)) {
+        } else if (characters.trySkip('\'')) {
+            while (trySkipJson5SingleStringCharacter(characters)) {
             }
-            if (codePoints.trySkip('\'')) {
-                return Optional.of(createToken(codePoints, Json5TokenType.STRING));
+            if (characters.trySkip('\'')) {
+                return Optional.of(createToken(characters, Json5TokenType.STRING));
             } else {
                 throw Json5ParseError.unexpectedTextError(
                     "string character or '\\''",
-                    describeCodePoint(codePoints.peek()),
-                    codePoints.codePointSourceRange()
+                    describeCharacter(characters.peek()),
+                    characters.characterSourceRange()
                 );
             }
         } else {
@@ -388,12 +388,12 @@ class Json5Tokenizer {
         }
     }
 
-    private static boolean trySkipJson5DoubleStringCharacter(CodePointIterator codePoints) {
-        return trySkipJson5StringCharacter(codePoints, StringType.DOUBLE_STRING);
+    private static boolean trySkipJson5DoubleStringCharacter(CharacterIterator characters) {
+        return trySkipJson5StringCharacter(characters, StringType.DOUBLE_STRING);
     }
 
-    private static boolean trySkipJson5SingleStringCharacter(CodePointIterator codePoints) {
-        return trySkipJson5StringCharacter(codePoints, StringType.SINGLE_STRING);
+    private static boolean trySkipJson5SingleStringCharacter(CharacterIterator characters) {
+        return trySkipJson5StringCharacter(characters, StringType.SINGLE_STRING);
     }
 
     private enum StringType {
@@ -402,7 +402,7 @@ class Json5Tokenizer {
     }
 
     private static boolean trySkipJson5StringCharacter(
-        CodePointIterator codePoints,
+        CharacterIterator characters,
         StringType stringType
     ) {
         // JSON5DoubleStringCharacter ::
@@ -428,8 +428,8 @@ class Json5Tokenizer {
         //     <LS>
         //     <PS>
 
-        var codePoint = codePoints.peek();
-        switch (codePoint) {
+        var character = characters.peek();
+        switch (character) {
             case '"':
                 if (stringType == StringType.DOUBLE_STRING) {
                     return false;
@@ -443,13 +443,13 @@ class Json5Tokenizer {
                 break;
 
             case '\\':
-                codePoints.skip();
-                if (trySkipEscapeSequenceOrLineTerminatorSequence(codePoints)) {
+                characters.skip();
+                if (trySkipEscapeSequenceOrLineTerminatorSequence(characters)) {
                     return true;
                 } else {
                     throw new Json5ParseError(
-                        "Expected escape sequence or line terminator, but was " + describeCodePoint(codePoints.peek()),
-                        codePoints.codePointSourceRange()
+                        "Expected escape sequence or line terminator, but was " + describeCharacter(characters.peek()),
+                        characters.characterSourceRange()
                     );
                 }
 
@@ -459,11 +459,11 @@ class Json5Tokenizer {
                 return false;
         }
 
-        codePoints.skip();
+        characters.skip();
         return true;
     }
 
-    private static boolean trySkipEscapeSequenceOrLineTerminatorSequence(CodePointIterator codePoints) {
+    private static boolean trySkipEscapeSequenceOrLineTerminatorSequence(CharacterIterator characters) {
         // EscapeSequence ::
         //     CharacterEscapeSequence
         //     `0` [lookahead ∉ DecimalDigit]
@@ -489,67 +489,67 @@ class Json5Tokenizer {
         //     <PS>
         //     <CR> <LF>
 
-        switch (codePoints.peek()) {
+        switch (characters.peek()) {
             // LineTerminatorSequence
 
             case '\n':
             case '\u2028':
             case '\u2029':
-                codePoints.skip();
+                characters.skip();
                 return true;
 
             case '\r':
-                codePoints.skip();
-                codePoints.trySkip('\n');
+                characters.skip();
+                characters.trySkip('\n');
                 return true;
 
             // EscapeSequence
 
             case '0':
-                codePoints.skip();
-                if (isDecimalDigit(codePoints.peek())) {
+                characters.skip();
+                if (isDecimalDigit(characters.peek())) {
                     throw new Json5ParseError(
                         "'\\0' cannot be followed by decimal digit",
-                        codePoints.codePointSourceRange()
+                        characters.characterSourceRange()
                     );
                 }
                 return true;
 
             case 'x':
-                codePoints.skip();
-                skipHexDigit(codePoints);
-                skipHexDigit(codePoints);
+                characters.skip();
+                skipHexDigit(characters);
+                skipHexDigit(characters);
                 return true;
 
             case 'u':
-                codePoints.skip();
-                skipHexDigit(codePoints);
-                skipHexDigit(codePoints);
-                skipHexDigit(codePoints);
-                skipHexDigit(codePoints);
+                characters.skip();
+                skipHexDigit(characters);
+                skipHexDigit(characters);
+                skipHexDigit(characters);
+                skipHexDigit(characters);
                 return true;
 
             case -1:
                 return false;
 
             default:
-                codePoints.skip();
+                characters.skip();
                 return true;
         }
     }
 
-    private static void skipUnicodeEscapeSequence(CodePointIterator codePoints) {
+    private static void skipUnicodeEscapeSequence(CharacterIterator characters) {
         // UnicodeEscapeSequence ::
         //     `u` HexDigit HexDigit HexDigit HexDigit
 
-        codePoints.skip('u');
-        skipHexDigit(codePoints);
-        skipHexDigit(codePoints);
-        skipHexDigit(codePoints);
-        skipHexDigit(codePoints);
+        characters.skip('u');
+        skipHexDigit(characters);
+        skipHexDigit(characters);
+        skipHexDigit(characters);
+        skipHexDigit(characters);
     }
 
-    private static Optional<Json5Token> tokenizeJson5Number(CodePointIterator codePoints) {
+    private static Optional<Json5Token> tokenizeJson5Number(CharacterIterator characters) {
         // JSON5Number ::
         //     JSON5NumericLiteral
         //     `+` JSON5NumericLiteral
@@ -567,47 +567,47 @@ class Json5Tokenizer {
         // The source character immediately following a NumericLiteral
         // must not be an IdentifierStart or DecimalDigit.
 
-        var hasPlusSign = codePoints.trySkip('+');
+        var hasPlusSign = characters.trySkip('+');
         var isNegative = false;
 
         if (!hasPlusSign) {
-            isNegative = codePoints.trySkip('-');
+            isNegative = characters.trySkip('-');
         }
 
-        if (codePoints.trySkip(BUFFER_INFINITY)) {
+        if (characters.trySkip(BUFFER_INFINITY)) {
             var tokenType = isNegative
                 ? Json5TokenType.NUMBER_NEGATIVE_INFINITY
                 : Json5TokenType.NUMBER_POSITIVE_INFINITY;
 
-            var token = createToken(codePoints, tokenType);
+            var token = createToken(characters, tokenType);
             return Optional.of(token);
         }
 
-        if (codePoints.trySkip(BUFFER_NAN)) {
-            var token = createToken(codePoints, Json5TokenType.NUMBER_NAN);
+        if (characters.trySkip(BUFFER_NAN)) {
+            var token = createToken(characters, Json5TokenType.NUMBER_NAN);
             return Optional.of(token);
         }
 
         Json5Token token;
-        if (trySkipHexIntegerLiteral(codePoints)) {
-            token = createToken(codePoints, Json5TokenType.NUMBER_HEX);
-        } else if (trySkipDecimalLiteral(codePoints)) {
-            token = createToken(codePoints, Json5TokenType.NUMBER_DECIMAL);
+        if (trySkipHexIntegerLiteral(characters)) {
+            token = createToken(characters, Json5TokenType.NUMBER_HEX);
+        } else if (trySkipDecimalLiteral(characters)) {
+            token = createToken(characters, Json5TokenType.NUMBER_DECIMAL);
         } else if (hasPlusSign || isNegative) {
             throw Json5ParseError.unexpectedTextError(
                 "numeric literal",
-                describeCodePoint(codePoints.peek()),
-                codePoints.codePointSourceRange()
+                describeCharacter(characters.peek()),
+                characters.characterSourceRange()
             );
         } else {
             return Optional.empty();
         }
 
-        if (isIdentifierStart(codePoints)) {
+        if (isIdentifierStart(characters)) {
             throw new Json5ParseError(
                 "The source character immediately following a numeric " +
                     "literal must not be the start of an identifier",
-                codePoints.codePointSourceRange()
+                characters.characterSourceRange()
             );
         }
 
@@ -617,34 +617,34 @@ class Json5Tokenizer {
     private static final CharBuffer BUFFER_INFINITY = CharBuffer.wrap("Infinity");
     private static final CharBuffer BUFFER_NAN = CharBuffer.wrap("NaN");
 
-    private static boolean trySkipDecimalLiteral(CodePointIterator codePoints) {
+    private static boolean trySkipDecimalLiteral(CharacterIterator characters) {
         // DecimalLiteral ::
         //     DecimalIntegerLiteral `.` DecimalDigits? ExponentPart?
         //     `.` DecimalDigits ExponentPart?
         //     DecimalIntegerLiteral ExponentPart?
 
-        if (trySkipDecimalIntegerLiteral(codePoints)) {
-            if (codePoints.trySkip('.')) {
-                trySkipDecimalDigits(codePoints);
+        if (trySkipDecimalIntegerLiteral(characters)) {
+            if (characters.trySkip('.')) {
+                trySkipDecimalDigits(characters);
             }
-        } else if (codePoints.trySkip('.')) {
-            if (!trySkipDecimalDigits(codePoints)) {
+        } else if (characters.trySkip('.')) {
+            if (!trySkipDecimalDigits(characters)) {
                 throw Json5ParseError.unexpectedTextError(
                     "decimal digit",
-                    describeCodePoint(codePoints.peek()),
-                    codePoints.codePointSourceRange()
+                    describeCharacter(characters.peek()),
+                    characters.characterSourceRange()
                 );
             }
         } else {
             return false;
         }
 
-        trySkipExponentPart(codePoints);
+        trySkipExponentPart(characters);
 
         return true;
     }
 
-    private static boolean trySkipDecimalIntegerLiteral(CodePointIterator codePoints) {
+    private static boolean trySkipDecimalIntegerLiteral(CharacterIterator characters) {
         // DecimalIntegerLiteral ::
         //     `0`
         //     NonZeroDigit DecimalDigits?
@@ -652,11 +652,11 @@ class Json5Tokenizer {
         // NonZeroDigit :: one of
         //     `1` `2` `3 `4` `5` `6` `7` `8` `9`
 
-        var firstCodePoint = codePoints.peek();
-        if (firstCodePoint == '0') {
-            codePoints.skip();
-            if (trySkipDecimalDigits(codePoints)) {
-                var sourceRange = codePoints.tokenSourceRange();
+        var firstCharacter = characters.peek();
+        if (firstCharacter == '0') {
+            characters.skip();
+            if (trySkipDecimalDigits(characters)) {
+                var sourceRange = characters.tokenSourceRange();
                 throw new Json5ParseError(
                     "Integer part of number cannot have leading zeroes",
                     sourceRange
@@ -664,50 +664,50 @@ class Json5Tokenizer {
             } else {
                 return true;
             }
-        } else if (firstCodePoint >= '1' && firstCodePoint <= '9') {
-            codePoints.skip();
-            trySkipDecimalDigits(codePoints);
+        } else if (firstCharacter >= '1' && firstCharacter <= '9') {
+            characters.skip();
+            trySkipDecimalDigits(characters);
             return true;
         } else {
             return false;
         }
     }
 
-    private static void skipDecimalDigits(CodePointIterator codePoints) {
-        if (!trySkipDecimalDigits(codePoints)) {
+    private static void skipDecimalDigits(CharacterIterator characters) {
+        if (!trySkipDecimalDigits(characters)) {
             throw Json5ParseError.unexpectedTextError(
                 "decimal digit",
-                describeCodePoint(codePoints.peek()),
-                codePoints.codePointSourceRange()
+                describeCharacter(characters.peek()),
+                characters.characterSourceRange()
             );
         }
     }
 
-    private static boolean trySkipDecimalDigits(CodePointIterator codePoints) {
+    private static boolean trySkipDecimalDigits(CharacterIterator characters) {
         // DecimalDigits ::
         //     DecimalDigit
         //     DecimalDigits DecimalDigit
 
-        var initialIndex = codePoints.codePointIndex;
+        var initialIndex = characters.characterIndex;
 
         while (true) {
-            var codePoint = codePoints.peek();
-            if (isDecimalDigit(codePoint)) {
-                codePoints.skip();
+            var character = characters.peek();
+            if (isDecimalDigit(character)) {
+                characters.skip();
             } else {
-                return initialIndex != codePoints.codePointIndex;
+                return initialIndex != characters.characterIndex;
             }
         }
     }
 
-    private static boolean isDecimalDigit(int codePoint) {
+    private static boolean isDecimalDigit(int character) {
         // DecimalDigit :: one of
         //     `0` `1` `2` `3 `4` `5` `6` `7` `8` `9`
 
-        return codePoint >= '0' && codePoint <= '9';
+        return character >= '0' && character <= '9';
     }
 
-    private static void trySkipExponentPart(CodePointIterator codePoints) {
+    private static void trySkipExponentPart(CharacterIterator characters) {
         // ExponentPart ::
         //     ExponentIndicator SignedInteger
         //
@@ -719,31 +719,31 @@ class Json5Tokenizer {
         //     `+` DecimalDigits
         //     `-` DecimalDigits
 
-        var codePoint = codePoints.peek();
-        if (!(codePoint == 'e' || codePoint == 'E')) {
+        var character = characters.peek();
+        if (!(character == 'e' || character == 'E')) {
             return;
         }
-        codePoints.skip();
+        characters.skip();
 
-        if (!codePoints.trySkip('+')) {
-            codePoints.trySkip('-');
+        if (!characters.trySkip('+')) {
+            characters.trySkip('-');
         }
 
-        skipDecimalDigits(codePoints);
+        skipDecimalDigits(characters);
     }
 
-    private static boolean trySkipHexIntegerLiteral(CodePointIterator codePoints) {
+    private static boolean trySkipHexIntegerLiteral(CharacterIterator characters) {
         // HexIntegerLiteral ::
         //     `0x` HexDigit
         //     `0X` HexDigit
         //     HexIntegerLiteral HexDigit
 
         if (
-            codePoints.trySkip(BUFFER_HEX_INTEGER_LITERAL_PREFIX_LOWERCASE) ||
-                codePoints.trySkip(BUFFER_HEX_INTEGER_LITERAL_PREFIX_UPPERCASE)
+            characters.trySkip(BUFFER_HEX_INTEGER_LITERAL_PREFIX_LOWERCASE) ||
+                characters.trySkip(BUFFER_HEX_INTEGER_LITERAL_PREFIX_UPPERCASE)
         ) {
-            skipHexDigit(codePoints);
-            while (trySkipHexDigit(codePoints)) {
+            skipHexDigit(characters);
+            while (trySkipHexDigit(characters)) {
             }
             return true;
         } else {
@@ -754,65 +754,65 @@ class Json5Tokenizer {
     private static final CharBuffer BUFFER_HEX_INTEGER_LITERAL_PREFIX_LOWERCASE = CharBuffer.wrap("0x");
     private static final CharBuffer BUFFER_HEX_INTEGER_LITERAL_PREFIX_UPPERCASE = CharBuffer.wrap("0X");
 
-    private static void skipHexDigit(CodePointIterator codePoints) {
-        if (!trySkipHexDigit(codePoints)) {
-            var sourceRange = codePoints.codePointSourceRange();
+    private static void skipHexDigit(CharacterIterator characters) {
+        if (!trySkipHexDigit(characters)) {
+            var sourceRange = characters.characterSourceRange();
             throw Json5ParseError.unexpectedTextError(
                 "hex digit",
-                describeCodePoint(codePoints.peek()),
+                describeCharacter(characters.peek()),
                 sourceRange
             );
         }
     }
 
-    private static boolean trySkipHexDigit(CodePointIterator codePoints) {
+    private static boolean trySkipHexDigit(CharacterIterator characters) {
         // HexDigit :: one of
         //     `0` `1` `2` `3` `4` `5` `6` `7` `8` `9` `a` `b` `c` `d` `e` `f` `A` `B` `C` `D` `E` `F`
 
-        var codePoint = codePoints.peek();
+        var character = characters.peek();
         if (
-            (codePoint >= '0' && codePoint <= '9') ||
-                (codePoint >= 'a' && codePoint <= 'f') ||
-                (codePoint >= 'A' && codePoint <= 'F')
+            (character >= '0' && character <= '9') ||
+                (character >= 'a' && character <= 'f') ||
+                (character >= 'A' && character <= 'F')
         ) {
-            codePoints.skip();
+            characters.skip();
             return true;
         } else {
             return false;
         }
     }
 
-    private static String describeCodePoint(int codePoint) {
-        // TODO: handle codepoints that should be escaped
-        if (codePoint == -1) {
+    private static String describeCharacter(int character) {
+        // TODO: handle characters that should be escaped
+        if (character == -1) {
             return "end of document";
         } else {
-            return String.format("'%s'", new String(new int[]{codePoint}, 0, 1));
+            return String.format("'%s'", new String(new int[]{character}, 0, 1));
         }
     }
 
     private static Json5Token createToken(
-        CodePointIterator codePoints,
+        CharacterIterator characters,
         Json5TokenType tokenType
     ) {
-        var sourceRange = codePoints.tokenSourceRange();
-        var buffer = codePoints.tokenSubBuffer();
+        var sourceRange = characters.tokenSourceRange();
+        var buffer = characters.tokenSubBuffer();
         return new Json5Token(tokenType, buffer, sourceRange);
     }
 
-    private static class CodePointIterator {
+    private static class CharacterIterator {
         private final CharBuffer buffer;
-        private int codePointIndex;
+        private int characterIndex;
         private Json5SourcePosition tokenStartPosition;
 
-        private CodePointIterator(String text) {
+        private CharacterIterator(String text) {
             this.buffer = CharBuffer.wrap(text);
-            this.codePointIndex = 0;
+            this.characterIndex = 0;
             this.tokenStartPosition = new Json5SourcePosition(0);
         }
 
         private boolean isEnd() {
-            return this.codePointIndex >= this.buffer.length();
+            return this.characterIndex >= this.buffer.length();
         }
 
         private boolean trySkip(char skip) {
@@ -829,8 +829,8 @@ class Json5Tokenizer {
                 return false;
             }
 
-            if (this.buffer.subSequence(this.codePointIndex, this.codePointIndex + skip.length()).equals(skip)) {
-                this.codePointIndex += skip.length();
+            if (this.buffer.subSequence(this.characterIndex, this.characterIndex + skip.length()).equals(skip)) {
+                this.characterIndex += skip.length();
                 return true;
             } else {
                 return false;
@@ -838,50 +838,49 @@ class Json5Tokenizer {
         }
 
         private int remaining() {
-            return this.buffer.length() - this.codePointIndex;
+            return this.buffer.length() - this.characterIndex;
         }
 
         int peek() {
-            if (this.codePointIndex >= this.buffer.length()) {
+            if (this.characterIndex >= this.buffer.length()) {
                 return -1;
             }
 
-            // TODO: handle codepoints instead of char
-            return this.buffer.get(this.codePointIndex);
+            return this.buffer.get(this.characterIndex);
         }
 
         void skip() {
-            if (this.codePointIndex < this.buffer.length()) {
-                this.codePointIndex += 1;
+            if (this.characterIndex < this.buffer.length()) {
+                this.characterIndex += 1;
             }
         }
 
-        void skip(int expectedCodePoint) {
-            var actualCodePoint = peek();
-            if (actualCodePoint == expectedCodePoint) {
+        void skip(int expectedCharacter) {
+            var actualCharacter = peek();
+            if (actualCharacter == expectedCharacter) {
                 skip();
             } else {
                 throw Json5ParseError.unexpectedTextError(
-                    describeCodePoint(expectedCodePoint),
-                    describeCodePoint(actualCodePoint),
-                    codePointSourceRange()
+                    describeCharacter(expectedCharacter),
+                    describeCharacter(actualCharacter),
+                    characterSourceRange()
                 );
             }
         }
 
-        Json5SourceRange codePointSourceRange() {
+        Json5SourceRange characterSourceRange() {
             if (isEnd()) {
                 return new Json5SourceRange(position(), position());
             } else {
                 return new Json5SourceRange(
                     position(),
-                    new Json5SourcePosition(this.codePointIndex + 1)
+                    new Json5SourcePosition(this.characterIndex + 1)
                 );
             }
         }
 
         private Json5SourcePosition position() {
-            return new Json5SourcePosition(this.codePointIndex);
+            return new Json5SourcePosition(this.characterIndex);
         }
 
         void startToken() {
@@ -895,9 +894,8 @@ class Json5Tokenizer {
         }
 
         CharBuffer tokenSubBuffer() {
-            var startIndex = this.tokenStartPosition.codePointIndex();
-            // TODO: use character index
-            return this.buffer.subSequence(startIndex, this.codePointIndex);
+            var startIndex = this.tokenStartPosition.characterIndex();
+            return this.buffer.subSequence(startIndex, this.characterIndex);
         }
     }
 }
