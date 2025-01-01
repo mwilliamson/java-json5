@@ -1,5 +1,6 @@
 package org.zwobble.json5.parser;
 
+import org.zwobble.json5.sources.Json5SourcePosition;
 import org.zwobble.json5.sources.Json5SourceRange;
 
 import java.nio.CharBuffer;
@@ -135,7 +136,10 @@ class Json5Tokenizer {
 
         while (!codePoints.trySkip(BUFFER_ASTERISK_FORWARD_SLASH)) {
             if (codePoints.isEnd()) {
-                var sourceRange = new Json5SourceRange(codePoints.index, codePoints.index);
+                var sourceRange = new Json5SourceRange(
+                    codePoints.position(),
+                    codePoints.position()
+                );
                 throw Json5ParseError.unexpectedTextError("'*/'", "end of document", sourceRange);
             }
             codePoints.skip();
@@ -241,9 +245,9 @@ class Json5Tokenizer {
     }
 
     private static boolean isIdentifierStart(CodePointIterator codePoints) {
-        var index = codePoints.index;
+        var index = codePoints.codePointIndex;
         if (trySkipIdentifierStart(codePoints)) {
-            codePoints.index = index;
+            codePoints.codePointIndex = index;
             return true;
         } else {
             return false;
@@ -684,14 +688,14 @@ class Json5Tokenizer {
         //     DecimalDigit
         //     DecimalDigits DecimalDigit
 
-        var initialIndex = codePoints.index;
+        var initialIndex = codePoints.codePointIndex;
 
         while (true) {
             var codePoint = codePoints.peek();
             if (isDecimalDigit(codePoint)) {
                 codePoints.skip();
             } else {
-                return initialIndex != codePoints.index;
+                return initialIndex != codePoints.codePointIndex;
             }
         }
     }
@@ -798,17 +802,17 @@ class Json5Tokenizer {
 
     private static class CodePointIterator {
         private final CharBuffer buffer;
-        private int index;
-        private int tokenStartIndex;
+        private int codePointIndex;
+        private Json5SourcePosition tokenStartPosition;
 
         private CodePointIterator(String text) {
             this.buffer = CharBuffer.wrap(text);
-            this.index = 0;
-            this.tokenStartIndex = 0;
+            this.codePointIndex = 0;
+            this.tokenStartPosition = new Json5SourcePosition(0);
         }
 
         private boolean isEnd() {
-            return this.index >= this.buffer.length();
+            return this.codePointIndex >= this.buffer.length();
         }
 
         private boolean trySkip(char skip) {
@@ -825,8 +829,8 @@ class Json5Tokenizer {
                 return false;
             }
 
-            if (this.buffer.subSequence(this.index, this.index + skip.length()).equals(skip)) {
-                this.index += skip.length();
+            if (this.buffer.subSequence(this.codePointIndex, this.codePointIndex + skip.length()).equals(skip)) {
+                this.codePointIndex += skip.length();
                 return true;
             } else {
                 return false;
@@ -834,21 +838,21 @@ class Json5Tokenizer {
         }
 
         private int remaining() {
-            return this.buffer.length() - this.index;
+            return this.buffer.length() - this.codePointIndex;
         }
 
         int peek() {
-            if (this.index >= this.buffer.length()) {
+            if (this.codePointIndex >= this.buffer.length()) {
                 return -1;
             }
 
             // TODO: handle codepoints instead of char
-            return this.buffer.get(this.index);
+            return this.buffer.get(this.codePointIndex);
         }
 
         void skip() {
-            if (this.index < this.buffer.length()) {
-                this.index += 1;
+            if (this.codePointIndex < this.buffer.length()) {
+                this.codePointIndex += 1;
             }
         }
 
@@ -867,25 +871,33 @@ class Json5Tokenizer {
 
         Json5SourceRange codePointSourceRange() {
             if (isEnd()) {
-                return new Json5SourceRange(this.index, this.index);
+                return new Json5SourceRange(position(), position());
             } else {
-                return new Json5SourceRange(this.index, this.index + 1);
+                return new Json5SourceRange(
+                    position(),
+                    new Json5SourcePosition(this.codePointIndex + 1)
+                );
             }
         }
 
+        private Json5SourcePosition position() {
+            return new Json5SourcePosition(this.codePointIndex);
+        }
+
         void startToken() {
-            this.tokenStartIndex = this.index;
+            this.tokenStartPosition = position();
         }
 
         Json5SourceRange tokenSourceRange() {
-            var startCodePointIndex = this.tokenStartIndex;
-            var endCodePointIndex = this.index;
-            return new Json5SourceRange(startCodePointIndex, endCodePointIndex);
+            var start = this.tokenStartPosition;
+            var end = position();
+            return new Json5SourceRange(start, end);
         }
 
         CharBuffer tokenSubBuffer() {
-            var startIndex = this.tokenStartIndex;
-            return this.buffer.subSequence(startIndex, this.index);
+            var startIndex = this.tokenStartPosition.codePointIndex();
+            // TODO: use character index
+            return this.buffer.subSequence(startIndex, this.codePointIndex);
         }
     }
 }

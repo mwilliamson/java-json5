@@ -1,6 +1,7 @@
 package org.zwobble.json5.values;
 
 import org.junit.jupiter.api.Test;
+import org.zwobble.json5.sources.Json5SourcePosition;
 import org.zwobble.json5.sources.Json5SourceRange;
 
 import static org.zwobble.json5.sources.Json5SourceRangeMatchers.isJson5SourceRange;
@@ -10,7 +11,10 @@ import static org.zwobble.precisely.Matchers.isOptionalEmpty;
 import static org.zwobble.precisely.Matchers.isOptionalOf;
 
 public class Json5ObjectTests {
-    public static final Json5SourceRange SOURCE_RANGE = new Json5SourceRange(0, 0);
+    public static final Json5SourceRange SOURCE_RANGE = new Json5SourceRange(
+        new Json5SourcePosition(0),
+        new Json5SourcePosition(0)
+    );
 
     @Test
     public void whenObjectHasMemberThenMemberCanBeRetrievedByName() {

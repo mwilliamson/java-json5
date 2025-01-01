@@ -1,19 +1,19 @@
 package org.zwobble.json5.sources;
 
 public class Json5SourceRange {
-    private final int startCodePointIndex;
-    private final int endCodePointIndex;
+    private final Json5SourcePosition start;
+    private final Json5SourcePosition end;
 
-    public Json5SourceRange(int startCodePointIndex, int codePointEndIndex) {
-        this.startCodePointIndex = startCodePointIndex;
-        this.endCodePointIndex = codePointEndIndex;
+    public Json5SourceRange(Json5SourcePosition start, Json5SourcePosition end) {
+        this.start = start;
+        this.end = end;
     }
 
-    public int startCodePointIndex() {
-        return startCodePointIndex;
+    public Json5SourcePosition start() {
+        return this.start;
     }
 
-    public int endCodePointIndex() {
-        return endCodePointIndex;
+    public Json5SourcePosition end() {
+        return this.end;
     }
 }

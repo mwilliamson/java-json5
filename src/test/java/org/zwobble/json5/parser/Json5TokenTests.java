@@ -1,6 +1,7 @@
 package org.zwobble.json5.parser;
 
 import org.junit.jupiter.api.Test;
+import org.zwobble.json5.sources.Json5SourcePosition;
 import org.zwobble.json5.sources.Json5SourceRange;
 
 import java.nio.CharBuffer;
@@ -9,7 +10,10 @@ import static org.zwobble.precisely.AssertThat.assertThat;
 import static org.zwobble.precisely.Matchers.equalTo;
 
 public class Json5TokenTests {
-    public static final Json5SourceRange SOURCE_RANGE = new Json5SourceRange(0, 0);
+    public static final Json5SourceRange SOURCE_RANGE = new Json5SourceRange(
+        new Json5SourcePosition(0),
+        new Json5SourcePosition(0)
+    );
 
     @Test
     public void identifierTokenIsDescribedLiterally() {

@@ -516,8 +516,8 @@ public class Json5Parser {
         Json5SourceRange end
     ) {
         return new Json5SourceRange(
-            start.startCodePointIndex(),
-            end.endCodePointIndex()
+            start.start(),
+            end.end()
         );
     }
 }
