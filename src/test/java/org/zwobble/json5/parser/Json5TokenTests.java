@@ -9,12 +9,14 @@ import static org.zwobble.precisely.AssertThat.assertThat;
 import static org.zwobble.precisely.Matchers.equalTo;
 
 public class Json5TokenTests {
+    public static final Json5SourceRange SOURCE_RANGE = new Json5SourceRange(0, 0);
+
     @Test
     public void identifierTokenIsDescribedLiterally() {
         var token = new Json5Token(
             Json5TokenType.IDENTIFIER,
             CharBuffer.wrap("foo"),
-            new Json5SourceRange(0, 0)
+            SOURCE_RANGE
         );
 
         var result = token.describe();
@@ -28,7 +30,7 @@ public class Json5TokenTests {
         var token = new Json5Token(
             Json5TokenType.PUNCTUATOR_BRACE_OPEN,
             CharBuffer.wrap("{"),
-            new Json5SourceRange(0, 0)
+            SOURCE_RANGE
         );
 
         var result = token.describe();
@@ -41,7 +43,7 @@ public class Json5TokenTests {
         var token = new Json5Token(
             Json5TokenType.PUNCTUATOR_BRACE_CLOSE,
             CharBuffer.wrap("}"),
-            new Json5SourceRange(0, 0)
+            SOURCE_RANGE
         );
 
         var result = token.describe();
@@ -54,7 +56,7 @@ public class Json5TokenTests {
         var token = new Json5Token(
             Json5TokenType.PUNCTUATOR_SQUARE_OPEN,
             CharBuffer.wrap("["),
-            new Json5SourceRange(0, 0)
+            SOURCE_RANGE
         );
 
         var result = token.describe();
@@ -67,7 +69,7 @@ public class Json5TokenTests {
         var token = new Json5Token(
             Json5TokenType.PUNCTUATOR_SQUARE_CLOSE,
             CharBuffer.wrap("]"),
-            new Json5SourceRange(0, 0)
+            SOURCE_RANGE
         );
 
         var result = token.describe();
@@ -80,7 +82,7 @@ public class Json5TokenTests {
         var token = new Json5Token(
             Json5TokenType.PUNCTUATOR_COLON,
             CharBuffer.wrap(":"),
-            new Json5SourceRange(0, 0)
+            SOURCE_RANGE
         );
 
         var result = token.describe();
@@ -93,7 +95,7 @@ public class Json5TokenTests {
         var token = new Json5Token(
             Json5TokenType.PUNCTUATOR_COMMA,
             CharBuffer.wrap(","),
-            new Json5SourceRange(0, 0)
+            SOURCE_RANGE
         );
 
         var result = token.describe();
@@ -106,7 +108,7 @@ public class Json5TokenTests {
         var token = new Json5Token(
             Json5TokenType.STRING,
             CharBuffer.wrap("\"foo\""),
-            new Json5SourceRange(0, 0)
+            SOURCE_RANGE
         );
 
         var result = token.describe();
@@ -119,7 +121,7 @@ public class Json5TokenTests {
         var token = new Json5Token(
             Json5TokenType.NUMBER_DECIMAL,
             CharBuffer.wrap("42"),
-            new Json5SourceRange(0, 0)
+            SOURCE_RANGE
         );
 
         var result = token.describe();
@@ -132,7 +134,7 @@ public class Json5TokenTests {
         var token = new Json5Token(
             Json5TokenType.NUMBER_HEX,
             CharBuffer.wrap("0x42"),
-            new Json5SourceRange(0, 0)
+            SOURCE_RANGE
         );
 
         var result = token.describe();
@@ -145,7 +147,7 @@ public class Json5TokenTests {
         var token = new Json5Token(
             Json5TokenType.NUMBER_POSITIVE_INFINITY,
             CharBuffer.wrap("Infinity"),
-            new Json5SourceRange(0, 0)
+            SOURCE_RANGE
         );
 
         var result = token.describe();
@@ -158,7 +160,7 @@ public class Json5TokenTests {
         var token = new Json5Token(
             Json5TokenType.NUMBER_NEGATIVE_INFINITY,
             CharBuffer.wrap("-Infinity"),
-            new Json5SourceRange(0, 0)
+            SOURCE_RANGE
         );
 
         var result = token.describe();
@@ -171,7 +173,7 @@ public class Json5TokenTests {
         var token = new Json5Token(
             Json5TokenType.NUMBER_NAN,
             CharBuffer.wrap("NaN"),
-            new Json5SourceRange(0, 0)
+            SOURCE_RANGE
         );
 
         var result = token.describe();
@@ -184,7 +186,7 @@ public class Json5TokenTests {
         var token = new Json5Token(
             Json5TokenType.END,
             CharBuffer.wrap(""),
-            new Json5SourceRange(0, 0)
+            SOURCE_RANGE
         );
 
         var result = token.describe();

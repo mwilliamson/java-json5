@@ -10,20 +10,22 @@ import static org.zwobble.precisely.Matchers.isOptionalEmpty;
 import static org.zwobble.precisely.Matchers.isOptionalOf;
 
 public class Json5ObjectTests {
+    public static final Json5SourceRange SOURCE_RANGE = new Json5SourceRange(0, 0);
+
     @Test
     public void whenObjectHasMemberThenMemberCanBeRetrievedByName() {
         var object = Json5Object.builder()
             .addMember(new Json5Member(
-                new Json5MemberName("foo", new Json5SourceRange(0, 0)),
-                new Json5Boolean(true, new Json5SourceRange(0, 0)),
-                new Json5SourceRange(0, 0)
+                new Json5MemberName("foo", SOURCE_RANGE),
+                new Json5Boolean(true, SOURCE_RANGE),
+                SOURCE_RANGE
             ))
             .addMember(new Json5Member(
-                new Json5MemberName("bar", new Json5SourceRange(0, 0)),
-                new Json5Boolean(false, new Json5SourceRange(0, 0)),
-                new Json5SourceRange(0, 0)
+                new Json5MemberName("bar", SOURCE_RANGE),
+                new Json5Boolean(false, SOURCE_RANGE),
+                SOURCE_RANGE
             ))
-            .build(new Json5SourceRange(0, 0));
+            .build(SOURCE_RANGE);
 
         var result = object.getValue("foo");
 
@@ -36,16 +38,16 @@ public class Json5ObjectTests {
     public void whenObjectHasNoMemberWithNameThenGetValueReturnsEmptyOptional() {
         var object = Json5Object.builder()
             .addMember(new Json5Member(
-                new Json5MemberName("foo", new Json5SourceRange(0, 0)),
-                new Json5Boolean(true, new Json5SourceRange(0, 0)),
-                new Json5SourceRange(0, 0)
+                new Json5MemberName("foo", SOURCE_RANGE),
+                new Json5Boolean(true, SOURCE_RANGE),
+                SOURCE_RANGE
             ))
             .addMember(new Json5Member(
-                new Json5MemberName("bar", new Json5SourceRange(0, 0)),
-                new Json5Boolean(false, new Json5SourceRange(0, 0)),
-                new Json5SourceRange(0, 0)
+                new Json5MemberName("bar", SOURCE_RANGE),
+                new Json5Boolean(false, SOURCE_RANGE),
+                SOURCE_RANGE
             ))
-            .build(new Json5SourceRange(0, 0));
+            .build(SOURCE_RANGE);
 
         var result = object.getValue("baz");
 
