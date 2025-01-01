@@ -3,6 +3,7 @@ package org.zwobble.json5.values;
 import org.zwobble.json5.sources.Json5SourceRange;
 
 import java.util.LinkedHashMap;
+import java.util.Optional;
 
 public final class Json5Object implements Json5Value {
     private final LinkedHashMap<String, Json5Member> members;
@@ -18,6 +19,17 @@ public final class Json5Object implements Json5Value {
 
     public Iterable<Json5Member> members() {
         return members.values();
+    }
+
+    /**
+     * Get the value of the member with the given name, if any.
+     *
+     * @param name The member of the name to find.
+     * @return If there is a member with the given name, the value of that
+     * member, otherwise an empty {@code Optional}.
+     */
+    public Optional<Json5Value> getValue(String name) {
+        return Optional.ofNullable(members.get(name)).map(Json5Member::value);
     }
 
     @Override
