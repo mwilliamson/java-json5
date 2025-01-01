@@ -8,8 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.zwobble.json5.sources.Json5SourceRangeMatchers.isJson5SourceRange;
 import static org.zwobble.json5.values.Json5ValueMatchers.*;
 import static org.zwobble.precisely.AssertThat.assertThat;
-import static org.zwobble.precisely.Matchers.equalTo;
-import static org.zwobble.precisely.Matchers.isSequence;
+import static org.zwobble.precisely.Matchers.*;
 
 public class Json5ParserTests {
     // == Nulls ==
@@ -779,6 +778,25 @@ public class Json5ParserTests {
     }
 
     @Test
+    public void nestedObject() {
+        var result = Json5Parser.parseText("{a: {}}");
+
+        assertThat(result, isJson5Object(
+            isSequence(
+                isJson5Member(
+                    isJson5MemberName("a", isJson5SourceRange(1, 2)),
+                    isJson5Object(
+                        isSequence(),
+                        isJson5SourceRange(4, 6)
+                    ),
+                    isJson5SourceRange(1, 6)
+                )
+            ),
+            isJson5SourceRange(0, 7)
+        ));
+    }
+
+    @Test
     public void whenObjectHasTokenThatIsNeitherMemberNameNorClosingBraceThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,
@@ -1174,6 +1192,21 @@ public class Json5ParserTests {
                 isJson5Null(isJson5SourceRange(14, 18))
             ),
             isJson5SourceRange(0, 20)
+        ));
+    }
+
+    @Test
+    public void nestedArray() {
+        var result = Json5Parser.parseText("[[]]");
+
+        assertThat(result, isJson5Array(
+            isSequence(
+                isJson5Array(
+                    isSequence(),
+                    isJson5SourceRange(1, 3)
+                )
+            ),
+            isJson5SourceRange(0, 4)
         ));
     }
 

@@ -365,7 +365,10 @@ public class Json5Parser {
         }
 
         var endToken = tokens.peek();
-        var sourceRange = sourceRange(startToken, endToken);
+        var sourceRange = new Json5SourceRange(
+            startToken.sourceRange().start(),
+            endToken.sourceRange().start()
+        );
         return Optional.of(objectBuilder.build(sourceRange));
     }
 
@@ -386,9 +389,9 @@ public class Json5Parser {
 
         var value = parseValue(tokens);
 
-        var sourceRange = sourceRange(
-            memberName.get().sourceRange(),
-            value.sourceRange()
+        var sourceRange = new Json5SourceRange(
+            memberName.get().sourceRange().start(),
+            value.sourceRange().end()
         );
 
         return Optional.of(new Json5Member(memberName.get(), value, sourceRange));
@@ -455,10 +458,11 @@ public class Json5Parser {
         }
 
         var endToken = tokens.peek();
-        return Optional.of(new Json5Array(
-            elements,
-            sourceRange(startToken, endToken)
-        ));
+        var sourceRange = new Json5SourceRange(
+            startToken.sourceRange().start(),
+            endToken.sourceRange().start()
+        );
+        return Optional.of(new Json5Array(elements, sourceRange));
     }
 
     private static String parseIdentifier(CharBuffer buffer) {
@@ -499,23 +503,6 @@ public class Json5Parser {
             expected,
             token.describe(),
             token.sourceRange()
-        );
-    }
-
-    private static Json5SourceRange sourceRange(
-        Json5Token start,
-        Json5Token end
-    ) {
-        return sourceRange(start.sourceRange(), end.sourceRange());
-    }
-
-    private static Json5SourceRange sourceRange(
-        Json5SourceRange start,
-        Json5SourceRange end
-    ) {
-        return new Json5SourceRange(
-            start.start(),
-            end.end()
         );
     }
 }

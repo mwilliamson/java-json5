@@ -1,7 +1,6 @@
 package org.zwobble.json5.values;
 
 import org.zwobble.json5.sources.Json5SourceRange;
-import org.zwobble.json5.values.*;
 import org.zwobble.precisely.MatchResult;
 import org.zwobble.precisely.Matcher;
 import org.zwobble.precisely.TextTree;
