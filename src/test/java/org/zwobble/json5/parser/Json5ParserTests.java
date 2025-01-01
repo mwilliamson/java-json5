@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.zwobble.json5.parser.values.Json5ValueMatchers.*;
+import static org.zwobble.json5.values.Json5ValueMatchers.*;
 import static org.zwobble.json5.sources.Json5SourceRangeMatchers.isJson5SourceRange;
 import static org.zwobble.precisely.AssertThat.assertThat;
 import static org.zwobble.precisely.Matchers.equalTo;

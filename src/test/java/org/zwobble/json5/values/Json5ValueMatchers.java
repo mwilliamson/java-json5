@@ -1,4 +1,4 @@
-package org.zwobble.json5.parser.values;
+package org.zwobble.json5.values;
 
 import org.zwobble.json5.sources.Json5SourceRange;
 import org.zwobble.json5.values.*;
