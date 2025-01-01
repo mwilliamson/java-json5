@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.Optional;
 
 /**
@@ -346,12 +345,12 @@ public class Json5Parser {
         }
         tokens.skip();
 
-        var members = new LinkedHashMap<String, Json5Member>();
+        var objectBuilder = Json5Object.builder();
         while (true) {
             var member = tryParseMember(tokens);
             if (member.isPresent()) {
                 // TODO: handle duplicates
-                members.put(member.get().name().value(), member.get());
+                objectBuilder.addMember(member.get());
             } else if (tokens.trySkip(Json5TokenType.PUNCTUATOR_BRACE_CLOSE)) {
                 break;
             } else {
@@ -368,10 +367,8 @@ public class Json5Parser {
         }
 
         var endToken = tokens.peek();
-        return Optional.of(new Json5Object(
-            members,
-            sourceRange(startToken, endToken)
-        ));
+        var sourceRange = sourceRange(startToken, endToken);
+        return Optional.of(objectBuilder.build(sourceRange));
     }
 
     private static Optional<Json5Member> tryParseMember(TokenIterator tokens) {
