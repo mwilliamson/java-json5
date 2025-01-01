@@ -30,8 +30,15 @@ class Json5Tokenizer {
             } else {
                 iterator.startToken();
                 var token = tokenizeJson5Token(iterator);
-                // TODO: handle no token
-                tokens.add(token.get());
+                if (token.isPresent()) {
+                    tokens.add(token.get());
+                } else {
+                    throw Json5ParseError.unexpectedTextError(
+                        "JSON5 token",
+                        describeCodePoint(iterator.peek()),
+                        iterator.codePointSourceRange()
+                    );
+                }
             }
         }
 

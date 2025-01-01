@@ -1366,4 +1366,19 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(0, 2)));
     }
+
+    @Test
+    public void whenCharacterCannotBeTokenizedThenErrorIsThrown() {
+        var error = assertThrows(
+            Json5ParseError.class,
+            () -> Json5Parser.parseText("=")
+        );
+
+
+        assertThat(
+            error.getMessage(),
+            equalTo("Expected JSON5 token, but was '='")
+        );
+        assertThat(error.sourceRange(), isJson5SourceRange(0, 1));
+    }
 }
