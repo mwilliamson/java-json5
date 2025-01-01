@@ -1,6 +1,7 @@
 package org.zwobble.json5.values;
 
 import org.junit.jupiter.api.Test;
+import org.zwobble.json5.paths.Json5Path;
 import org.zwobble.json5.sources.Json5SourcePosition;
 import org.zwobble.json5.sources.Json5SourceRange;
 
@@ -21,15 +22,15 @@ public class Json5ObjectTests {
         var object = Json5Object.builder()
             .addMember(new Json5Member(
                 new Json5MemberName("foo", SOURCE_RANGE),
-                new Json5Boolean(true, SOURCE_RANGE),
+                new Json5Boolean(true, Json5Path.ROOT, SOURCE_RANGE),
                 SOURCE_RANGE
             ))
             .addMember(new Json5Member(
                 new Json5MemberName("bar", SOURCE_RANGE),
-                new Json5Boolean(false, SOURCE_RANGE),
+                new Json5Boolean(false, Json5Path.ROOT, SOURCE_RANGE),
                 SOURCE_RANGE
             ))
-            .build(SOURCE_RANGE);
+            .build(Json5Path.ROOT, SOURCE_RANGE);
 
         var result = object.getValue("foo");
 
@@ -43,15 +44,15 @@ public class Json5ObjectTests {
         var object = Json5Object.builder()
             .addMember(new Json5Member(
                 new Json5MemberName("foo", SOURCE_RANGE),
-                new Json5Boolean(true, SOURCE_RANGE),
+                new Json5Boolean(true, Json5Path.ROOT, SOURCE_RANGE),
                 SOURCE_RANGE
             ))
             .addMember(new Json5Member(
                 new Json5MemberName("bar", SOURCE_RANGE),
-                new Json5Boolean(false, SOURCE_RANGE),
+                new Json5Boolean(false, Json5Path.ROOT, SOURCE_RANGE),
                 SOURCE_RANGE
             ))
-            .build(SOURCE_RANGE);
+            .build(Json5Path.ROOT, SOURCE_RANGE);
 
         var result = object.getValue("baz");
 

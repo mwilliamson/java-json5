@@ -1,6 +1,10 @@
 package org.zwobble.json5.parser;
 
 import org.junit.jupiter.api.Test;
+import org.zwobble.json5.paths.Json5Path;
+import org.zwobble.json5.values.Json5Array;
+import org.zwobble.json5.values.Json5Boolean;
+import org.zwobble.json5.values.Json5Object;
 
 import java.math.BigDecimal;
 
@@ -1431,6 +1435,62 @@ public class Json5ParserTests {
                 )
             ),
             isJson5SourceRange(0, 12)
+        ));
+    }
+
+    // == Paths ==
+
+    @Test
+    public void pathsAreGeneratedForObjectMembers() {
+        var result = Json5Parser.parseText("{a: {b: true}}");
+
+        assertThat(result, instanceOf(
+            Json5Object.class,
+            has("path", x -> x.path(), equalTo(Json5Path.ROOT)),
+            has("members", x -> x.members(), isSequence(
+                allOf(
+                    has("name", x -> x.name().value(), equalTo("a")),
+                    has("value", x -> x.value(), instanceOf(
+                        Json5Object.class,
+                        has("path", x -> x.path(), equalTo(Json5Path.ROOT.member("a"))),
+                        has("members", x -> x.members(), isSequence(
+                            allOf(
+                                has("name", x -> x.name().value(), equalTo("b")),
+                                has("value", x -> x.value(), instanceOf(
+                                    Json5Boolean.class,
+                                    has("path", x -> x.path(), equalTo(Json5Path.ROOT.member("a").member("b")))
+                                ))
+                            )
+                        ))
+                    ))
+                )
+            ))
+        ));
+    }
+
+    @Test
+    public void pathsAreGeneratedForArrayElements() {
+        var result = Json5Parser.parseText("[[true], false]");
+
+        assertThat(result, instanceOf(
+            Json5Array.class,
+            has("path", x -> x.path(), equalTo(Json5Path.ROOT)),
+            has("elements", x -> x.elements(), isSequence(
+                instanceOf(
+                    Json5Array.class,
+                    has("path", x -> x.path(), equalTo(Json5Path.ROOT.index(0))),
+                    has("elements", x -> x.elements(), isSequence(
+                        instanceOf(
+                            Json5Boolean.class,
+                            has("path", x -> x.path(), equalTo(Json5Path.ROOT.index(0).index(0)))
+                        )
+                    ))
+                ),
+                instanceOf(
+                    Json5Boolean.class,
+                    has("path", x -> x.path(), equalTo(Json5Path.ROOT.index(1)))
+                )
+            ))
         ));
     }
 }

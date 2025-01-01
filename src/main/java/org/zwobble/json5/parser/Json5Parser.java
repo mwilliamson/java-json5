@@ -1,5 +1,6 @@
 package org.zwobble.json5.parser;
 
+import org.zwobble.json5.paths.Json5Path;
 import org.zwobble.json5.sources.Json5SourceRange;
 import org.zwobble.json5.values.*;
 
@@ -27,7 +28,7 @@ public class Json5Parser {
         var tokens = Json5Tokenizer.tokenize(text);
         var tokenIterator = new TokenIterator(tokens);
 
-        var value = parseValue(tokenIterator);
+        var value = parseValue(tokenIterator, Json5Path.ROOT);
 
         if (tokenIterator.peek().tokenType() != Json5TokenType.END) {
             throw unexpectedTokenError("end of document", tokenIterator);
@@ -36,8 +37,8 @@ public class Json5Parser {
         return value;
     }
 
-    private static Json5Value parseValue(TokenIterator tokens) {
-        var json5Value = tryParseValue(tokens);
+    private static Json5Value parseValue(TokenIterator tokens, Json5Path path) {
+        var json5Value = tryParseValue(tokens, path);
         if (json5Value.isPresent()) {
             return json5Value.get();
         }
@@ -45,7 +46,10 @@ public class Json5Parser {
         throw unexpectedTokenError("JSON value", tokens);
     }
 
-    private static Optional<Json5Value> tryParseValue(TokenIterator tokens) {
+    private static Optional<Json5Value> tryParseValue(
+        TokenIterator tokens,
+        Json5Path path
+    ) {
         // JSON5Value :
         //     JSON5Null
         //     JSON5Boolean
@@ -54,32 +58,32 @@ public class Json5Parser {
         //     JSON5Object
         //     JSON5Array
 
-        var json5Null = tryParseNull(tokens);
+        var json5Null = tryParseNull(tokens, path);
         if (json5Null.isPresent()) {
             return json5Null;
         }
 
-        var json5Boolean = tryParseBoolean(tokens);
+        var json5Boolean = tryParseBoolean(tokens, path);
         if (json5Boolean.isPresent()) {
             return json5Boolean;
         }
 
-        var json5String = tryParseString(tokens);
+        var json5String = tryParseString(tokens, path);
         if (json5String.isPresent()) {
             return json5String;
         }
 
-        var json5Number = tryParseNumber(tokens);
+        var json5Number = tryParseNumber(tokens, path);
         if (json5Number.isPresent()) {
             return json5Number;
         }
 
-        var json5Object = tryParseObject(tokens);
+        var json5Object = tryParseObject(tokens, path);
         if (json5Object.isPresent()) {
             return json5Object;
         }
 
-        var json5Array = tryParseArray(tokens);
+        var json5Array = tryParseArray(tokens, path);
         if (json5Array.isPresent()) {
             return json5Array;
         }
@@ -87,7 +91,10 @@ public class Json5Parser {
         return Optional.empty();
     }
 
-    private static Optional<Json5Value> tryParseNull(TokenIterator tokens) {
+    private static Optional<Json5Value> tryParseNull(
+        TokenIterator tokens,
+        Json5Path path
+    ) {
         // JSON5Null ::
         //     NullLiteral
         //
@@ -97,7 +104,7 @@ public class Json5Parser {
         var token = tokens.peek();
         if (token.is(Json5TokenType.IDENTIFIER, BUFFER_NULL)) {
             tokens.skip();
-            return Optional.of(new Json5Null(token.sourceRange()));
+            return Optional.of(new Json5Null(path, token.sourceRange()));
         } else {
             return Optional.empty();
         }
@@ -105,7 +112,10 @@ public class Json5Parser {
 
     private static final CharBuffer BUFFER_NULL = CharBuffer.wrap("null");
 
-    private static Optional<Json5Value> tryParseBoolean(TokenIterator tokens) {
+    private static Optional<Json5Value> tryParseBoolean(
+        TokenIterator tokens,
+        Json5Path path
+    ) {
         // JSON5Boolean ::
         //     BooleanLiteral
         //
@@ -116,10 +126,10 @@ public class Json5Parser {
         var token = tokens.peek();
         if (token.is(Json5TokenType.IDENTIFIER, BUFFER_TRUE)) {
             tokens.skip();
-            return Optional.of(new Json5Boolean(true, token.sourceRange()));
+            return Optional.of(new Json5Boolean(true, path, token.sourceRange()));
         } else if (token.is(Json5TokenType.IDENTIFIER, BUFFER_FALSE)) {
             tokens.skip();
-            return Optional.of(new Json5Boolean(false, token.sourceRange()));
+            return Optional.of(new Json5Boolean(false, path, token.sourceRange()));
         } else {
             return Optional.empty();
         }
@@ -128,14 +138,21 @@ public class Json5Parser {
     private static final CharBuffer BUFFER_TRUE = CharBuffer.wrap("true");
     private static final CharBuffer BUFFER_FALSE = CharBuffer.wrap("false");
 
-    private static Optional<Json5Value> tryParseString(TokenIterator tokens) {
+    private static Optional<Json5Value> tryParseString(
+        TokenIterator tokens,
+        Json5Path path
+    ) {
         var token = tokens.peek();
         if (token.is(Json5TokenType.STRING)) {
             tokens.skip();
 
             var stringValue = parseStringValue(token);
 
-            return Optional.of(new Json5String(stringValue, token.sourceRange()));
+            return Optional.of(new Json5String(
+                stringValue,
+                path,
+                token.sourceRange()
+            ));
         } else {
             return Optional.empty();
         }
@@ -246,7 +263,10 @@ public class Json5Parser {
         }
     }
 
-    private static Optional<Json5Value> tryParseNumber(TokenIterator tokens) {
+    private static Optional<Json5Value> tryParseNumber(
+        TokenIterator tokens,
+        Json5Path path
+    ) {
         var token = tokens.peek();
 
         switch (token.tokenType()) {
@@ -262,11 +282,13 @@ public class Json5Parser {
                 if (token.buffer().equals(BUFFER_INFINITY)) {
                     tokens.skip();
                     return Optional.of(new Json5NumberPositiveInfinity(
+                        path,
                         token.sourceRange()
                     ));
                 } else if (token.buffer().equals(BUFFER_NAN)) {
                     tokens.skip();
                     return Optional.of(new Json5NumberNan(
+                        path,
                         token.sourceRange()
                     ));
                 }
@@ -275,6 +297,7 @@ public class Json5Parser {
                 tokens.skip();
                 return Optional.of(new Json5NumberFinite(
                     new BigDecimal(token.buffer().toString()),
+                    path,
                     token.sourceRange()
                 ));
             }
@@ -299,24 +322,28 @@ public class Json5Parser {
                 var integer = isNegative ? unsignedInteger.negate() : unsignedInteger;
                 return Optional.of(new Json5NumberFinite(
                     new BigDecimal(integer),
+                    path,
                     token.sourceRange()
                 ));
             }
             case NUMBER_POSITIVE_INFINITY -> {
                 tokens.skip();
                 return Optional.of(new Json5NumberPositiveInfinity(
+                    path,
                     token.sourceRange()
                 ));
             }
             case NUMBER_NEGATIVE_INFINITY -> {
                 tokens.skip();
                 return Optional.of(new Json5NumberNegativeInfinity(
+                    path,
                     token.sourceRange()
                 ));
             }
             case NUMBER_NAN -> {
                 tokens.skip();
                 return Optional.of(new Json5NumberNan(
+                    path,
                     token.sourceRange()
                 ));
             }
@@ -328,7 +355,10 @@ public class Json5Parser {
     private static final CharBuffer BUFFER_INFINITY = CharBuffer.wrap("Infinity");
     private static final CharBuffer BUFFER_NAN = CharBuffer.wrap("NaN");
 
-    private static Optional<Json5Value> tryParseObject(TokenIterator tokens) {
+    private static Optional<Json5Value> tryParseObject(
+        TokenIterator tokens,
+        Json5Path path
+    ) {
         // JSON5Object :
         //     `{` `}`
         //     `{` JSON5MemberList `,`? `}`
@@ -345,7 +375,7 @@ public class Json5Parser {
 
         var objectBuilder = Json5Object.builder();
         while (true) {
-            var member = tryParseMember(tokens);
+            var member = tryParseMember(tokens, path);
             if (member.isPresent()) {
                 // TODO: handle duplicates
                 objectBuilder.addMember(member.get());
@@ -369,10 +399,13 @@ public class Json5Parser {
             startToken.sourceRange().start(),
             endToken.sourceRange().start()
         );
-        return Optional.of(objectBuilder.build(sourceRange));
+        return Optional.of(objectBuilder.build(path, sourceRange));
     }
 
-    private static Optional<Json5Member> tryParseMember(TokenIterator tokens) {
+    private static Optional<Json5Member> tryParseMember(
+        TokenIterator tokens,
+        Json5Path path
+    ) {
         //  JSON5Member :
         //      JSON5MemberName `:` JSON5Value
 
@@ -387,7 +420,7 @@ public class Json5Parser {
         }
         tokens.skip();
 
-        var value = parseValue(tokens);
+        var value = parseValue(tokens, path.member(memberName.get().value()));
 
         var sourceRange = new Json5SourceRange(
             memberName.get().sourceRange().start(),
@@ -422,7 +455,10 @@ public class Json5Parser {
         }
     }
 
-    private static Optional<Json5Value> tryParseArray(TokenIterator tokens) {
+    private static Optional<Json5Value> tryParseArray(
+        TokenIterator tokens,
+        Json5Path path
+    ) {
         // JSON5Array :
         //     `[` `]`
         //     `[` JSON5ElementList `,`? `]`
@@ -439,7 +475,7 @@ public class Json5Parser {
 
         var elements = new ArrayList<Json5Value>();
         while (true) {
-            var element = tryParseValue(tokens);
+            var element = tryParseValue(tokens, path.index(elements.size()));
             if (element.isPresent()) {
                 elements.add(element.get());
             } else if (tokens.trySkip(Json5TokenType.PUNCTUATOR_SQUARE_CLOSE)) {
@@ -462,7 +498,7 @@ public class Json5Parser {
             startToken.sourceRange().start(),
             endToken.sourceRange().start()
         );
-        return Optional.of(new Json5Array(elements, sourceRange));
+        return Optional.of(new Json5Array(elements, path, sourceRange));
     }
 
     private static String parseIdentifier(CharBuffer buffer) {
