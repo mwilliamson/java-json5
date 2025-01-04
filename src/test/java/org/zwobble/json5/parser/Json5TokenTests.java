@@ -12,9 +12,9 @@ import static org.zwobble.precisely.Matchers.equalTo;
 public class Json5TokenTests {
     public static Json5SourceRange sourceRange(String text) {
         return new Json5SourceRange(
-                CharBuffer.wrap(text),
-                new Json5SourcePosition(0),
-                new Json5SourcePosition(text.length())
+            CharBuffer.wrap(text),
+            new Json5SourcePosition(0),
+            new Json5SourcePosition(text.length())
         );
     }
 
