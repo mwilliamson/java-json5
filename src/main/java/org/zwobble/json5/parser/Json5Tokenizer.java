@@ -805,7 +805,7 @@ class Json5Tokenizer {
 
         private CharacterIterator(String text) {
             this.iterator = Json5SourceCharacterIterator.from(text);
-            this.tokenStartPosition = new Json5SourcePosition(0);
+            this.tokenStartPosition = this.iterator.position();
         }
 
         private boolean isEnd() {
