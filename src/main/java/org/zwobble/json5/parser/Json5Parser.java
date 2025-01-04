@@ -1,7 +1,6 @@
 package org.zwobble.json5.parser;
 
 import org.zwobble.json5.paths.Json5Path;
-import org.zwobble.json5.sources.Json5SourceRange;
 import org.zwobble.json5.values.*;
 
 import java.math.BigDecimal;
@@ -30,7 +29,7 @@ public class Json5Parser {
 
         var value = parseValue(tokenIterator, Json5Path.ROOT);
 
-        if (tokenIterator.peek().tokenType() != Json5TokenType.END) {
+        if (!tokenIterator.isNext(Json5TokenType.END)) {
             throw unexpectedTokenError("end of document", tokenIterator);
         }
 
@@ -379,7 +378,7 @@ public class Json5Parser {
             if (member.isPresent()) {
                 // TODO: handle duplicates
                 objectBuilder.addMember(member.get());
-            } else if (tokens.trySkip(Json5TokenType.PUNCTUATOR_BRACE_CLOSE)) {
+            } else if (tokens.isNext(Json5TokenType.PUNCTUATOR_BRACE_CLOSE)) {
                 break;
             } else {
                 throw unexpectedTokenError("JSON member or '}'", tokens);
@@ -387,7 +386,7 @@ public class Json5Parser {
 
             if (tokens.trySkip(Json5TokenType.PUNCTUATOR_COMMA)) {
                 // Next member
-            } else if (tokens.trySkip(Json5TokenType.PUNCTUATOR_BRACE_CLOSE)) {
+            } else if (tokens.isNext(Json5TokenType.PUNCTUATOR_BRACE_CLOSE)) {
                 break;
             } else {
                 throw unexpectedTokenError("',' or '}'", tokens);
@@ -395,11 +394,8 @@ public class Json5Parser {
         }
 
         var endToken = tokens.peek();
-        var sourceRange = new Json5SourceRange(
-            startToken.charBuffer(),
-            startToken.sourceRange().start(),
-            endToken.sourceRange().start()
-        );
+        var sourceRange = startToken.sourceRange().to(endToken.sourceRange());
+        tokens.skip();
         return Optional.of(objectBuilder.build(path, sourceRange));
     }
 
@@ -423,11 +419,7 @@ public class Json5Parser {
 
         var value = parseValue(tokens, path.member(memberName.get().value()));
 
-        var sourceRange = new Json5SourceRange(
-            memberName.get().sourceRange().charBuffer(),
-            memberName.get().sourceRange().start(),
-            value.sourceRange().end()
-        );
+        var sourceRange = memberName.get().sourceRange().to(value.sourceRange());
 
         return Optional.of(new Json5Member(memberName.get(), value, sourceRange));
     }
@@ -480,7 +472,7 @@ public class Json5Parser {
             var element = tryParseValue(tokens, path.index(elements.size()));
             if (element.isPresent()) {
                 elements.add(element.get());
-            } else if (tokens.trySkip(Json5TokenType.PUNCTUATOR_SQUARE_CLOSE)) {
+            } else if (tokens.isNext(Json5TokenType.PUNCTUATOR_SQUARE_CLOSE)) {
                 break;
             } else {
                 throw unexpectedTokenError("JSON value or ']'", tokens);
@@ -488,7 +480,7 @@ public class Json5Parser {
 
             if (tokens.trySkip(Json5TokenType.PUNCTUATOR_COMMA)) {
                 // Next element
-            } else if (tokens.trySkip(Json5TokenType.PUNCTUATOR_SQUARE_CLOSE)) {
+            } else if (tokens.isNext(Json5TokenType.PUNCTUATOR_SQUARE_CLOSE)) {
                 break;
             } else {
                 throw unexpectedTokenError("',' or ']'", tokens);
@@ -496,11 +488,8 @@ public class Json5Parser {
         }
 
         var endToken = tokens.peek();
-        var sourceRange = new Json5SourceRange(
-            startToken.sourceRange().charBuffer(),
-            startToken.sourceRange().start(),
-            endToken.sourceRange().start()
-        );
+        var sourceRange = startToken.sourceRange().to(endToken.sourceRange());
+        tokens.skip();
         return Optional.of(new Json5Array(elements, path, sourceRange));
     }
 

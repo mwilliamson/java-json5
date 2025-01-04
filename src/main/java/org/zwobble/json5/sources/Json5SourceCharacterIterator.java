@@ -67,16 +67,6 @@ public class Json5SourceCharacterIterator {
         this.characterIndex = position.characterIndex();
     }
 
-    public CharBuffer sequence(
-        Json5SourcePosition start,
-        Json5SourcePosition end
-    ) {
-        return this.buffer.subSequence(
-            start.characterIndex(),
-            end.characterIndex()
-        );
-    }
-
     public Json5SourceRange sourceRange(
         Json5SourcePosition start,
         Json5SourcePosition end

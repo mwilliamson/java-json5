@@ -33,7 +33,7 @@ class TokenIterator {
     }
 
     boolean trySkip(Json5TokenType tokenType) {
-        if (peek().tokenType() == tokenType) {
+        if (isNext(tokenType)) {
             this.tokenIndex += 1;
             return true;
         } else {
@@ -57,5 +57,9 @@ class TokenIterator {
         }
 
         return this.tokens.get(this.tokenIndex);
+    }
+
+    boolean isNext(Json5TokenType tokenType) {
+        return peek().tokenType() == tokenType;
     }
 }

@@ -31,4 +31,12 @@ public class Json5SourceRange {
     public Json5SourcePosition end() {
         return this.end;
     }
+
+    public Json5SourceRange to(Json5SourceRange end) {
+        return new Json5SourceRange(
+            this.sourceText,
+            this.start,
+            end.end
+        );
+    }
 }
