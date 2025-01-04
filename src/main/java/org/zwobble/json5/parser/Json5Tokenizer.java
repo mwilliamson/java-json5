@@ -1,5 +1,6 @@
 package org.zwobble.json5.parser;
 
+import org.zwobble.json5.sources.Json5SourceCharacterIterator;
 import org.zwobble.json5.sources.Json5SourcePosition;
 import org.zwobble.json5.sources.Json5SourceRange;
 
@@ -136,10 +137,7 @@ class Json5Tokenizer {
 
         while (!characters.trySkip(BUFFER_ASTERISK_FORWARD_SLASH)) {
             if (characters.isEnd()) {
-                var sourceRange = new Json5SourceRange(
-                    characters.position(),
-                    characters.position()
-                );
+                var sourceRange = characters.characterSourceRange();
                 throw Json5ParseError.unexpectedTextError("'*/'", "end of document", sourceRange);
             }
             characters.skip();
@@ -245,9 +243,9 @@ class Json5Tokenizer {
     }
 
     private static boolean isIdentifierStart(CharacterIterator characters) {
-        var index = characters.characterIndex;
+        var position = characters.position();
         if (trySkipIdentifierStart(characters)) {
-            characters.characterIndex = index;
+            characters.position(position);
             return true;
         } else {
             return false;
@@ -688,14 +686,15 @@ class Json5Tokenizer {
         //     DecimalDigit
         //     DecimalDigits DecimalDigit
 
-        var initialIndex = characters.characterIndex;
+        var skipped = false;
 
         while (true) {
             var character = characters.peek();
             if (isDecimalDigit(character)) {
                 characters.skip();
+                skipped = true;
             } else {
-                return initialIndex != characters.characterIndex;
+                return skipped;
             }
         }
     }
@@ -801,18 +800,16 @@ class Json5Tokenizer {
     }
 
     private static class CharacterIterator {
-        private final CharBuffer buffer;
-        private int characterIndex;
+        private final Json5SourceCharacterIterator iterator;
         private Json5SourcePosition tokenStartPosition;
 
         private CharacterIterator(String text) {
-            this.buffer = CharBuffer.wrap(text);
-            this.characterIndex = 0;
+            this.iterator = Json5SourceCharacterIterator.from(text);
             this.tokenStartPosition = new Json5SourcePosition(0);
         }
 
         private boolean isEnd() {
-            return this.characterIndex >= this.buffer.length();
+            return this.iterator.isEnd();
         }
 
         private boolean trySkip(char skip) {
@@ -825,34 +822,24 @@ class Json5Tokenizer {
         }
 
         private boolean trySkip(CharBuffer skip) {
-            if (remaining() < skip.length()) {
+            if (this.iterator.remaining() < skip.length()) {
                 return false;
             }
 
-            if (this.buffer.subSequence(this.characterIndex, this.characterIndex + skip.length()).equals(skip)) {
-                this.characterIndex += skip.length();
+            if (this.iterator.peekSequence(skip.length()).equals(skip)) {
+                this.iterator.skip(skip.length());
                 return true;
             } else {
                 return false;
             }
         }
 
-        private int remaining() {
-            return this.buffer.length() - this.characterIndex;
-        }
-
         int peek() {
-            if (this.characterIndex >= this.buffer.length()) {
-                return -1;
-            }
-
-            return this.buffer.get(this.characterIndex);
+            return this.iterator.peek();
         }
 
         void skip() {
-            if (this.characterIndex < this.buffer.length()) {
-                this.characterIndex += 1;
-            }
+            this.iterator.skip();
         }
 
         void skip(int expectedCharacter) {
@@ -869,33 +856,32 @@ class Json5Tokenizer {
         }
 
         Json5SourceRange characterSourceRange() {
-            if (isEnd()) {
-                return new Json5SourceRange(position(), position());
-            } else {
-                return new Json5SourceRange(
-                    position(),
-                    new Json5SourcePosition(this.characterIndex + 1)
-                );
-            }
-        }
-
-        private Json5SourcePosition position() {
-            return new Json5SourcePosition(this.characterIndex);
+            return this.iterator.characterSourceRange();
         }
 
         void startToken() {
-            this.tokenStartPosition = position();
+            this.tokenStartPosition = this.iterator.position();
         }
 
         Json5SourceRange tokenSourceRange() {
             var start = this.tokenStartPosition;
-            var end = position();
-            return new Json5SourceRange(start, end);
+            var end = this.iterator.position();
+            return iterator.sourceRange(start, end);
         }
 
         CharBuffer tokenSubBuffer() {
-            var startIndex = this.tokenStartPosition.characterIndex();
-            return this.buffer.subSequence(startIndex, this.characterIndex);
+            return this.iterator.sequence(
+                this.tokenStartPosition,
+                this.iterator.position()
+            );
+        }
+
+        Json5SourcePosition position() {
+            return this.iterator.position();
+        }
+
+        public void position(Json5SourcePosition position) {
+            this.iterator.position(position);
         }
     }
 }
