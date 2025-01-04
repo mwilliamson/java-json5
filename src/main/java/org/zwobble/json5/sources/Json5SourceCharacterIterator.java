@@ -52,14 +52,11 @@ public class Json5SourceCharacterIterator {
     }
 
     public Json5SourceRange characterSourceRange() {
-        if (isEnd()) {
-            return new Json5SourceRange(position(), position());
-        } else {
-            return new Json5SourceRange(
-                position(),
-                new Json5SourcePosition(this.characterIndex + 1)
-            );
-        }
+        var end = isEnd()
+            ? position()
+            : new Json5SourcePosition(this.characterIndex + 1);
+
+        return new Json5SourceRange(buffer, position(), end);
     }
 
     public Json5SourcePosition position() {
@@ -84,6 +81,6 @@ public class Json5SourceCharacterIterator {
         Json5SourcePosition start,
         Json5SourcePosition end
     ) {
-        return new Json5SourceRange(start, end);
+        return new Json5SourceRange(buffer, start, end);
     }
 }

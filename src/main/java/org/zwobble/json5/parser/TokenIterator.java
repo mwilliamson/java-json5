@@ -12,15 +12,16 @@ class TokenIterator {
     private final Json5Token tokenEnd;
 
     TokenIterator(List<Json5Token> tokens) {
+        // TODO: create end token so we don't have to synthesise (incorrect) end tokens here.
         this.tokens = tokens;
         this.tokenIndex = 0;
         var lastTokenSourceRange = this.tokens.isEmpty()
-            ? new Json5SourceRange(new Json5SourcePosition(0), new Json5SourcePosition(0))
+            ? new Json5SourceRange(CharBuffer.wrap(""), new Json5SourcePosition(0), new Json5SourcePosition(0))
             : tokens.getLast().sourceRange();
         this.tokenEnd = new Json5Token(
             Json5TokenType.END,
-            CharBuffer.wrap(""),
             new Json5SourceRange(
+                lastTokenSourceRange.charBuffer(),
                 lastTokenSourceRange.end(),
                 lastTokenSourceRange.end()
             )
@@ -42,7 +43,7 @@ class TokenIterator {
 
     boolean trySkip(Json5TokenType tokenType, CharBuffer buffer) {
         var token = peek();
-        if (token.tokenType() == tokenType && token.buffer().equals(buffer)) {
+        if (token.tokenType() == tokenType && token.charBuffer().equals(buffer)) {
             this.tokenIndex += 1;
             return true;
         } else {

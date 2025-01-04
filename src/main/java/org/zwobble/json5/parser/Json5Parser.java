@@ -159,8 +159,8 @@ public class Json5Parser {
     }
 
     private static String parseStringValue(Json5Token token) {
-        var stringCharacters = token.buffer()
-            .subSequence(1, token.buffer().length() - 1);
+        var stringCharacters = token.charBuffer()
+            .subSequence(1, token.charBuffer().length() - 1);
 
         var stringValue = new StringBuilder();
         var index = 0;
@@ -279,13 +279,13 @@ public class Json5Parser {
                 // Therefore, to keep identifier handling straightforward, we
                 // interpret such tokens as identifiers, and handle the special
                 // case when parsing numbers i.e. here.
-                if (token.buffer().equals(BUFFER_INFINITY)) {
+                if (token.charBuffer().equals(BUFFER_INFINITY)) {
                     tokens.skip();
                     return Optional.of(new Json5NumberPositiveInfinity(
                         path,
                         token.sourceRange()
                     ));
-                } else if (token.buffer().equals(BUFFER_NAN)) {
+                } else if (token.charBuffer().equals(BUFFER_NAN)) {
                     tokens.skip();
                     return Optional.of(new Json5NumberNan(
                         path,
@@ -296,7 +296,7 @@ public class Json5Parser {
             case NUMBER_DECIMAL -> {
                 tokens.skip();
                 return Optional.of(new Json5NumberFinite(
-                    new BigDecimal(token.buffer().toString()),
+                    new BigDecimal(token.charBuffer().toString()),
                     path,
                     token.sourceRange()
                 ));
@@ -307,7 +307,7 @@ public class Json5Parser {
                 var hasSign = false;
                 var isNegative = false;
 
-                var buffer = token.buffer();
+                var buffer = token.charBuffer();
                 if (buffer.charAt(0) == '+') {
                     hasSign = true;
                 } else if (buffer.charAt(0) == '-') {
@@ -316,7 +316,7 @@ public class Json5Parser {
                 }
 
                 var unsignedInteger = new BigInteger(
-                    token.buffer().toString().substring(hasSign ? 3 : 2),
+                    token.charBuffer().toString().substring(hasSign ? 3 : 2),
                     16
                 );
                 var integer = isNegative ? unsignedInteger.negate() : unsignedInteger;
@@ -396,6 +396,7 @@ public class Json5Parser {
 
         var endToken = tokens.peek();
         var sourceRange = new Json5SourceRange(
+            startToken.charBuffer(),
             startToken.sourceRange().start(),
             endToken.sourceRange().start()
         );
@@ -423,6 +424,7 @@ public class Json5Parser {
         var value = parseValue(tokens, path.member(memberName.get().value()));
 
         var sourceRange = new Json5SourceRange(
+            memberName.get().sourceRange().charBuffer(),
             memberName.get().sourceRange().start(),
             value.sourceRange().end()
         );
@@ -439,7 +441,7 @@ public class Json5Parser {
         switch (token.tokenType()) {
             case IDENTIFIER -> {
                 tokens.skip();
-                var name = parseIdentifier(token.buffer());
+                var name = parseIdentifier(token.charBuffer());
                 return Optional.of(new Json5MemberName(name, token.sourceRange()));
             }
 
@@ -495,6 +497,7 @@ public class Json5Parser {
 
         var endToken = tokens.peek();
         var sourceRange = new Json5SourceRange(
+            startToken.sourceRange().charBuffer(),
             startToken.sourceRange().start(),
             endToken.sourceRange().start()
         );

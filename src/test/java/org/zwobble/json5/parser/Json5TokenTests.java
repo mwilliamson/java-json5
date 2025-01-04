@@ -10,17 +10,19 @@ import static org.zwobble.precisely.AssertThat.assertThat;
 import static org.zwobble.precisely.Matchers.equalTo;
 
 public class Json5TokenTests {
-    public static final Json5SourceRange SOURCE_RANGE = new Json5SourceRange(
-        new Json5SourcePosition(0),
-        new Json5SourcePosition(0)
-    );
+    public static Json5SourceRange sourceRange(String text) {
+        return new Json5SourceRange(
+                CharBuffer.wrap(text),
+                new Json5SourcePosition(0),
+                new Json5SourcePosition(text.length())
+        );
+    }
 
     @Test
     public void identifierTokenIsDescribedLiterally() {
         var token = new Json5Token(
             Json5TokenType.IDENTIFIER,
-            CharBuffer.wrap("foo"),
-            SOURCE_RANGE
+            sourceRange("foo")
         );
 
         var result = token.describe();
@@ -33,8 +35,7 @@ public class Json5TokenTests {
     public void braceOpenTokenIsDescribedLiterally() {
         var token = new Json5Token(
             Json5TokenType.PUNCTUATOR_BRACE_OPEN,
-            CharBuffer.wrap("{"),
-            SOURCE_RANGE
+            sourceRange("{")
         );
 
         var result = token.describe();
@@ -46,8 +47,7 @@ public class Json5TokenTests {
     public void braceCloseTokenIsDescribedLiterally() {
         var token = new Json5Token(
             Json5TokenType.PUNCTUATOR_BRACE_CLOSE,
-            CharBuffer.wrap("}"),
-            SOURCE_RANGE
+            sourceRange("}")
         );
 
         var result = token.describe();
@@ -59,8 +59,7 @@ public class Json5TokenTests {
     public void squareOpenTokenIsDescribedLiterally() {
         var token = new Json5Token(
             Json5TokenType.PUNCTUATOR_SQUARE_OPEN,
-            CharBuffer.wrap("["),
-            SOURCE_RANGE
+            sourceRange("[")
         );
 
         var result = token.describe();
@@ -72,8 +71,7 @@ public class Json5TokenTests {
     public void squareCloseTokenIsDescribedLiterally() {
         var token = new Json5Token(
             Json5TokenType.PUNCTUATOR_SQUARE_CLOSE,
-            CharBuffer.wrap("]"),
-            SOURCE_RANGE
+            sourceRange("]")
         );
 
         var result = token.describe();
@@ -85,8 +83,7 @@ public class Json5TokenTests {
     public void colonTokenIsDescribedLiterally() {
         var token = new Json5Token(
             Json5TokenType.PUNCTUATOR_COLON,
-            CharBuffer.wrap(":"),
-            SOURCE_RANGE
+            sourceRange(":")
         );
 
         var result = token.describe();
@@ -98,8 +95,7 @@ public class Json5TokenTests {
     public void commaTokenIsDescribedLiterally() {
         var token = new Json5Token(
             Json5TokenType.PUNCTUATOR_COMMA,
-            CharBuffer.wrap(","),
-            SOURCE_RANGE
+            sourceRange(",")
         );
 
         var result = token.describe();
@@ -111,8 +107,7 @@ public class Json5TokenTests {
     public void stringTokenIsDescribedLiterally() {
         var token = new Json5Token(
             Json5TokenType.STRING,
-            CharBuffer.wrap("\"foo\""),
-            SOURCE_RANGE
+            sourceRange("\"foo\"")
         );
 
         var result = token.describe();
@@ -124,8 +119,7 @@ public class Json5TokenTests {
     public void numberDecimalTokenIsDescribedLiterally() {
         var token = new Json5Token(
             Json5TokenType.NUMBER_DECIMAL,
-            CharBuffer.wrap("42"),
-            SOURCE_RANGE
+            sourceRange("42")
         );
 
         var result = token.describe();
@@ -137,8 +131,7 @@ public class Json5TokenTests {
     public void numberHexTokenIsDescribedLiterally() {
         var token = new Json5Token(
             Json5TokenType.NUMBER_HEX,
-            CharBuffer.wrap("0x42"),
-            SOURCE_RANGE
+            sourceRange("0x42")
         );
 
         var result = token.describe();
@@ -150,8 +143,7 @@ public class Json5TokenTests {
     public void numberPositiveInfinityTokenIsDescribedLiterally() {
         var token = new Json5Token(
             Json5TokenType.NUMBER_POSITIVE_INFINITY,
-            CharBuffer.wrap("Infinity"),
-            SOURCE_RANGE
+            sourceRange("Infinity")
         );
 
         var result = token.describe();
@@ -163,8 +155,7 @@ public class Json5TokenTests {
     public void numberNegativeInfinityTokenIsDescribedLiterally() {
         var token = new Json5Token(
             Json5TokenType.NUMBER_NEGATIVE_INFINITY,
-            CharBuffer.wrap("-Infinity"),
-            SOURCE_RANGE
+            sourceRange("-Infinity")
         );
 
         var result = token.describe();
@@ -176,8 +167,7 @@ public class Json5TokenTests {
     public void numberNaNTokenIsDescribedLiterally() {
         var token = new Json5Token(
             Json5TokenType.NUMBER_NAN,
-            CharBuffer.wrap("NaN"),
-            SOURCE_RANGE
+            sourceRange("NaN")
         );
 
         var result = token.describe();
@@ -189,8 +179,7 @@ public class Json5TokenTests {
     public void endTokenIsDescribedAsEndOfDocument() {
         var token = new Json5Token(
             Json5TokenType.END,
-            CharBuffer.wrap(""),
-            SOURCE_RANGE
+            sourceRange("")
         );
 
         var result = token.describe();

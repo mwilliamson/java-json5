@@ -795,8 +795,7 @@ class Json5Tokenizer {
         Json5TokenType tokenType
     ) {
         var sourceRange = characters.tokenSourceRange();
-        var buffer = characters.tokenSubBuffer();
-        return new Json5Token(tokenType, buffer, sourceRange);
+        return new Json5Token(tokenType, sourceRange);
     }
 
     private static class CharacterIterator {
@@ -867,13 +866,6 @@ class Json5Tokenizer {
             var start = this.tokenStartPosition;
             var end = this.iterator.position();
             return iterator.sourceRange(start, end);
-        }
-
-        CharBuffer tokenSubBuffer() {
-            return this.iterator.sequence(
-                this.tokenStartPosition,
-                this.iterator.position()
-            );
         }
 
         Json5SourcePosition position() {
