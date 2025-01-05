@@ -1,6 +1,5 @@
 package org.zwobble.json5.parser;
 
-import java.nio.CharBuffer;
 import java.util.List;
 
 class TokenIterator {
@@ -20,16 +19,6 @@ class TokenIterator {
 
     boolean trySkip(Json5TokenType tokenType) {
         if (isNext(tokenType)) {
-            this.tokenIndex += 1;
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    boolean trySkip(Json5TokenType tokenType, CharBuffer buffer) {
-        var token = peek();
-        if (token.tokenType() == tokenType && token.charBuffer().equals(buffer)) {
             this.tokenIndex += 1;
             return true;
         } else {
