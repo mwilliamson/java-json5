@@ -2,6 +2,7 @@ package org.zwobble.json5.parser;
 
 import org.zwobble.json5.paths.Json5Path;
 import org.zwobble.json5.values.*;
+import org.zwobble.sourcetext.SourceText;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -19,18 +20,17 @@ public class Json5Parser {
     /**
      * Parse JSON5 text into a JSON5 value.
      *
-     * @param text The JSON5 text to parse.
+     * @param sourceText The JSON5 text to parse.
      * @return A structured representation of the JSON5 value represented by
      * {@code text}.
      */
-    public static Json5Value parseText(String text) {
-        var tokens = Json5Tokenizer.tokenize(text);
-        var tokenIterator = new TokenIterator(tokens);
+    public static Json5Value parse(SourceText sourceText) {
+        var tokens = Json5Tokenizer.tokenize(sourceText);
 
-        var value = parseValue(tokenIterator, Json5Path.ROOT);
+        var value = parseValue(tokens, Json5Path.ROOT);
 
-        if (!tokenIterator.isNext(Json5TokenType.END)) {
-            throw unexpectedTokenError("end of document", tokenIterator);
+        if (!tokens.isNext(Json5TokenType.END)) {
+            throw unexpectedTokenError("end of document", tokens);
         }
 
         return value;

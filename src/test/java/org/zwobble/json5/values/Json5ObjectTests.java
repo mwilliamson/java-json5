@@ -14,7 +14,7 @@ import static org.zwobble.precisely.Matchers.isOptionalOf;
 
 public class Json5ObjectTests {
     public static final SourceRange SOURCE_RANGE = new SourceRange(
-        SourceText.fromString(""),
+        SourceText.fromString("<string>", ""),
         new SourcePosition(0),
         new SourcePosition(0)
     );

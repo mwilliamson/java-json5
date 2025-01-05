@@ -5,6 +5,8 @@ import org.zwobble.json5.paths.Json5Path;
 import org.zwobble.json5.values.Json5Array;
 import org.zwobble.json5.values.Json5Boolean;
 import org.zwobble.json5.values.Json5Object;
+import org.zwobble.json5.values.Json5Value;
+import org.zwobble.sourcetext.SourceText;
 
 import java.math.BigDecimal;
 
@@ -19,7 +21,7 @@ public class Json5ParserTests {
 
     @Test
     public void canParseNullLiteral() {
-        var result = Json5Parser.parseText("null");
+        var result = parseText("null");
 
         assertThat(result, isJson5Null(isSourceRange(0, 4)));
     }
@@ -28,14 +30,14 @@ public class Json5ParserTests {
 
     @Test
     public void canParseTrue() {
-        var result = Json5Parser.parseText("true");
+        var result = parseText("true");
 
         assertThat(result, isJson5Boolean(true, isSourceRange(0, 4)));
     }
 
     @Test
     public void canParseFalse() {
-        var result = Json5Parser.parseText("false");
+        var result = parseText("false");
 
         assertThat(result, isJson5Boolean(false, isSourceRange(0, 5)));
     }
@@ -44,147 +46,147 @@ public class Json5ParserTests {
 
     @Test
     public void canParseEmptyStringUsingDoubleQuotes() {
-        var result = Json5Parser.parseText("\"\"");
+        var result = parseText("\"\"");
 
         assertThat(result, isJson5String("", isSourceRange(0, 2)));
     }
 
     @Test
     public void canParseEmptyStringUsingSingleQuotes() {
-        var result = Json5Parser.parseText("''");
+        var result = parseText("''");
 
         assertThat(result, isJson5String("", isSourceRange(0, 2)));
     }
 
     @Test
     public void canParseDoubleQuotedStringContainingAsciiCharacters() {
-        var result = Json5Parser.parseText("\"abc123\"");
+        var result = parseText("\"abc123\"");
 
         assertThat(result, isJson5String("abc123", isSourceRange(0, 8)));
     }
 
     @Test
     public void canParseSingleQuotedStringContainingAsciiCharacters() {
-        var result = Json5Parser.parseText("'abc123'");
+        var result = parseText("'abc123'");
 
         assertThat(result, isJson5String("abc123", isSourceRange(0, 8)));
     }
 
     @Test
     public void canParseDoubleQuotedStringContainingSingleQuote() {
-        var result = Json5Parser.parseText("\"'\"");
+        var result = parseText("\"'\"");
 
         assertThat(result, isJson5String("'", isSourceRange(0, 3)));
     }
 
     @Test
     public void canParseSingleQuotedStringContainingDoubleQuote() {
-        var result = Json5Parser.parseText("'\"'");
+        var result = parseText("'\"'");
 
         assertThat(result, isJson5String("\"", isSourceRange(0, 3)));
     }
 
     @Test
     public void canParseStringContainingEscapedSingleQuote() {
-        var result = Json5Parser.parseText("\"\\'\"");
+        var result = parseText("\"\\'\"");
 
         assertThat(result, isJson5String("'", isSourceRange(0, 4)));
     }
 
     @Test
     public void canParseStringContainingEscapedDoubleQuote() {
-        var result = Json5Parser.parseText("\"\\\"\"");
+        var result = parseText("\"\\\"\"");
 
         assertThat(result, isJson5String("\"", isSourceRange(0, 4)));
     }
 
     @Test
     public void canParseStringContainingEscapedBackslash() {
-        var result = Json5Parser.parseText("\"\\\\\"");
+        var result = parseText("\"\\\\\"");
 
         assertThat(result, isJson5String("\\", isSourceRange(0, 4)));
     }
 
     @Test
     public void canParseStringContainingEscapedBackspace() {
-        var result = Json5Parser.parseText("\"\\b\"");
+        var result = parseText("\"\\b\"");
 
         assertThat(result, isJson5String("\b", isSourceRange(0, 4)));
     }
 
     @Test
     public void canParseStringContainingEscapedFormFeed() {
-        var result = Json5Parser.parseText("\"\\f\"");
+        var result = parseText("\"\\f\"");
 
         assertThat(result, isJson5String("\f", isSourceRange(0, 4)));
     }
 
     @Test
     public void canParseStringContainingEscapedLineFeed() {
-        var result = Json5Parser.parseText("\"\\n\"");
+        var result = parseText("\"\\n\"");
 
         assertThat(result, isJson5String("\n", isSourceRange(0, 4)));
     }
 
     @Test
     public void canParseStringContainingEscapedCarriageReturn() {
-        var result = Json5Parser.parseText("\"\\r\"");
+        var result = parseText("\"\\r\"");
 
         assertThat(result, isJson5String("\r", isSourceRange(0, 4)));
     }
 
     @Test
     public void canParseStringContainingEscapedHorizontalTab() {
-        var result = Json5Parser.parseText("\"\\t\"");
+        var result = parseText("\"\\t\"");
 
         assertThat(result, isJson5String("\t", isSourceRange(0, 4)));
     }
 
     @Test
     public void canParseStringContainingEscapedVerticalTab() {
-        var result = Json5Parser.parseText("\"\\v\"");
+        var result = parseText("\"\\v\"");
 
         assertThat(result, isJson5String("\u000b", isSourceRange(0, 4)));
     }
 
     @Test
     public void canParseStringContainingEscapedNonEscapeCharacter() {
-        var result = Json5Parser.parseText("\"\\a\"");
+        var result = parseText("\"\\a\"");
 
         assertThat(result, isJson5String("a", isSourceRange(0, 4)));
     }
 
     @Test
     public void canParseDoubleQuotedStringContainingLineSeparator() {
-        var result = Json5Parser.parseText("\"\u2028\"");
+        var result = parseText("\"\u2028\"");
 
         assertThat(result, isJson5String("\u2028", isSourceRange(0, 3)));
     }
 
     @Test
     public void canParseSingleQuotedStringContainingLineSeparator() {
-        var result = Json5Parser.parseText("'\u2028'");
+        var result = parseText("'\u2028'");
 
         assertThat(result, isJson5String("\u2028", isSourceRange(0, 3)));
     }
 
     @Test
     public void canParseDoubleQuotedStringContainingParagraphSeparator() {
-        var result = Json5Parser.parseText("\"\u2029\"");
+        var result = parseText("\"\u2029\"");
 
         assertThat(result, isJson5String("\u2029", isSourceRange(0, 3)));
     }
 
     @Test
     public void canParseSingleQuotedStringContainingParagraphSeparator() {
-        var result = Json5Parser.parseText("'\u2029'");
+        var result = parseText("'\u2029'");
 
         assertThat(result, isJson5String("\u2029", isSourceRange(0, 3)));
     }
 
     @Test
     public void canParseStringContainingNullEscapeSequenceNotFollowedByDecimalDigit() {
-        var result = Json5Parser.parseText("\"\\0\"");
+        var result = parseText("\"\\0\"");
 
         assertThat(result, isJson5String("\0", isSourceRange(0, 4)));
     }
@@ -193,7 +195,7 @@ public class Json5ParserTests {
     public void whenStringContainsNullEscapeSequenceThenDecimalDigitThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,
-            () -> Json5Parser.parseText("\"\\01\"")
+            () -> parseText("\"\\01\"")
         );
 
         assertThat(
@@ -205,49 +207,49 @@ public class Json5ParserTests {
 
     @Test
     public void canParseStringContainingHexEscapeSequence() {
-        var result = Json5Parser.parseText("\"\\x5b\"");
+        var result = parseText("\"\\x5b\"");
 
         assertThat(result, isJson5String("[", isSourceRange(0, 6)));
     }
 
     @Test
     public void canParseStringContainingUnicodeEscapeSequence() {
-        var result = Json5Parser.parseText("\"\\u03c0\"");
+        var result = parseText("\"\\u03c0\"");
 
         assertThat(result, isJson5String("\u03c0", isSourceRange(0, 8)));
     }
 
     @Test
     public void canParseStringContainingLineContinuationWithLineFeed() {
-        var result = Json5Parser.parseText("\"abc\\\ndef\"");
+        var result = parseText("\"abc\\\ndef\"");
 
         assertThat(result, isJson5String("abcdef", isSourceRange(0, 10)));
     }
 
     @Test
     public void canParseStringContainingLineContinuationWithCarriageReturnNoLineFeed() {
-        var result = Json5Parser.parseText("\"abc\\\rdef\"");
+        var result = parseText("\"abc\\\rdef\"");
 
         assertThat(result, isJson5String("abcdef", isSourceRange(0, 10)));
     }
 
     @Test
     public void canParseStringContainingLineContinuationWithCarriageReturnThenLineFeed() {
-        var result = Json5Parser.parseText("\"abc\\\r\ndef\"");
+        var result = parseText("\"abc\\\r\ndef\"");
 
         assertThat(result, isJson5String("abcdef", isSourceRange(0, 11)));
     }
 
     @Test
     public void canParseStringContainingLineContinuationWithLineSeparator() {
-        var result = Json5Parser.parseText("\"abc\\\u2028def\"");
+        var result = parseText("\"abc\\\u2028def\"");
 
         assertThat(result, isJson5String("abcdef", isSourceRange(0, 10)));
     }
 
     @Test
     public void canParseStringContainingLineContinuationWithParagraphSeparator() {
-        var result = Json5Parser.parseText("\"abc\\\u2029def\"");
+        var result = parseText("\"abc\\\u2029def\"");
 
         assertThat(result, isJson5String("abcdef", isSourceRange(0, 10)));
     }
@@ -256,7 +258,7 @@ public class Json5ParserTests {
     public void whenStringContainsLineFeedAfterLineContinuationThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,
-            () -> Json5Parser.parseText("\"\\\n\n\"")
+            () -> parseText("\"\\\n\n\"")
         );
 
         assertThat(
@@ -270,7 +272,7 @@ public class Json5ParserTests {
     public void whenUnclosedStringEndsWithBackslashThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,
-            () -> Json5Parser.parseText("\"\\")
+            () -> parseText("\"\\")
         );
 
         assertThat(
@@ -284,7 +286,7 @@ public class Json5ParserTests {
     public void whenDoubleQuotedStringIsUnclosedThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,
-            () -> Json5Parser.parseText("\"")
+            () -> parseText("\"")
         );
 
         assertThat(
@@ -298,7 +300,7 @@ public class Json5ParserTests {
     public void whenSingleQuotedStringIsUnclosedThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,
-            () -> Json5Parser.parseText("'")
+            () -> parseText("'")
         );
 
         assertThat(
@@ -312,7 +314,7 @@ public class Json5ParserTests {
 
     @Test
     public void canParseIntegerZero() {
-        var result = Json5Parser.parseText("0");
+        var result = parseText("0");
 
         assertThat(result, isJson5NumberFinite(
             BigDecimal.ZERO,
@@ -322,7 +324,7 @@ public class Json5ParserTests {
 
     @Test
     public void canParseIntegerZeroWithPositiveSign() {
-        var result = Json5Parser.parseText("+0");
+        var result = parseText("+0");
 
         assertThat(result, isJson5NumberFinite(
             BigDecimal.ZERO,
@@ -332,7 +334,7 @@ public class Json5ParserTests {
 
     @Test
     public void canParseIntegerZeroWithNegativeSign() {
-        var result = Json5Parser.parseText("-0");
+        var result = parseText("-0");
 
         assertThat(result, isJson5NumberFinite(
             BigDecimal.ZERO,
@@ -342,7 +344,7 @@ public class Json5ParserTests {
 
     @Test
     public void canParseDecimalIntegerWithoutSign() {
-        var result = Json5Parser.parseText("123");
+        var result = parseText("123");
 
         assertThat(result, isJson5NumberFinite(
             BigDecimal.valueOf(123),
@@ -352,7 +354,7 @@ public class Json5ParserTests {
 
     @Test
     public void canParseDecimalIntegerWithPositiveSign() {
-        var result = Json5Parser.parseText("+123");
+        var result = parseText("+123");
 
         assertThat(result, isJson5NumberFinite(
             BigDecimal.valueOf(123),
@@ -362,7 +364,7 @@ public class Json5ParserTests {
 
     @Test
     public void canParseDecimalIntegerWithNegativeSign() {
-        var result = Json5Parser.parseText("-123");
+        var result = parseText("-123");
 
         assertThat(result, isJson5NumberFinite(
             BigDecimal.valueOf(-123),
@@ -374,7 +376,7 @@ public class Json5ParserTests {
     public void whenPlusSignIsNotFollowedByNumericLiteralThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,
-            () -> Json5Parser.parseText("+")
+            () -> parseText("+")
         );
 
         assertThat(
@@ -388,7 +390,7 @@ public class Json5ParserTests {
     public void whenNegativeSignIsNotFollowedByNumericLiteralThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,
-            () -> Json5Parser.parseText("-")
+            () -> parseText("-")
         );
 
         assertThat(
@@ -400,7 +402,7 @@ public class Json5ParserTests {
 
     @Test
     public void canParseIntegerWithTrailingDot() {
-        var result = Json5Parser.parseText("123.");
+        var result = parseText("123.");
 
         assertThat(result, isJson5NumberFinite(
             BigDecimal.valueOf(123),
@@ -412,7 +414,7 @@ public class Json5ParserTests {
     public void integerCannotHaveLeadingZeroes() {
         var error = assertThrows(
             Json5ParseError.class,
-            () -> Json5Parser.parseText("01")
+            () -> parseText("01")
         );
 
         assertThat(
@@ -424,7 +426,7 @@ public class Json5ParserTests {
 
     @Test
     public void canParseNumberWithIntegerPartAndFractionalPart() {
-        var result = Json5Parser.parseText("123.456");
+        var result = parseText("123.456");
 
         assertThat(result, isJson5NumberFinite(
             new BigDecimal("123.456"),
@@ -434,7 +436,7 @@ public class Json5ParserTests {
 
     @Test
     public void canParseNumberWithoutIntegerPartAndWithFractionalPart() {
-        var result = Json5Parser.parseText(".456");
+        var result = parseText(".456");
 
         assertThat(result, isJson5NumberFinite(
             new BigDecimal(".456"),
@@ -446,7 +448,7 @@ public class Json5ParserTests {
     public void whenThereIsNoIntegerPartThenDigitsAreExpectedAfterDot() {
         var error = assertThrows(
             Json5ParseError.class,
-            () -> Json5Parser.parseText(".")
+            () -> parseText(".")
         );
 
         assertThat(
@@ -458,7 +460,7 @@ public class Json5ParserTests {
 
     @Test
     public void canParseNumberWithIntegerPartAndExponent() {
-        var result = Json5Parser.parseText("1e3");
+        var result = parseText("1e3");
 
         assertThat(result, isJson5NumberFinite(
             new BigDecimal("1000"),
@@ -468,7 +470,7 @@ public class Json5ParserTests {
 
     @Test
     public void canParseNumberWithIntegerPartAndFractionalPartAndExponent() {
-        var result = Json5Parser.parseText("1.4e3");
+        var result = parseText("1.4e3");
 
         assertThat(result, isJson5NumberFinite(
             new BigDecimal("1400"),
@@ -478,7 +480,7 @@ public class Json5ParserTests {
 
     @Test
     public void canParseNumberWithFractionalPartAndExponent() {
-        var result = Json5Parser.parseText(".4e3");
+        var result = parseText(".4e3");
 
         assertThat(result, isJson5NumberFinite(
             new BigDecimal("400"),
@@ -488,7 +490,7 @@ public class Json5ParserTests {
 
     @Test
     public void exponentIndicatorCanBeLowercase() {
-        var result = Json5Parser.parseText("1e3");
+        var result = parseText("1e3");
 
         assertThat(result, isJson5NumberFinite(
             new BigDecimal("1000"),
@@ -498,7 +500,7 @@ public class Json5ParserTests {
 
     @Test
     public void exponentIndicatorCanBeUppercase() {
-        var result = Json5Parser.parseText("1E3");
+        var result = parseText("1E3");
 
         assertThat(result, isJson5NumberFinite(
             new BigDecimal("1000"),
@@ -508,7 +510,7 @@ public class Json5ParserTests {
 
     @Test
     public void whenExponentPartHasNoSignThenExponentIsPositive() {
-        var result = Json5Parser.parseText("1e3");
+        var result = parseText("1e3");
 
         assertThat(result, isJson5NumberFinite(
             new BigDecimal("1000"),
@@ -518,7 +520,7 @@ public class Json5ParserTests {
 
     @Test
     public void whenExponentPartHasPlusSignThenExponentIsPositive() {
-        var result = Json5Parser.parseText("1e+3");
+        var result = parseText("1e+3");
 
         assertThat(result, isJson5NumberFinite(
             new BigDecimal("1000"),
@@ -528,7 +530,7 @@ public class Json5ParserTests {
 
     @Test
     public void whenExponentPartHasMinusSignThenExponentIsNegative() {
-        var result = Json5Parser.parseText("1e-3");
+        var result = parseText("1e-3");
 
         assertThat(result, isJson5NumberFinite(
             new BigDecimal("0.001"),
@@ -540,7 +542,7 @@ public class Json5ParserTests {
     public void whenExponentIndicatorIsNotFollowedByDecimalDigitsThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,
-            () -> Json5Parser.parseText("1e")
+            () -> parseText("1e")
         );
 
         assertThat(
@@ -554,7 +556,7 @@ public class Json5ParserTests {
     public void whenLowercaseHexLiteralPrefixIsNotFollowedByHexDigitThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,
-            () -> Json5Parser.parseText("0x")
+            () -> parseText("0x")
         );
 
         assertThat(
@@ -568,7 +570,7 @@ public class Json5ParserTests {
     public void whenUppercaseHexLiteralPrefixIsNotFollowedByHexDigitThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,
-            () -> Json5Parser.parseText("0X")
+            () -> parseText("0X")
         );
 
         assertThat(
@@ -580,7 +582,7 @@ public class Json5ParserTests {
 
     @Test
     public void hexLiteralPrefixCanBeLowercase() {
-        var result = Json5Parser.parseText("0x0");
+        var result = parseText("0x0");
 
         assertThat(result, isJson5NumberFinite(
             BigDecimal.ZERO,
@@ -590,7 +592,7 @@ public class Json5ParserTests {
 
     @Test
     public void hexLiteralPrefixCanBeUppercase() {
-        var result = Json5Parser.parseText("0X0");
+        var result = parseText("0X0");
 
         assertThat(result, isJson5NumberFinite(
             BigDecimal.ZERO,
@@ -600,7 +602,7 @@ public class Json5ParserTests {
 
     @Test
     public void canParseHexIntegerWithoutSign() {
-        var result = Json5Parser.parseText("0x19afAFcD");
+        var result = parseText("0x19afAFcD");
 
         assertThat(result, isJson5NumberFinite(
             BigDecimal.valueOf(0x19afAFcD),
@@ -610,7 +612,7 @@ public class Json5ParserTests {
 
     @Test
     public void canParseHexIntegerWithPositiveSign() {
-        var result = Json5Parser.parseText("+0x19afAFcD");
+        var result = parseText("+0x19afAFcD");
 
         assertThat(result, isJson5NumberFinite(
             BigDecimal.valueOf(0x19afAFcD),
@@ -620,7 +622,7 @@ public class Json5ParserTests {
 
     @Test
     public void canParseHexIntegerWithNegativeSign() {
-        var result = Json5Parser.parseText("-0x19afAFcD");
+        var result = parseText("-0x19afAFcD");
 
         assertThat(result, isJson5NumberFinite(
             BigDecimal.valueOf(-0x19afAFcD),
@@ -630,42 +632,42 @@ public class Json5ParserTests {
 
     @Test
     public void canParseInfinityWithoutSign() {
-        var result = Json5Parser.parseText("Infinity");
+        var result = parseText("Infinity");
 
         assertThat(result, isJson5NumberPositiveInfinity(isSourceRange(0, 8)));
     }
 
     @Test
     public void canParseInfinityWithPositiveSign() {
-        var result = Json5Parser.parseText("+Infinity");
+        var result = parseText("+Infinity");
 
         assertThat(result, isJson5NumberPositiveInfinity(isSourceRange(0, 9)));
     }
 
     @Test
     public void canParseInfinityWithNegativeSign() {
-        var result = Json5Parser.parseText("-Infinity");
+        var result = parseText("-Infinity");
 
         assertThat(result, isJson5NumberNegativeInfinity(isSourceRange(0, 9)));
     }
 
     @Test
     public void canParseNanWithoutSign() {
-        var result = Json5Parser.parseText("NaN");
+        var result = parseText("NaN");
 
         assertThat(result, isJson5NumberNan(isSourceRange(0, 3)));
     }
 
     @Test
     public void canParseNanWithPositiveSign() {
-        var result = Json5Parser.parseText("+NaN");
+        var result = parseText("+NaN");
 
         assertThat(result, isJson5NumberNan(isSourceRange(0, 4)));
     }
 
     @Test
     public void canParseNanWithNegativeSign() {
-        var result = Json5Parser.parseText("-NaN");
+        var result = parseText("-NaN");
 
         assertThat(result, isJson5NumberNan(isSourceRange(0, 4)));
     }
@@ -674,7 +676,7 @@ public class Json5ParserTests {
     public void sourceCharacterAfterNumericLiteralMustNotBeIdentifierStart() {
         var error = assertThrows(
             Json5ParseError.class,
-            () -> Json5Parser.parseText("0x0g")
+            () -> parseText("0x0g")
         );
 
         assertThat(
@@ -691,14 +693,14 @@ public class Json5ParserTests {
 
     @Test
     public void emptyObject() {
-        var result = Json5Parser.parseText("{}");
+        var result = parseText("{}");
 
         assertThat(result, isJson5Object(isSequence(), isSourceRange(0, 2)));
     }
 
     @Test
     public void canParseObjectWithOneMemberAndNoTrailingComma() {
-        var result = Json5Parser.parseText("{foo: true}");
+        var result = parseText("{foo: true}");
 
         assertThat(result, isJson5Object(
             isSequence(
@@ -714,7 +716,7 @@ public class Json5ParserTests {
 
     @Test
     public void canParseObjectWithOneMemberAndTrailingComma() {
-        var result = Json5Parser.parseText("{foo: true,}");
+        var result = parseText("{foo: true,}");
 
         assertThat(result, isJson5Object(
             isSequence(
@@ -730,7 +732,7 @@ public class Json5ParserTests {
 
     @Test
     public void canParseObjectWithMultipleMembersAndNoTrailingComma() {
-        var result = Json5Parser.parseText("{foo:true,bar:false,baz:null}");
+        var result = parseText("{foo:true,bar:false,baz:null}");
 
         assertThat(result, isJson5Object(
             isSequence(
@@ -756,7 +758,7 @@ public class Json5ParserTests {
 
     @Test
     public void canParseObjectWithMultipleMembersAndTrailingComma() {
-        var result = Json5Parser.parseText("{foo:true,bar:false,baz:null,}");
+        var result = parseText("{foo:true,bar:false,baz:null,}");
 
 
         assertThat(result, isJson5Object(
@@ -783,7 +785,7 @@ public class Json5ParserTests {
 
     @Test
     public void nestedObject() {
-        var result = Json5Parser.parseText("{a: {}}");
+        var result = parseText("{a: {}}");
 
         assertThat(result, isJson5Object(
             isSequence(
@@ -804,7 +806,7 @@ public class Json5ParserTests {
     public void whenObjectHasTokenThatIsNeitherMemberNameNorClosingBraceThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,
-            () -> Json5Parser.parseText("{]}")
+            () -> parseText("{]}")
         );
 
         assertThat(
@@ -818,7 +820,7 @@ public class Json5ParserTests {
     public void whenObjectMemberIsMissingColonThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,
-            () -> Json5Parser.parseText("{foo,}")
+            () -> parseText("{foo,}")
         );
 
         assertThat(
@@ -832,7 +834,7 @@ public class Json5ParserTests {
     public void whenObjectHasMemberValueThatIsNeitherValueNorClosingBraceThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,
-            () -> Json5Parser.parseText("{foo:]}")
+            () -> parseText("{foo:]}")
         );
 
         assertThat(
@@ -846,7 +848,7 @@ public class Json5ParserTests {
     public void whenObjectHasPostMemberTokenThatIsNeitherCommaNorClosingBraceThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,
-            () -> Json5Parser.parseText("{foo:null]}")
+            () -> parseText("{foo:null]}")
         );
 
         assertThat(
@@ -860,7 +862,7 @@ public class Json5ParserTests {
     public void whenObjectIsMissingClosingBraceThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,
-            () -> Json5Parser.parseText("{")
+            () -> parseText("{")
         );
 
         assertThat(
@@ -873,7 +875,7 @@ public class Json5ParserTests {
 
     @Test
     public void memberNameCanBeIdentifier() {
-        var result = Json5Parser.parseText("{foo: true}");
+        var result = parseText("{foo: true}");
 
         assertThat(result, isJson5Object(
             isSequence(
@@ -889,7 +891,7 @@ public class Json5ParserTests {
 
     @Test
     public void memberNameCanBeReservedWord() {
-        var result = Json5Parser.parseText("{null: true}");
+        var result = parseText("{null: true}");
 
         assertThat(result, isJson5Object(
             isSequence(
@@ -905,7 +907,7 @@ public class Json5ParserTests {
 
     @Test
     public void memberNameCanStartWithDollar() {
-        var result = Json5Parser.parseText("{$foo: true}");
+        var result = parseText("{$foo: true}");
 
         assertThat(result, isJson5Object(
             isSequence(
@@ -921,7 +923,7 @@ public class Json5ParserTests {
 
     @Test
     public void memberNameCanContainDollar() {
-        var result = Json5Parser.parseText("{foo$: true}");
+        var result = parseText("{foo$: true}");
 
         assertThat(result, isJson5Object(
             isSequence(
@@ -937,7 +939,7 @@ public class Json5ParserTests {
 
     @Test
     public void memberNameCanStartWithUnderscore() {
-        var result = Json5Parser.parseText("{_foo: true}");
+        var result = parseText("{_foo: true}");
 
         assertThat(result, isJson5Object(
             isSequence(
@@ -953,7 +955,7 @@ public class Json5ParserTests {
 
     @Test
     public void memberNameCanContainUnderscore() {
-        var result = Json5Parser.parseText("{foo_: true}");
+        var result = parseText("{foo_: true}");
 
         assertThat(result, isJson5Object(
             isSequence(
@@ -969,7 +971,7 @@ public class Json5ParserTests {
 
     @Test
     public void memberNameCanStartWithUnicodeEscapeSequence() {
-        var result = Json5Parser.parseText("{\\u03c0foo: true}");
+        var result = parseText("{\\u03c0foo: true}");
 
         assertThat(result, isJson5Object(
             isSequence(
@@ -985,7 +987,7 @@ public class Json5ParserTests {
 
     @Test
     public void memberNameCanContainUnicodeEscapeSequence() {
-        var result = Json5Parser.parseText("{foo\\u03c0: true}");
+        var result = parseText("{foo\\u03c0: true}");
 
         assertThat(result, isJson5Object(
             isSequence(
@@ -1003,7 +1005,7 @@ public class Json5ParserTests {
     public void whenMemberNameContainsSyntacticallyInvalidUnicodeEscapeSequenceThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,
-            () -> Json5Parser.parseText("{foo\\u20: true}")
+            () -> parseText("{foo\\u20: true}")
         );
 
         assertThat(error.getMessage(), equalTo("Expected hex digit, but was ':'"));
@@ -1012,7 +1014,7 @@ public class Json5ParserTests {
 
     @Test
     public void memberNameCanContainUnicodeNonSpacingMark() {
-        var result = Json5Parser.parseText("{foo\u0300: true}");
+        var result = parseText("{foo\u0300: true}");
 
         assertThat(result, isJson5Object(
             isSequence(
@@ -1028,7 +1030,7 @@ public class Json5ParserTests {
 
     @Test
     public void memberNameCanContainUnicodeCombiningSpacingMark() {
-        var result = Json5Parser.parseText("{foo\u0903: true}");
+        var result = parseText("{foo\u0903: true}");
 
         assertThat(result, isJson5Object(
             isSequence(
@@ -1044,7 +1046,7 @@ public class Json5ParserTests {
 
     @Test
     public void memberNameCanContainUnicodeDecimalNumber() {
-        var result = Json5Parser.parseText("{foo0: true}");
+        var result = parseText("{foo0: true}");
 
         assertThat(result, isJson5Object(
             isSequence(
@@ -1060,7 +1062,7 @@ public class Json5ParserTests {
 
     @Test
     public void memberNameCanContainUnicodeConnectorPunctation() {
-        var result = Json5Parser.parseText("{foo\u203f: true}");
+        var result = parseText("{foo\u203f: true}");
 
         assertThat(result, isJson5Object(
             isSequence(
@@ -1076,7 +1078,7 @@ public class Json5ParserTests {
 
     @Test
     public void memberNameCanContainUnicodeZeroWidthNonJoiner() {
-        var result = Json5Parser.parseText("{foo\u200c: true}");
+        var result = parseText("{foo\u200c: true}");
 
         assertThat(result, isJson5Object(
             isSequence(
@@ -1092,7 +1094,7 @@ public class Json5ParserTests {
 
     @Test
     public void memberNameCanContainUnicodeZeroWidthJoiner() {
-        var result = Json5Parser.parseText("{foo\u200d: true}");
+        var result = parseText("{foo\u200d: true}");
 
         assertThat(result, isJson5Object(
             isSequence(
@@ -1108,7 +1110,7 @@ public class Json5ParserTests {
 
     @Test
     public void memberNameCanBeDoubleQuotedString() {
-        var result = Json5Parser.parseText("{\"foo\": true}");
+        var result = parseText("{\"foo\": true}");
 
         assertThat(result, isJson5Object(
             isSequence(
@@ -1124,7 +1126,7 @@ public class Json5ParserTests {
 
     @Test
     public void memberNameCanBeSingleQuotedString() {
-        var result = Json5Parser.parseText("{'foo': true}");
+        var result = parseText("{'foo': true}");
 
         assertThat(result, isJson5Object(
             isSequence(
@@ -1142,14 +1144,14 @@ public class Json5ParserTests {
 
     @Test
     public void emptyArray() {
-        var result = Json5Parser.parseText("[]");
+        var result = parseText("[]");
 
         assertThat(result, isJson5Array(isSequence(), isSourceRange(0, 2)));
     }
 
     @Test
     public void canParseArrayWithOneElementAndNoTrailingComma() {
-        var result = Json5Parser.parseText("[true]");
+        var result = parseText("[true]");
 
         assertThat(result, isJson5Array(
             isSequence(
@@ -1161,7 +1163,7 @@ public class Json5ParserTests {
 
     @Test
     public void canParseArrayWithOneElementAndTrailingComma() {
-        var result = Json5Parser.parseText("[true,]");
+        var result = parseText("[true,]");
 
         assertThat(result, isJson5Array(
             isSequence(
@@ -1173,7 +1175,7 @@ public class Json5ParserTests {
 
     @Test
     public void canParseArrayWithMultipleElementsAndNoTrailingComma() {
-        var result = Json5Parser.parseText("[true, false, null]");
+        var result = parseText("[true, false, null]");
 
         assertThat(result, isJson5Array(
             isSequence(
@@ -1187,7 +1189,7 @@ public class Json5ParserTests {
 
     @Test
     public void canParseArrayWithMultipleElementsAndTrailingComma() {
-        var result = Json5Parser.parseText("[true, false, null,]");
+        var result = parseText("[true, false, null,]");
 
         assertThat(result, isJson5Array(
             isSequence(
@@ -1201,7 +1203,7 @@ public class Json5ParserTests {
 
     @Test
     public void nestedArray() {
-        var result = Json5Parser.parseText("[[]]");
+        var result = parseText("[[]]");
 
         assertThat(result, isJson5Array(
             isSequence(
@@ -1218,7 +1220,7 @@ public class Json5ParserTests {
     public void whenArrayHasElementThatIsNeitherValueNorClosingSquareBracketThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,
-            () -> Json5Parser.parseText("[}]")
+            () -> parseText("[}]")
         );
 
         assertThat(
@@ -1232,7 +1234,7 @@ public class Json5ParserTests {
     public void whenArrayHasPostElementTokenThatIsNeitherCommaNorClosingSquareBracketThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,
-            () -> Json5Parser.parseText("[null}]")
+            () -> parseText("[null}]")
         );
 
         assertThat(
@@ -1246,7 +1248,7 @@ public class Json5ParserTests {
     public void whenArrayIsMissingClosingSquareBracketThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,
-            () -> Json5Parser.parseText("[")
+            () -> parseText("[")
         );
 
         assertThat(
@@ -1261,7 +1263,7 @@ public class Json5ParserTests {
     public void whenDocumentIsEmptyThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,
-            () -> Json5Parser.parseText("")
+            () -> parseText("")
         );
 
         assertThat(
@@ -1275,7 +1277,7 @@ public class Json5ParserTests {
     public void whenDocumentHasTokensAfterValueThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,
-            () -> Json5Parser.parseText("[][")
+            () -> parseText("[][")
         );
 
         assertThat(
@@ -1287,91 +1289,91 @@ public class Json5ParserTests {
 
     @Test
     public void whitespaceIsIgnored() {
-        var result = Json5Parser.parseText("   [ ]  ");
+        var result = parseText("   [ ]  ");
 
         assertThat(result, isJson5Array(isSequence(), isSourceRange(3, 6)));
     }
 
     @Test
     public void tabIsTreatedAsWhiteSpace() {
-        var result = Json5Parser.parseText("\t[]");
+        var result = parseText("\t[]");
 
         assertThat(result, isJson5Array(isSequence(), isSourceRange(1, 3)));
     }
 
     @Test
     public void verticalTabIsTreatedAsWhiteSpace() {
-        var result = Json5Parser.parseText("\u000b[]");
+        var result = parseText("\u000b[]");
 
         assertThat(result, isJson5Array(isSequence(), isSourceRange(1, 3)));
     }
 
     @Test
     public void formFeedIsTreatedAsWhiteSpace() {
-        var result = Json5Parser.parseText("\f[]");
+        var result = parseText("\f[]");
 
         assertThat(result, isJson5Array(isSequence(), isSourceRange(1, 3)));
     }
 
     @Test
     public void noBreakSpaceIsTreatedAsWhiteSpace() {
-        var result = Json5Parser.parseText("\u00a0[]");
+        var result = parseText("\u00a0[]");
 
         assertThat(result, isJson5Array(isSequence(), isSourceRange(1, 3)));
     }
 
     @Test
     public void spaceIsTreatedAsWhiteSpace() {
-        var result = Json5Parser.parseText(" []");
+        var result = parseText(" []");
 
         assertThat(result, isJson5Array(isSequence(), isSourceRange(1, 3)));
     }
 
     @Test
     public void byteOrderMarkIsTreatedAsWhiteSpace() {
-        var result = Json5Parser.parseText("\ufeff[]");
+        var result = parseText("\ufeff[]");
 
         assertThat(result, isJson5Array(isSequence(), isSourceRange(1, 3)));
     }
 
     @Test
     public void anyOtherUnicodeSpaceSeparatorIsTreatedAsWhiteSpace() {
-        var result = Json5Parser.parseText("\u2000[]");
+        var result = parseText("\u2000[]");
 
         assertThat(result, isJson5Array(isSequence(), isSourceRange(1, 3)));
     }
 
     @Test
     public void lineTerminatorLineFeedIsIgnored() {
-        var result = Json5Parser.parseText("\n\n\n[\n]\n\n");
+        var result = parseText("\n\n\n[\n]\n\n");
 
         assertThat(result, isJson5Array(isSequence(), isSourceRange(3, 6)));
     }
 
     @Test
     public void lineTerminatorCarriageReturnIsIgnored() {
-        var result = Json5Parser.parseText("\r\r\r[\r]\r\r");
+        var result = parseText("\r\r\r[\r]\r\r");
 
         assertThat(result, isJson5Array(isSequence(), isSourceRange(3, 6)));
     }
 
     @Test
     public void lineTerminatorLineSeparatorIsIgnored() {
-        var result = Json5Parser.parseText("\u2028\u2028\u2028[\u2028]\u2028\u2028");
+        var result = parseText("\u2028\u2028\u2028[\u2028]\u2028\u2028");
 
         assertThat(result, isJson5Array(isSequence(), isSourceRange(3, 6)));
     }
 
     @Test
     public void lineTerminatorParagraphSeparatorIsIgnored() {
-        var result = Json5Parser.parseText("\u2029\u2029\u2029[\u2029]\u2029\u2029");
+        var result = parseText("\u2029\u2029\u2029[\u2029]\u2029\u2029");
 
         assertThat(result, isJson5Array(isSequence(), isSourceRange(3, 6)));
     }
 
     @Test
     public void multiLineCommentIsIgnored() {
-        var result = Json5Parser.parseText("/* a */[/* b\n\nc */] /** d*  **/");
+        var result = parseText("/* a */[/* b\n\nc */] /** d*  **/");
 
         assertThat(result, isJson5Array(isSequence(), isSourceRange(7, 19)));
     }
@@ -1380,7 +1382,7 @@ public class Json5ParserTests {
     public void whenMultiLineCommentIsNotClosedThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,
-            () -> Json5Parser.parseText("[]/*")
+            () -> parseText("[]/*")
         );
 
         assertThat(
@@ -1392,14 +1394,14 @@ public class Json5ParserTests {
 
     @Test
     public void singleLineCommentIsIgnored() {
-        var result = Json5Parser.parseText("// a\n[// b\n] // c\n\n");
+        var result = parseText("// a\n[// b\n] // c\n\n");
 
         assertThat(result, isJson5Array(isSequence(), isSourceRange(5, 12)));
     }
 
     @Test
     public void singleLineCommentCanBeClosedByEndOfDocument() {
-        var result = Json5Parser.parseText("[]//");
+        var result = parseText("[]//");
 
         assertThat(result, isJson5Array(isSequence(), isSourceRange(0, 2)));
     }
@@ -1408,7 +1410,7 @@ public class Json5ParserTests {
     public void whenCharacterCannotBeTokenizedThenErrorIsThrown() {
         var error = assertThrows(
             Json5ParseError.class,
-            () -> Json5Parser.parseText("=")
+            () -> parseText("=")
         );
 
 
@@ -1421,7 +1423,7 @@ public class Json5ParserTests {
 
     @Test
     public void whenSurrogatePairsAreUsedThenCharacterIndexCountsEachSurrogateAsOneCharacter() {
-        var result = Json5Parser.parseText("[\"\uD83E\uDD67\", true]");
+        var result = parseText("[\"\uD83E\uDD67\", true]");
 
         assertThat(result, isJson5Array(
             isSequence(
@@ -1442,7 +1444,7 @@ public class Json5ParserTests {
 
     @Test
     public void pathsAreGeneratedForObjectMembers() {
-        var result = Json5Parser.parseText("{a: {b: true}}");
+        var result = parseText("{a: {b: true}}");
 
         assertThat(result, instanceOf(
             Json5Object.class,
@@ -1470,7 +1472,7 @@ public class Json5ParserTests {
 
     @Test
     public void pathsAreGeneratedForArrayElements() {
-        var result = Json5Parser.parseText("[[true], false]");
+        var result = parseText("[[true], false]");
 
         assertThat(result, instanceOf(
             Json5Array.class,
@@ -1492,5 +1494,11 @@ public class Json5ParserTests {
                 )
             ))
         ));
+    }
+
+    // == Test Helpers ==
+
+    private Json5Value parseText(String text) {
+        return Json5Parser.parse(SourceText.fromString("<string>", text));
     }
 }

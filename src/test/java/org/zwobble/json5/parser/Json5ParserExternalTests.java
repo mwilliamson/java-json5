@@ -2,6 +2,7 @@ package org.zwobble.json5.parser;
 
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
+import org.zwobble.sourcetext.SourceText;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -36,7 +37,11 @@ public class Json5ParserExternalTests {
                     return Stream.of(DynamicTest.dynamicTest(
                         relativePath.toString(),
                         () -> {
-                            Json5Parser.parseText(Files.readString(path));
+                            var sourceText = SourceText.fromString(
+                                path.toString(),
+                                Files.readString(path)
+                            );
+                            Json5Parser.parse(sourceText);
                         }
                     ));
 
@@ -45,9 +50,13 @@ public class Json5ParserExternalTests {
                     return Stream.of(DynamicTest.dynamicTest(
                         relativePath.toString(),
                         () -> {
+                            var sourceText = SourceText.fromString(
+                                path.toString(),
+                                Files.readString(path)
+                            );
                             assertThrows(
                                 Json5ParseError.class,
-                                () -> Json5Parser.parseText(Files.readString(path))
+                                () -> Json5Parser.parse(sourceText)
                             );
                         }
                     ));

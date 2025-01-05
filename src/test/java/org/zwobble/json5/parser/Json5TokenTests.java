@@ -11,7 +11,7 @@ import static org.zwobble.precisely.Matchers.equalTo;
 public class Json5TokenTests {
     public static SourceRange sourceRange(String text) {
         return new SourceRange(
-            SourceText.fromString(text),
+            SourceText.fromString("<string>", text),
             new SourcePosition(0),
             new SourcePosition(text.length())
         );

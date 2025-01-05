@@ -3,18 +3,18 @@ package org.zwobble.json5.parser;
 import org.zwobble.sourcetext.SourceCharacterIterator;
 import org.zwobble.sourcetext.SourcePosition;
 import org.zwobble.sourcetext.SourceRange;
+import org.zwobble.sourcetext.SourceText;
 
 import java.nio.CharBuffer;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 class Json5Tokenizer {
     private Json5Tokenizer() {
     }
 
-    static List<Json5Token> tokenize(String text) {
-        var iterator = new CharacterIterator(text);
+    static TokenIterator tokenize(SourceText sourceText) {
+        var iterator = new CharacterIterator(sourceText);
         var tokens = new ArrayList<Json5Token>();
 
         while (!iterator.isEnd()) {
@@ -44,7 +44,12 @@ class Json5Tokenizer {
             }
         }
 
-        return tokens;
+        var tokenEnd = new Json5Token(
+            Json5TokenType.END,
+            iterator.characterSourceRange()
+        );
+
+        return new TokenIterator(tokens, tokenEnd);
     }
 
     private static boolean trySkipWhiteSpace(CharacterIterator characters) {
@@ -802,8 +807,8 @@ class Json5Tokenizer {
         private final SourceCharacterIterator iterator;
         private SourcePosition tokenStartPosition;
 
-        private CharacterIterator(String text) {
-            this.iterator = SourceCharacterIterator.from(text);
+        private CharacterIterator(SourceText sourceText) {
+            this.iterator = sourceText.characterIterator();
             this.tokenStartPosition = this.iterator.position();
         }
 
