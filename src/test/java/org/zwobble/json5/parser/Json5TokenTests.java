@@ -3,8 +3,7 @@ package org.zwobble.json5.parser;
 import org.junit.jupiter.api.Test;
 import org.zwobble.json5.sources.Json5SourcePosition;
 import org.zwobble.json5.sources.Json5SourceRange;
-
-import java.nio.CharBuffer;
+import org.zwobble.json5.sources.Json5SourceText;
 
 import static org.zwobble.precisely.AssertThat.assertThat;
 import static org.zwobble.precisely.Matchers.equalTo;
@@ -12,7 +11,7 @@ import static org.zwobble.precisely.Matchers.equalTo;
 public class Json5TokenTests {
     public static Json5SourceRange sourceRange(String text) {
         return new Json5SourceRange(
-            CharBuffer.wrap(text),
+            Json5SourceText.fromString(text),
             new Json5SourcePosition(0),
             new Json5SourcePosition(text.length())
         );

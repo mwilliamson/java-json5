@@ -7,39 +7,39 @@ public class Json5SourceCharacterIterator {
         return new Json5SourceCharacterIterator(text);
     }
 
-    private final CharBuffer buffer;
+    private final Json5SourceText sourceText;
     private int characterIndex;
 
     private Json5SourceCharacterIterator(String text) {
-        this.buffer = CharBuffer.wrap(text);
+        this.sourceText = Json5SourceText.fromString(text);
         this.characterIndex = 0;
     }
 
     public boolean isEnd() {
-        return this.characterIndex >= this.buffer.length();
+        return this.characterIndex >= this.sourceText.characterLength();
     }
 
     public int remaining() {
-        return this.buffer.length() - this.characterIndex;
+        return this.sourceText.characterLength() - this.characterIndex;
     }
 
     public int peek() {
-        if (this.characterIndex >= this.buffer.length()) {
+        if (this.characterIndex >= this.sourceText.characterLength()) {
             return -1;
         }
 
-        return this.buffer.get(this.characterIndex);
+        return this.sourceText.getCharacter(this.characterIndex);
     }
 
     public CharBuffer peekSequence(int length) {
-        return this.buffer.subSequence(
+        return this.sourceText.charBuffer(
             this.characterIndex,
             this.characterIndex + length
         );
     }
 
     public void skip() {
-        if (this.characterIndex < this.buffer.length()) {
+        if (this.characterIndex < this.sourceText.characterLength()) {
             this.characterIndex += 1;
         }
     }
@@ -47,7 +47,7 @@ public class Json5SourceCharacterIterator {
     public void skip(int length) {
         this.characterIndex = Math.min(
             this.characterIndex + length,
-            this.buffer.length()
+            this.sourceText.characterLength()
         );
     }
 
@@ -56,7 +56,7 @@ public class Json5SourceCharacterIterator {
             ? position()
             : new Json5SourcePosition(this.characterIndex + 1);
 
-        return new Json5SourceRange(buffer, position(), end);
+        return new Json5SourceRange(sourceText, position(), end);
     }
 
     public Json5SourcePosition position() {
@@ -71,6 +71,6 @@ public class Json5SourceCharacterIterator {
         Json5SourcePosition start,
         Json5SourcePosition end
     ) {
-        return new Json5SourceRange(buffer, start, end);
+        return new Json5SourceRange(sourceText, start, end);
     }
 }

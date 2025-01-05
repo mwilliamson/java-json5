@@ -4,8 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.zwobble.json5.paths.Json5Path;
 import org.zwobble.json5.sources.Json5SourcePosition;
 import org.zwobble.json5.sources.Json5SourceRange;
-
-import java.nio.CharBuffer;
+import org.zwobble.json5.sources.Json5SourceText;
 
 import static org.zwobble.json5.sources.Json5SourceRangeMatchers.isJson5SourceRange;
 import static org.zwobble.json5.values.Json5ValueMatchers.isJson5Boolean;
@@ -15,7 +14,7 @@ import static org.zwobble.precisely.Matchers.isOptionalOf;
 
 public class Json5ObjectTests {
     public static final Json5SourceRange SOURCE_RANGE = new Json5SourceRange(
-        CharBuffer.wrap(""),
+        Json5SourceText.fromString(""),
         new Json5SourcePosition(0),
         new Json5SourcePosition(0)
     );
