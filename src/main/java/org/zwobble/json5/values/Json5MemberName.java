@@ -1,12 +1,12 @@
 package org.zwobble.json5.values;
 
-import org.zwobble.json5.sources.Json5SourceRange;
+import org.zwobble.sourcetext.SourceRange;
 
 public class Json5MemberName {
     private final String value;
-    private final Json5SourceRange sourceRange;
+    private final SourceRange sourceRange;
 
-    public Json5MemberName(String value, Json5SourceRange sourceRange) {
+    public Json5MemberName(String value, SourceRange sourceRange) {
         this.value = value;
         this.sourceRange = sourceRange;
     }
@@ -15,7 +15,7 @@ public class Json5MemberName {
         return this.value;
     }
 
-    public Json5SourceRange sourceRange() {
+    public SourceRange sourceRange() {
         return this.sourceRange;
     }
 }

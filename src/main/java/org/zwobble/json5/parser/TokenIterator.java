@@ -1,8 +1,8 @@
 package org.zwobble.json5.parser;
 
-import org.zwobble.json5.sources.Json5SourcePosition;
-import org.zwobble.json5.sources.Json5SourceRange;
-import org.zwobble.json5.sources.Json5SourceText;
+import org.zwobble.sourcetext.SourcePosition;
+import org.zwobble.sourcetext.SourceRange;
+import org.zwobble.sourcetext.SourceText;
 
 import java.nio.CharBuffer;
 import java.util.List;
@@ -17,11 +17,11 @@ class TokenIterator {
         this.tokens = tokens;
         this.tokenIndex = 0;
         var lastTokenSourceRange = this.tokens.isEmpty()
-            ? new Json5SourceRange(Json5SourceText.fromString(""), new Json5SourcePosition(0), new Json5SourcePosition(0))
+            ? new SourceRange(SourceText.fromString(""), new SourcePosition(0), new SourcePosition(0))
             : tokens.getLast().sourceRange();
         this.tokenEnd = new Json5Token(
             Json5TokenType.END,
-            new Json5SourceRange(
+            new SourceRange(
                 lastTokenSourceRange.sourceText(),
                 lastTokenSourceRange.end(),
                 lastTokenSourceRange.end()

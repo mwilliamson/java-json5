@@ -60,6 +60,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.github.mwilliamson</groupId>
+      <artifactId>java-source-text</artifactId>
+      <version>2503bbf11e924684d5bc217ffc607d90922d2180</version>
+    </dependency>
+    <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
       <scope>test</scope>

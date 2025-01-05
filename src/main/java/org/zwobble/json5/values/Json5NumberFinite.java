@@ -1,19 +1,19 @@
 package org.zwobble.json5.values;
 
 import org.zwobble.json5.paths.Json5Path;
-import org.zwobble.json5.sources.Json5SourceRange;
+import org.zwobble.sourcetext.SourceRange;
 
 import java.math.BigDecimal;
 
 public final class Json5NumberFinite implements Json5Number {
     private final BigDecimal value;
     private final Json5Path path;
-    private final Json5SourceRange sourceRange;
+    private final SourceRange sourceRange;
 
     public Json5NumberFinite(
         BigDecimal value,
         Json5Path path,
-        Json5SourceRange sourceRange
+        SourceRange sourceRange
     ) {
         this.value = value;
         this.path = path;
@@ -30,7 +30,7 @@ public final class Json5NumberFinite implements Json5Number {
     }
 
     @Override
-    public Json5SourceRange sourceRange() {
+    public SourceRange sourceRange() {
         return this.sourceRange;
     }
 }

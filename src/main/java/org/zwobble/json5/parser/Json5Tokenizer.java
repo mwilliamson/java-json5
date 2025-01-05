@@ -1,8 +1,8 @@
 package org.zwobble.json5.parser;
 
-import org.zwobble.json5.sources.Json5SourceCharacterIterator;
-import org.zwobble.json5.sources.Json5SourcePosition;
-import org.zwobble.json5.sources.Json5SourceRange;
+import org.zwobble.sourcetext.SourceCharacterIterator;
+import org.zwobble.sourcetext.SourcePosition;
+import org.zwobble.sourcetext.SourceRange;
 
 import java.nio.CharBuffer;
 import java.util.ArrayList;
@@ -799,11 +799,11 @@ class Json5Tokenizer {
     }
 
     private static class CharacterIterator {
-        private final Json5SourceCharacterIterator iterator;
-        private Json5SourcePosition tokenStartPosition;
+        private final SourceCharacterIterator iterator;
+        private SourcePosition tokenStartPosition;
 
         private CharacterIterator(String text) {
-            this.iterator = Json5SourceCharacterIterator.from(text);
+            this.iterator = SourceCharacterIterator.from(text);
             this.tokenStartPosition = this.iterator.position();
         }
 
@@ -854,7 +854,7 @@ class Json5Tokenizer {
             }
         }
 
-        Json5SourceRange characterSourceRange() {
+        SourceRange characterSourceRange() {
             return this.iterator.characterSourceRange();
         }
 
@@ -862,17 +862,17 @@ class Json5Tokenizer {
             this.tokenStartPosition = this.iterator.position();
         }
 
-        Json5SourceRange tokenSourceRange() {
+        SourceRange tokenSourceRange() {
             var start = this.tokenStartPosition;
             var end = this.iterator.position();
             return iterator.sourceRange(start, end);
         }
 
-        Json5SourcePosition position() {
+        SourcePosition position() {
             return this.iterator.position();
         }
 
-        public void position(Json5SourcePosition position) {
+        public void position(SourcePosition position) {
             this.iterator.position(position);
         }
     }

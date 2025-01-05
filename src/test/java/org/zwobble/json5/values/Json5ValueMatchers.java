@@ -1,6 +1,6 @@
 package org.zwobble.json5.values;
 
-import org.zwobble.json5.sources.Json5SourceRange;
+import org.zwobble.sourcetext.SourceRange;
 import org.zwobble.precisely.MatchResult;
 import org.zwobble.precisely.Matcher;
 import org.zwobble.precisely.TextTree;
@@ -11,7 +11,7 @@ import static org.zwobble.precisely.Matchers.*;
 
 public class Json5ValueMatchers {
     public static Matcher<Json5Value> isJson5Null(
-        Matcher<Json5SourceRange> sourceRange
+        Matcher<SourceRange> sourceRange
     ) {
         return instanceOf(
             Json5Null.class,
@@ -21,7 +21,7 @@ public class Json5ValueMatchers {
 
     public static Matcher<Json5Value> isJson5Boolean(
         boolean value,
-        Matcher<Json5SourceRange> sourceRange
+        Matcher<SourceRange> sourceRange
     ) {
         return instanceOf(
             Json5Boolean.class,
@@ -32,7 +32,7 @@ public class Json5ValueMatchers {
 
     public static Matcher<Json5Value> isJson5String(
         String value,
-        Matcher<Json5SourceRange> sourceRange
+        Matcher<SourceRange> sourceRange
     ) {
         return instanceOf(
             Json5String.class,
@@ -43,7 +43,7 @@ public class Json5ValueMatchers {
 
     public static Matcher<Json5Value> isJson5NumberFinite(
         BigDecimal value,
-        Matcher<Json5SourceRange> sourceRange
+        Matcher<SourceRange> sourceRange
     ) {
         return instanceOf(
             Json5NumberFinite.class,
@@ -75,7 +75,7 @@ public class Json5ValueMatchers {
     }
 
     public static Matcher<Json5Value> isJson5NumberPositiveInfinity(
-        Matcher<Json5SourceRange> sourceRange
+        Matcher<SourceRange> sourceRange
     ) {
         return instanceOf(
             Json5NumberPositiveInfinity.class,
@@ -84,7 +84,7 @@ public class Json5ValueMatchers {
     }
 
     public static Matcher<Json5Value> isJson5NumberNegativeInfinity(
-        Matcher<Json5SourceRange> sourceRange
+        Matcher<SourceRange> sourceRange
     ) {
         return instanceOf(
             Json5NumberNegativeInfinity.class,
@@ -93,7 +93,7 @@ public class Json5ValueMatchers {
     }
 
     public static Matcher<Json5Value> isJson5NumberNan(
-        Matcher<Json5SourceRange> sourceRange
+        Matcher<SourceRange> sourceRange
     ) {
         return instanceOf(
             Json5NumberNan.class,
@@ -103,7 +103,7 @@ public class Json5ValueMatchers {
 
     public static Matcher<Json5Value> isJson5Object(
         Matcher<Iterable<? extends Json5Member>> members,
-        Matcher<Json5SourceRange> sourceRange
+        Matcher<SourceRange> sourceRange
     ) {
         return instanceOf(
             Json5Object.class,
@@ -115,7 +115,7 @@ public class Json5ValueMatchers {
     public static Matcher<Json5Member> isJson5Member(
         Matcher<Json5MemberName> name,
         Matcher<Json5Value> value,
-        Matcher<Json5SourceRange> sourceRange
+        Matcher<SourceRange> sourceRange
     ) {
         return allOf(
             has("name", x -> x.name(), name),
@@ -126,7 +126,7 @@ public class Json5ValueMatchers {
 
     public static Matcher<Json5MemberName> isJson5MemberName(
         String value,
-        Matcher<Json5SourceRange> sourceRange
+        Matcher<SourceRange> sourceRange
     ) {
         return allOf(
             has("value", x -> x.value(), equalTo(value)),
@@ -136,7 +136,7 @@ public class Json5ValueMatchers {
 
     public static Matcher<Json5Value> isJson5Array(
         Matcher<Iterable<? extends Json5Value>> elements,
-        Matcher<Json5SourceRange> sourceRange
+        Matcher<SourceRange> sourceRange
     ) {
         return instanceOf(
             Json5Array.class,

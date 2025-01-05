@@ -1,15 +1,15 @@
 package org.zwobble.json5.values;
 
 import org.zwobble.json5.paths.Json5Path;
-import org.zwobble.json5.sources.Json5SourceRange;
+import org.zwobble.sourcetext.SourceRange;
 
 public final class Json5NumberNegativeInfinity implements Json5Number {
     private final Json5Path path;
-    private final Json5SourceRange sourceRange;
+    private final SourceRange sourceRange;
 
     public Json5NumberNegativeInfinity(
         Json5Path path,
-        Json5SourceRange sourceRange
+        SourceRange sourceRange
     ) {
         this.path = path;
         this.sourceRange = sourceRange;
@@ -21,7 +21,7 @@ public final class Json5NumberNegativeInfinity implements Json5Number {
     }
 
     @Override
-    public Json5SourceRange sourceRange() {
+    public SourceRange sourceRange() {
         return this.sourceRange;
     }
 }

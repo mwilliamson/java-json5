@@ -1,7 +1,7 @@
 package org.zwobble.json5.values;
 
 import org.zwobble.json5.paths.Json5Path;
-import org.zwobble.json5.sources.Json5SourceRange;
+import org.zwobble.sourcetext.SourceRange;
 
 import java.util.LinkedHashMap;
 import java.util.Optional;
@@ -9,12 +9,12 @@ import java.util.Optional;
 public final class Json5Object implements Json5Value {
     private final LinkedHashMap<String, Json5Member> members;
     private final Json5Path path;
-    private final Json5SourceRange sourceRange;
+    private final SourceRange sourceRange;
 
     private Json5Object(
         LinkedHashMap<String, Json5Member> members,
         Json5Path path,
-        Json5SourceRange sourceRange
+        SourceRange sourceRange
     ) {
         this.path = path;
         this.members = members;
@@ -42,7 +42,7 @@ public final class Json5Object implements Json5Value {
     }
 
     @Override
-    public Json5SourceRange sourceRange() {
+    public SourceRange sourceRange() {
         return this.sourceRange;
     }
 
@@ -58,7 +58,7 @@ public final class Json5Object implements Json5Value {
             return this;
         }
 
-        public Json5Object build(Json5Path path, Json5SourceRange sourceRange) {
+        public Json5Object build(Json5Path path, SourceRange sourceRange) {
             return new Json5Object(this.members, path, sourceRange);
         }
     }

@@ -9,7 +9,7 @@ import org.zwobble.json5.values.Json5Object;
 import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.zwobble.json5.sources.Json5SourceRangeMatchers.isJson5SourceRange;
+import static org.zwobble.json5.sources.SourceRangeMatchers.isSourceRange;
 import static org.zwobble.json5.values.Json5ValueMatchers.*;
 import static org.zwobble.precisely.AssertThat.assertThat;
 import static org.zwobble.precisely.Matchers.*;
@@ -21,7 +21,7 @@ public class Json5ParserTests {
     public void canParseNullLiteral() {
         var result = Json5Parser.parseText("null");
 
-        assertThat(result, isJson5Null(isJson5SourceRange(0, 4)));
+        assertThat(result, isJson5Null(isSourceRange(0, 4)));
     }
 
     // == Booleans ==
@@ -30,14 +30,14 @@ public class Json5ParserTests {
     public void canParseTrue() {
         var result = Json5Parser.parseText("true");
 
-        assertThat(result, isJson5Boolean(true, isJson5SourceRange(0, 4)));
+        assertThat(result, isJson5Boolean(true, isSourceRange(0, 4)));
     }
 
     @Test
     public void canParseFalse() {
         var result = Json5Parser.parseText("false");
 
-        assertThat(result, isJson5Boolean(false, isJson5SourceRange(0, 5)));
+        assertThat(result, isJson5Boolean(false, isSourceRange(0, 5)));
     }
 
     // == Strings ==
@@ -46,147 +46,147 @@ public class Json5ParserTests {
     public void canParseEmptyStringUsingDoubleQuotes() {
         var result = Json5Parser.parseText("\"\"");
 
-        assertThat(result, isJson5String("", isJson5SourceRange(0, 2)));
+        assertThat(result, isJson5String("", isSourceRange(0, 2)));
     }
 
     @Test
     public void canParseEmptyStringUsingSingleQuotes() {
         var result = Json5Parser.parseText("''");
 
-        assertThat(result, isJson5String("", isJson5SourceRange(0, 2)));
+        assertThat(result, isJson5String("", isSourceRange(0, 2)));
     }
 
     @Test
     public void canParseDoubleQuotedStringContainingAsciiCharacters() {
         var result = Json5Parser.parseText("\"abc123\"");
 
-        assertThat(result, isJson5String("abc123", isJson5SourceRange(0, 8)));
+        assertThat(result, isJson5String("abc123", isSourceRange(0, 8)));
     }
 
     @Test
     public void canParseSingleQuotedStringContainingAsciiCharacters() {
         var result = Json5Parser.parseText("'abc123'");
 
-        assertThat(result, isJson5String("abc123", isJson5SourceRange(0, 8)));
+        assertThat(result, isJson5String("abc123", isSourceRange(0, 8)));
     }
 
     @Test
     public void canParseDoubleQuotedStringContainingSingleQuote() {
         var result = Json5Parser.parseText("\"'\"");
 
-        assertThat(result, isJson5String("'", isJson5SourceRange(0, 3)));
+        assertThat(result, isJson5String("'", isSourceRange(0, 3)));
     }
 
     @Test
     public void canParseSingleQuotedStringContainingDoubleQuote() {
         var result = Json5Parser.parseText("'\"'");
 
-        assertThat(result, isJson5String("\"", isJson5SourceRange(0, 3)));
+        assertThat(result, isJson5String("\"", isSourceRange(0, 3)));
     }
 
     @Test
     public void canParseStringContainingEscapedSingleQuote() {
         var result = Json5Parser.parseText("\"\\'\"");
 
-        assertThat(result, isJson5String("'", isJson5SourceRange(0, 4)));
+        assertThat(result, isJson5String("'", isSourceRange(0, 4)));
     }
 
     @Test
     public void canParseStringContainingEscapedDoubleQuote() {
         var result = Json5Parser.parseText("\"\\\"\"");
 
-        assertThat(result, isJson5String("\"", isJson5SourceRange(0, 4)));
+        assertThat(result, isJson5String("\"", isSourceRange(0, 4)));
     }
 
     @Test
     public void canParseStringContainingEscapedBackslash() {
         var result = Json5Parser.parseText("\"\\\\\"");
 
-        assertThat(result, isJson5String("\\", isJson5SourceRange(0, 4)));
+        assertThat(result, isJson5String("\\", isSourceRange(0, 4)));
     }
 
     @Test
     public void canParseStringContainingEscapedBackspace() {
         var result = Json5Parser.parseText("\"\\b\"");
 
-        assertThat(result, isJson5String("\b", isJson5SourceRange(0, 4)));
+        assertThat(result, isJson5String("\b", isSourceRange(0, 4)));
     }
 
     @Test
     public void canParseStringContainingEscapedFormFeed() {
         var result = Json5Parser.parseText("\"\\f\"");
 
-        assertThat(result, isJson5String("\f", isJson5SourceRange(0, 4)));
+        assertThat(result, isJson5String("\f", isSourceRange(0, 4)));
     }
 
     @Test
     public void canParseStringContainingEscapedLineFeed() {
         var result = Json5Parser.parseText("\"\\n\"");
 
-        assertThat(result, isJson5String("\n", isJson5SourceRange(0, 4)));
+        assertThat(result, isJson5String("\n", isSourceRange(0, 4)));
     }
 
     @Test
     public void canParseStringContainingEscapedCarriageReturn() {
         var result = Json5Parser.parseText("\"\\r\"");
 
-        assertThat(result, isJson5String("\r", isJson5SourceRange(0, 4)));
+        assertThat(result, isJson5String("\r", isSourceRange(0, 4)));
     }
 
     @Test
     public void canParseStringContainingEscapedHorizontalTab() {
         var result = Json5Parser.parseText("\"\\t\"");
 
-        assertThat(result, isJson5String("\t", isJson5SourceRange(0, 4)));
+        assertThat(result, isJson5String("\t", isSourceRange(0, 4)));
     }
 
     @Test
     public void canParseStringContainingEscapedVerticalTab() {
         var result = Json5Parser.parseText("\"\\v\"");
 
-        assertThat(result, isJson5String("\u000b", isJson5SourceRange(0, 4)));
+        assertThat(result, isJson5String("\u000b", isSourceRange(0, 4)));
     }
 
     @Test
     public void canParseStringContainingEscapedNonEscapeCharacter() {
         var result = Json5Parser.parseText("\"\\a\"");
 
-        assertThat(result, isJson5String("a", isJson5SourceRange(0, 4)));
+        assertThat(result, isJson5String("a", isSourceRange(0, 4)));
     }
 
     @Test
     public void canParseDoubleQuotedStringContainingLineSeparator() {
         var result = Json5Parser.parseText("\"\u2028\"");
 
-        assertThat(result, isJson5String("\u2028", isJson5SourceRange(0, 3)));
+        assertThat(result, isJson5String("\u2028", isSourceRange(0, 3)));
     }
 
     @Test
     public void canParseSingleQuotedStringContainingLineSeparator() {
         var result = Json5Parser.parseText("'\u2028'");
 
-        assertThat(result, isJson5String("\u2028", isJson5SourceRange(0, 3)));
+        assertThat(result, isJson5String("\u2028", isSourceRange(0, 3)));
     }
 
     @Test
     public void canParseDoubleQuotedStringContainingParagraphSeparator() {
         var result = Json5Parser.parseText("\"\u2029\"");
 
-        assertThat(result, isJson5String("\u2029", isJson5SourceRange(0, 3)));
+        assertThat(result, isJson5String("\u2029", isSourceRange(0, 3)));
     }
 
     @Test
     public void canParseSingleQuotedStringContainingParagraphSeparator() {
         var result = Json5Parser.parseText("'\u2029'");
 
-        assertThat(result, isJson5String("\u2029", isJson5SourceRange(0, 3)));
+        assertThat(result, isJson5String("\u2029", isSourceRange(0, 3)));
     }
 
     @Test
     public void canParseStringContainingNullEscapeSequenceNotFollowedByDecimalDigit() {
         var result = Json5Parser.parseText("\"\\0\"");
 
-        assertThat(result, isJson5String("\0", isJson5SourceRange(0, 4)));
+        assertThat(result, isJson5String("\0", isSourceRange(0, 4)));
     }
 
     @Test
@@ -200,56 +200,56 @@ public class Json5ParserTests {
             error.getMessage(),
             equalTo("'\\0' cannot be followed by decimal digit")
         );
-        assertThat(error.sourceRange(), isJson5SourceRange(3, 4));
+        assertThat(error.sourceRange(), isSourceRange(3, 4));
     }
 
     @Test
     public void canParseStringContainingHexEscapeSequence() {
         var result = Json5Parser.parseText("\"\\x5b\"");
 
-        assertThat(result, isJson5String("[", isJson5SourceRange(0, 6)));
+        assertThat(result, isJson5String("[", isSourceRange(0, 6)));
     }
 
     @Test
     public void canParseStringContainingUnicodeEscapeSequence() {
         var result = Json5Parser.parseText("\"\\u03c0\"");
 
-        assertThat(result, isJson5String("\u03c0", isJson5SourceRange(0, 8)));
+        assertThat(result, isJson5String("\u03c0", isSourceRange(0, 8)));
     }
 
     @Test
     public void canParseStringContainingLineContinuationWithLineFeed() {
         var result = Json5Parser.parseText("\"abc\\\ndef\"");
 
-        assertThat(result, isJson5String("abcdef", isJson5SourceRange(0, 10)));
+        assertThat(result, isJson5String("abcdef", isSourceRange(0, 10)));
     }
 
     @Test
     public void canParseStringContainingLineContinuationWithCarriageReturnNoLineFeed() {
         var result = Json5Parser.parseText("\"abc\\\rdef\"");
 
-        assertThat(result, isJson5String("abcdef", isJson5SourceRange(0, 10)));
+        assertThat(result, isJson5String("abcdef", isSourceRange(0, 10)));
     }
 
     @Test
     public void canParseStringContainingLineContinuationWithCarriageReturnThenLineFeed() {
         var result = Json5Parser.parseText("\"abc\\\r\ndef\"");
 
-        assertThat(result, isJson5String("abcdef", isJson5SourceRange(0, 11)));
+        assertThat(result, isJson5String("abcdef", isSourceRange(0, 11)));
     }
 
     @Test
     public void canParseStringContainingLineContinuationWithLineSeparator() {
         var result = Json5Parser.parseText("\"abc\\\u2028def\"");
 
-        assertThat(result, isJson5String("abcdef", isJson5SourceRange(0, 10)));
+        assertThat(result, isJson5String("abcdef", isSourceRange(0, 10)));
     }
 
     @Test
     public void canParseStringContainingLineContinuationWithParagraphSeparator() {
         var result = Json5Parser.parseText("\"abc\\\u2029def\"");
 
-        assertThat(result, isJson5String("abcdef", isJson5SourceRange(0, 10)));
+        assertThat(result, isJson5String("abcdef", isSourceRange(0, 10)));
     }
 
     @Test
@@ -263,7 +263,7 @@ public class Json5ParserTests {
             error.getMessage(),
             equalTo("Expected string character or '\"', but was '\n'")
         );
-        assertThat(error.sourceRange(), isJson5SourceRange(3, 4));
+        assertThat(error.sourceRange(), isSourceRange(3, 4));
     }
 
     @Test
@@ -277,7 +277,7 @@ public class Json5ParserTests {
             error.getMessage(),
             equalTo("Expected escape sequence or line terminator, but was end of document")
         );
-        assertThat(error.sourceRange(), isJson5SourceRange(2, 2));
+        assertThat(error.sourceRange(), isSourceRange(2, 2));
     }
 
     @Test
@@ -291,7 +291,7 @@ public class Json5ParserTests {
             error.getMessage(),
             equalTo("Expected string character or '\"', but was end of document")
         );
-        assertThat(error.sourceRange(), isJson5SourceRange(1, 1));
+        assertThat(error.sourceRange(), isSourceRange(1, 1));
     }
 
     @Test
@@ -305,7 +305,7 @@ public class Json5ParserTests {
             error.getMessage(),
             equalTo("Expected string character or '\\'', but was end of document")
         );
-        assertThat(error.sourceRange(), isJson5SourceRange(1, 1));
+        assertThat(error.sourceRange(), isSourceRange(1, 1));
     }
 
     // == Numbers ==
@@ -316,7 +316,7 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5NumberFinite(
             BigDecimal.ZERO,
-            isJson5SourceRange(0, 1)
+            isSourceRange(0, 1)
         ));
     }
 
@@ -326,7 +326,7 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5NumberFinite(
             BigDecimal.ZERO,
-            isJson5SourceRange(0, 2)
+            isSourceRange(0, 2)
         ));
     }
 
@@ -336,7 +336,7 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5NumberFinite(
             BigDecimal.ZERO,
-            isJson5SourceRange(0, 2)
+            isSourceRange(0, 2)
         ));
     }
 
@@ -346,7 +346,7 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5NumberFinite(
             BigDecimal.valueOf(123),
-            isJson5SourceRange(0, 3)
+            isSourceRange(0, 3)
         ));
     }
 
@@ -356,7 +356,7 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5NumberFinite(
             BigDecimal.valueOf(123),
-            isJson5SourceRange(0, 4)
+            isSourceRange(0, 4)
         ));
     }
 
@@ -366,7 +366,7 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5NumberFinite(
             BigDecimal.valueOf(-123),
-            isJson5SourceRange(0, 4)
+            isSourceRange(0, 4)
         ));
     }
 
@@ -381,7 +381,7 @@ public class Json5ParserTests {
             error.getMessage(),
             equalTo("Expected numeric literal, but was end of document")
         );
-        assertThat(error.sourceRange(), isJson5SourceRange(1, 1));
+        assertThat(error.sourceRange(), isSourceRange(1, 1));
     }
 
     @Test
@@ -395,7 +395,7 @@ public class Json5ParserTests {
             error.getMessage(),
             equalTo("Expected numeric literal, but was end of document")
         );
-        assertThat(error.sourceRange(), isJson5SourceRange(1, 1));
+        assertThat(error.sourceRange(), isSourceRange(1, 1));
     }
 
     @Test
@@ -404,7 +404,7 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5NumberFinite(
             BigDecimal.valueOf(123),
-            isJson5SourceRange(0, 4)
+            isSourceRange(0, 4)
         ));
     }
 
@@ -419,7 +419,7 @@ public class Json5ParserTests {
             error.getMessage(),
             equalTo("Integer part of number cannot have leading zeroes")
         );
-        assertThat(error.sourceRange(), isJson5SourceRange(0, 2));
+        assertThat(error.sourceRange(), isSourceRange(0, 2));
     }
 
     @Test
@@ -428,7 +428,7 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5NumberFinite(
             new BigDecimal("123.456"),
-            isJson5SourceRange(0, 7)
+            isSourceRange(0, 7)
         ));
     }
 
@@ -438,7 +438,7 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5NumberFinite(
             new BigDecimal(".456"),
-            isJson5SourceRange(0, 4)
+            isSourceRange(0, 4)
         ));
     }
 
@@ -453,7 +453,7 @@ public class Json5ParserTests {
             error.getMessage(),
             equalTo("Expected decimal digit, but was end of document")
         );
-        assertThat(error.sourceRange(), isJson5SourceRange(1, 1));
+        assertThat(error.sourceRange(), isSourceRange(1, 1));
     }
 
     @Test
@@ -462,7 +462,7 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5NumberFinite(
             new BigDecimal("1000"),
-            isJson5SourceRange(0, 3)
+            isSourceRange(0, 3)
         ));
     }
 
@@ -472,7 +472,7 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5NumberFinite(
             new BigDecimal("1400"),
-            isJson5SourceRange(0, 5)
+            isSourceRange(0, 5)
         ));
     }
 
@@ -482,7 +482,7 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5NumberFinite(
             new BigDecimal("400"),
-            isJson5SourceRange(0, 4)
+            isSourceRange(0, 4)
         ));
     }
 
@@ -492,7 +492,7 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5NumberFinite(
             new BigDecimal("1000"),
-            isJson5SourceRange(0, 3)
+            isSourceRange(0, 3)
         ));
     }
 
@@ -502,7 +502,7 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5NumberFinite(
             new BigDecimal("1000"),
-            isJson5SourceRange(0, 3)
+            isSourceRange(0, 3)
         ));
     }
 
@@ -512,7 +512,7 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5NumberFinite(
             new BigDecimal("1000"),
-            isJson5SourceRange(0, 3)
+            isSourceRange(0, 3)
         ));
     }
 
@@ -522,7 +522,7 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5NumberFinite(
             new BigDecimal("1000"),
-            isJson5SourceRange(0, 4)
+            isSourceRange(0, 4)
         ));
     }
 
@@ -532,7 +532,7 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5NumberFinite(
             new BigDecimal("0.001"),
-            isJson5SourceRange(0, 4)
+            isSourceRange(0, 4)
         ));
     }
 
@@ -547,7 +547,7 @@ public class Json5ParserTests {
             error.getMessage(),
             equalTo("Expected decimal digit, but was end of document")
         );
-        assertThat(error.sourceRange(), isJson5SourceRange(2, 2));
+        assertThat(error.sourceRange(), isSourceRange(2, 2));
     }
 
     @Test
@@ -561,7 +561,7 @@ public class Json5ParserTests {
             error.getMessage(),
             equalTo("Expected hex digit, but was end of document")
         );
-        assertThat(error.sourceRange(), isJson5SourceRange(2, 2));
+        assertThat(error.sourceRange(), isSourceRange(2, 2));
     }
 
     @Test
@@ -575,7 +575,7 @@ public class Json5ParserTests {
             error.getMessage(),
             equalTo("Expected hex digit, but was end of document")
         );
-        assertThat(error.sourceRange(), isJson5SourceRange(2, 2));
+        assertThat(error.sourceRange(), isSourceRange(2, 2));
     }
 
     @Test
@@ -584,7 +584,7 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5NumberFinite(
             BigDecimal.ZERO,
-            isJson5SourceRange(0, 3)
+            isSourceRange(0, 3)
         ));
     }
 
@@ -594,7 +594,7 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5NumberFinite(
             BigDecimal.ZERO,
-            isJson5SourceRange(0, 3)
+            isSourceRange(0, 3)
         ));
     }
 
@@ -604,7 +604,7 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5NumberFinite(
             BigDecimal.valueOf(0x19afAFcD),
-            isJson5SourceRange(0, 10)
+            isSourceRange(0, 10)
         ));
     }
 
@@ -614,7 +614,7 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5NumberFinite(
             BigDecimal.valueOf(0x19afAFcD),
-            isJson5SourceRange(0, 11)
+            isSourceRange(0, 11)
         ));
     }
 
@@ -624,7 +624,7 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5NumberFinite(
             BigDecimal.valueOf(-0x19afAFcD),
-            isJson5SourceRange(0, 11)
+            isSourceRange(0, 11)
         ));
     }
 
@@ -632,42 +632,42 @@ public class Json5ParserTests {
     public void canParseInfinityWithoutSign() {
         var result = Json5Parser.parseText("Infinity");
 
-        assertThat(result, isJson5NumberPositiveInfinity(isJson5SourceRange(0, 8)));
+        assertThat(result, isJson5NumberPositiveInfinity(isSourceRange(0, 8)));
     }
 
     @Test
     public void canParseInfinityWithPositiveSign() {
         var result = Json5Parser.parseText("+Infinity");
 
-        assertThat(result, isJson5NumberPositiveInfinity(isJson5SourceRange(0, 9)));
+        assertThat(result, isJson5NumberPositiveInfinity(isSourceRange(0, 9)));
     }
 
     @Test
     public void canParseInfinityWithNegativeSign() {
         var result = Json5Parser.parseText("-Infinity");
 
-        assertThat(result, isJson5NumberNegativeInfinity(isJson5SourceRange(0, 9)));
+        assertThat(result, isJson5NumberNegativeInfinity(isSourceRange(0, 9)));
     }
 
     @Test
     public void canParseNanWithoutSign() {
         var result = Json5Parser.parseText("NaN");
 
-        assertThat(result, isJson5NumberNan(isJson5SourceRange(0, 3)));
+        assertThat(result, isJson5NumberNan(isSourceRange(0, 3)));
     }
 
     @Test
     public void canParseNanWithPositiveSign() {
         var result = Json5Parser.parseText("+NaN");
 
-        assertThat(result, isJson5NumberNan(isJson5SourceRange(0, 4)));
+        assertThat(result, isJson5NumberNan(isSourceRange(0, 4)));
     }
 
     @Test
     public void canParseNanWithNegativeSign() {
         var result = Json5Parser.parseText("-NaN");
 
-        assertThat(result, isJson5NumberNan(isJson5SourceRange(0, 4)));
+        assertThat(result, isJson5NumberNan(isSourceRange(0, 4)));
     }
 
     @Test
@@ -684,7 +684,7 @@ public class Json5ParserTests {
                     "literal must not be the start of an identifier"
             )
         );
-        assertThat(error.sourceRange(), isJson5SourceRange(3, 4));
+        assertThat(error.sourceRange(), isSourceRange(3, 4));
     }
 
     // == Objects ==
@@ -693,7 +693,7 @@ public class Json5ParserTests {
     public void emptyObject() {
         var result = Json5Parser.parseText("{}");
 
-        assertThat(result, isJson5Object(isSequence(), isJson5SourceRange(0, 2)));
+        assertThat(result, isJson5Object(isSequence(), isSourceRange(0, 2)));
     }
 
     @Test
@@ -703,12 +703,12 @@ public class Json5ParserTests {
         assertThat(result, isJson5Object(
             isSequence(
                 isJson5Member(
-                    isJson5MemberName("foo", isJson5SourceRange(1, 4)),
-                    isJson5Boolean(true, isJson5SourceRange(6, 10)),
-                    isJson5SourceRange(1, 10)
+                    isJson5MemberName("foo", isSourceRange(1, 4)),
+                    isJson5Boolean(true, isSourceRange(6, 10)),
+                    isSourceRange(1, 10)
                 )
             ),
-            isJson5SourceRange(0, 11)
+            isSourceRange(0, 11)
         ));
     }
 
@@ -719,12 +719,12 @@ public class Json5ParserTests {
         assertThat(result, isJson5Object(
             isSequence(
                 isJson5Member(
-                    isJson5MemberName("foo", isJson5SourceRange(1, 4)),
-                    isJson5Boolean(true, isJson5SourceRange(6, 10)),
-                    isJson5SourceRange(1, 10)
+                    isJson5MemberName("foo", isSourceRange(1, 4)),
+                    isJson5Boolean(true, isSourceRange(6, 10)),
+                    isSourceRange(1, 10)
                 )
             ),
-            isJson5SourceRange(0, 12)
+            isSourceRange(0, 12)
         ));
     }
 
@@ -735,22 +735,22 @@ public class Json5ParserTests {
         assertThat(result, isJson5Object(
             isSequence(
                 isJson5Member(
-                    isJson5MemberName("foo", isJson5SourceRange(1, 4)),
-                    isJson5Boolean(true, isJson5SourceRange(5, 9)),
-                    isJson5SourceRange(1, 9)
+                    isJson5MemberName("foo", isSourceRange(1, 4)),
+                    isJson5Boolean(true, isSourceRange(5, 9)),
+                    isSourceRange(1, 9)
                 ),
                 isJson5Member(
-                    isJson5MemberName("bar", isJson5SourceRange(10, 13)),
-                    isJson5Boolean(false, isJson5SourceRange(14, 19)),
-                    isJson5SourceRange(10, 19)
+                    isJson5MemberName("bar", isSourceRange(10, 13)),
+                    isJson5Boolean(false, isSourceRange(14, 19)),
+                    isSourceRange(10, 19)
                 ),
                 isJson5Member(
-                    isJson5MemberName("baz", isJson5SourceRange(20, 23)),
-                    isJson5Null(isJson5SourceRange(24, 28)),
-                    isJson5SourceRange(20, 28)
+                    isJson5MemberName("baz", isSourceRange(20, 23)),
+                    isJson5Null(isSourceRange(24, 28)),
+                    isSourceRange(20, 28)
                 )
             ),
-            isJson5SourceRange(0, 29)
+            isSourceRange(0, 29)
         ));
     }
 
@@ -762,22 +762,22 @@ public class Json5ParserTests {
         assertThat(result, isJson5Object(
             isSequence(
                 isJson5Member(
-                    isJson5MemberName("foo", isJson5SourceRange(1, 4)),
-                    isJson5Boolean(true, isJson5SourceRange(5, 9)),
-                    isJson5SourceRange(1, 9)
+                    isJson5MemberName("foo", isSourceRange(1, 4)),
+                    isJson5Boolean(true, isSourceRange(5, 9)),
+                    isSourceRange(1, 9)
                 ),
                 isJson5Member(
-                    isJson5MemberName("bar", isJson5SourceRange(10, 13)),
-                    isJson5Boolean(false, isJson5SourceRange(14, 19)),
-                    isJson5SourceRange(10, 19)
+                    isJson5MemberName("bar", isSourceRange(10, 13)),
+                    isJson5Boolean(false, isSourceRange(14, 19)),
+                    isSourceRange(10, 19)
                 ),
                 isJson5Member(
-                    isJson5MemberName("baz", isJson5SourceRange(20, 23)),
-                    isJson5Null(isJson5SourceRange(24, 28)),
-                    isJson5SourceRange(20, 28)
+                    isJson5MemberName("baz", isSourceRange(20, 23)),
+                    isJson5Null(isSourceRange(24, 28)),
+                    isSourceRange(20, 28)
                 )
             ),
-            isJson5SourceRange(0, 30)
+            isSourceRange(0, 30)
         ));
     }
 
@@ -788,15 +788,15 @@ public class Json5ParserTests {
         assertThat(result, isJson5Object(
             isSequence(
                 isJson5Member(
-                    isJson5MemberName("a", isJson5SourceRange(1, 2)),
+                    isJson5MemberName("a", isSourceRange(1, 2)),
                     isJson5Object(
                         isSequence(),
-                        isJson5SourceRange(4, 6)
+                        isSourceRange(4, 6)
                     ),
-                    isJson5SourceRange(1, 6)
+                    isSourceRange(1, 6)
                 )
             ),
-            isJson5SourceRange(0, 7)
+            isSourceRange(0, 7)
         ));
     }
 
@@ -811,7 +811,7 @@ public class Json5ParserTests {
             error.getMessage(),
             equalTo("Expected JSON member or '}', but was ']'")
         );
-        assertThat(error.sourceRange(), isJson5SourceRange(1, 2));
+        assertThat(error.sourceRange(), isSourceRange(1, 2));
     }
 
     @Test
@@ -825,7 +825,7 @@ public class Json5ParserTests {
             error.getMessage(),
             equalTo("Expected ':', but was ','")
         );
-        assertThat(error.sourceRange(), isJson5SourceRange(4, 5));
+        assertThat(error.sourceRange(), isSourceRange(4, 5));
     }
 
     @Test
@@ -839,7 +839,7 @@ public class Json5ParserTests {
             error.getMessage(),
             equalTo("Expected JSON value, but was ']'")
         );
-        assertThat(error.sourceRange(), isJson5SourceRange(5, 6));
+        assertThat(error.sourceRange(), isSourceRange(5, 6));
     }
 
     @Test
@@ -853,7 +853,7 @@ public class Json5ParserTests {
             error.getMessage(),
             equalTo("Expected ',' or '}', but was ']'")
         );
-        assertThat(error.sourceRange(), isJson5SourceRange(9, 10));
+        assertThat(error.sourceRange(), isSourceRange(9, 10));
     }
 
     @Test
@@ -878,12 +878,12 @@ public class Json5ParserTests {
         assertThat(result, isJson5Object(
             isSequence(
                 isJson5Member(
-                    isJson5MemberName("foo", isJson5SourceRange(1, 4)),
-                    isJson5Boolean(true, isJson5SourceRange(6, 10)),
-                    isJson5SourceRange(1, 10)
+                    isJson5MemberName("foo", isSourceRange(1, 4)),
+                    isJson5Boolean(true, isSourceRange(6, 10)),
+                    isSourceRange(1, 10)
                 )
             ),
-            isJson5SourceRange(0, 11)
+            isSourceRange(0, 11)
         ));
     }
 
@@ -894,12 +894,12 @@ public class Json5ParserTests {
         assertThat(result, isJson5Object(
             isSequence(
                 isJson5Member(
-                    isJson5MemberName("null", isJson5SourceRange(1, 5)),
-                    isJson5Boolean(true, isJson5SourceRange(7, 11)),
-                    isJson5SourceRange(1, 11)
+                    isJson5MemberName("null", isSourceRange(1, 5)),
+                    isJson5Boolean(true, isSourceRange(7, 11)),
+                    isSourceRange(1, 11)
                 )
             ),
-            isJson5SourceRange(0, 12)
+            isSourceRange(0, 12)
         ));
     }
 
@@ -910,12 +910,12 @@ public class Json5ParserTests {
         assertThat(result, isJson5Object(
             isSequence(
                 isJson5Member(
-                    isJson5MemberName("$foo", isJson5SourceRange(1, 5)),
-                    isJson5Boolean(true, isJson5SourceRange(7, 11)),
-                    isJson5SourceRange(1, 11)
+                    isJson5MemberName("$foo", isSourceRange(1, 5)),
+                    isJson5Boolean(true, isSourceRange(7, 11)),
+                    isSourceRange(1, 11)
                 )
             ),
-            isJson5SourceRange(0, 12)
+            isSourceRange(0, 12)
         ));
     }
 
@@ -926,12 +926,12 @@ public class Json5ParserTests {
         assertThat(result, isJson5Object(
             isSequence(
                 isJson5Member(
-                    isJson5MemberName("foo$", isJson5SourceRange(1, 5)),
-                    isJson5Boolean(true, isJson5SourceRange(7, 11)),
-                    isJson5SourceRange(1, 11)
+                    isJson5MemberName("foo$", isSourceRange(1, 5)),
+                    isJson5Boolean(true, isSourceRange(7, 11)),
+                    isSourceRange(1, 11)
                 )
             ),
-            isJson5SourceRange(0, 12)
+            isSourceRange(0, 12)
         ));
     }
 
@@ -942,12 +942,12 @@ public class Json5ParserTests {
         assertThat(result, isJson5Object(
             isSequence(
                 isJson5Member(
-                    isJson5MemberName("_foo", isJson5SourceRange(1, 5)),
-                    isJson5Boolean(true, isJson5SourceRange(7, 11)),
-                    isJson5SourceRange(1, 11)
+                    isJson5MemberName("_foo", isSourceRange(1, 5)),
+                    isJson5Boolean(true, isSourceRange(7, 11)),
+                    isSourceRange(1, 11)
                 )
             ),
-            isJson5SourceRange(0, 12)
+            isSourceRange(0, 12)
         ));
     }
 
@@ -958,12 +958,12 @@ public class Json5ParserTests {
         assertThat(result, isJson5Object(
             isSequence(
                 isJson5Member(
-                    isJson5MemberName("foo_", isJson5SourceRange(1, 5)),
-                    isJson5Boolean(true, isJson5SourceRange(7, 11)),
-                    isJson5SourceRange(1, 11)
+                    isJson5MemberName("foo_", isSourceRange(1, 5)),
+                    isJson5Boolean(true, isSourceRange(7, 11)),
+                    isSourceRange(1, 11)
                 )
             ),
-            isJson5SourceRange(0, 12)
+            isSourceRange(0, 12)
         ));
     }
 
@@ -974,12 +974,12 @@ public class Json5ParserTests {
         assertThat(result, isJson5Object(
             isSequence(
                 isJson5Member(
-                    isJson5MemberName("\u03c0foo", isJson5SourceRange(1, 10)),
-                    isJson5Boolean(true, isJson5SourceRange(12, 16)),
-                    isJson5SourceRange(1, 16)
+                    isJson5MemberName("\u03c0foo", isSourceRange(1, 10)),
+                    isJson5Boolean(true, isSourceRange(12, 16)),
+                    isSourceRange(1, 16)
                 )
             ),
-            isJson5SourceRange(0, 17)
+            isSourceRange(0, 17)
         ));
     }
 
@@ -990,12 +990,12 @@ public class Json5ParserTests {
         assertThat(result, isJson5Object(
             isSequence(
                 isJson5Member(
-                    isJson5MemberName("foo\u03c0", isJson5SourceRange(1, 10)),
-                    isJson5Boolean(true, isJson5SourceRange(12, 16)),
-                    isJson5SourceRange(1, 16)
+                    isJson5MemberName("foo\u03c0", isSourceRange(1, 10)),
+                    isJson5Boolean(true, isSourceRange(12, 16)),
+                    isSourceRange(1, 16)
                 )
             ),
-            isJson5SourceRange(0, 17)
+            isSourceRange(0, 17)
         ));
     }
 
@@ -1007,7 +1007,7 @@ public class Json5ParserTests {
         );
 
         assertThat(error.getMessage(), equalTo("Expected hex digit, but was ':'"));
-        assertThat(error.sourceRange(), isJson5SourceRange(8, 9));
+        assertThat(error.sourceRange(), isSourceRange(8, 9));
     }
 
     @Test
@@ -1017,12 +1017,12 @@ public class Json5ParserTests {
         assertThat(result, isJson5Object(
             isSequence(
                 isJson5Member(
-                    isJson5MemberName("foo\u0300", isJson5SourceRange(1, 5)),
-                    isJson5Boolean(true, isJson5SourceRange(7, 11)),
-                    isJson5SourceRange(1, 11)
+                    isJson5MemberName("foo\u0300", isSourceRange(1, 5)),
+                    isJson5Boolean(true, isSourceRange(7, 11)),
+                    isSourceRange(1, 11)
                 )
             ),
-            isJson5SourceRange(0, 12)
+            isSourceRange(0, 12)
         ));
     }
 
@@ -1033,12 +1033,12 @@ public class Json5ParserTests {
         assertThat(result, isJson5Object(
             isSequence(
                 isJson5Member(
-                    isJson5MemberName("foo\u0903", isJson5SourceRange(1, 5)),
-                    isJson5Boolean(true, isJson5SourceRange(7, 11)),
-                    isJson5SourceRange(1, 11)
+                    isJson5MemberName("foo\u0903", isSourceRange(1, 5)),
+                    isJson5Boolean(true, isSourceRange(7, 11)),
+                    isSourceRange(1, 11)
                 )
             ),
-            isJson5SourceRange(0, 12)
+            isSourceRange(0, 12)
         ));
     }
 
@@ -1049,12 +1049,12 @@ public class Json5ParserTests {
         assertThat(result, isJson5Object(
             isSequence(
                 isJson5Member(
-                    isJson5MemberName("foo0", isJson5SourceRange(1, 5)),
-                    isJson5Boolean(true, isJson5SourceRange(7, 11)),
-                    isJson5SourceRange(1, 11)
+                    isJson5MemberName("foo0", isSourceRange(1, 5)),
+                    isJson5Boolean(true, isSourceRange(7, 11)),
+                    isSourceRange(1, 11)
                 )
             ),
-            isJson5SourceRange(0, 12)
+            isSourceRange(0, 12)
         ));
     }
 
@@ -1065,12 +1065,12 @@ public class Json5ParserTests {
         assertThat(result, isJson5Object(
             isSequence(
                 isJson5Member(
-                    isJson5MemberName("foo\u203f", isJson5SourceRange(1, 5)),
-                    isJson5Boolean(true, isJson5SourceRange(7, 11)),
-                    isJson5SourceRange(1, 11)
+                    isJson5MemberName("foo\u203f", isSourceRange(1, 5)),
+                    isJson5Boolean(true, isSourceRange(7, 11)),
+                    isSourceRange(1, 11)
                 )
             ),
-            isJson5SourceRange(0, 12)
+            isSourceRange(0, 12)
         ));
     }
 
@@ -1081,12 +1081,12 @@ public class Json5ParserTests {
         assertThat(result, isJson5Object(
             isSequence(
                 isJson5Member(
-                    isJson5MemberName("foo\u200c", isJson5SourceRange(1, 5)),
-                    isJson5Boolean(true, isJson5SourceRange(7, 11)),
-                    isJson5SourceRange(1, 11)
+                    isJson5MemberName("foo\u200c", isSourceRange(1, 5)),
+                    isJson5Boolean(true, isSourceRange(7, 11)),
+                    isSourceRange(1, 11)
                 )
             ),
-            isJson5SourceRange(0, 12)
+            isSourceRange(0, 12)
         ));
     }
 
@@ -1097,12 +1097,12 @@ public class Json5ParserTests {
         assertThat(result, isJson5Object(
             isSequence(
                 isJson5Member(
-                    isJson5MemberName("foo\u200d", isJson5SourceRange(1, 5)),
-                    isJson5Boolean(true, isJson5SourceRange(7, 11)),
-                    isJson5SourceRange(1, 11)
+                    isJson5MemberName("foo\u200d", isSourceRange(1, 5)),
+                    isJson5Boolean(true, isSourceRange(7, 11)),
+                    isSourceRange(1, 11)
                 )
             ),
-            isJson5SourceRange(0, 12)
+            isSourceRange(0, 12)
         ));
     }
 
@@ -1113,12 +1113,12 @@ public class Json5ParserTests {
         assertThat(result, isJson5Object(
             isSequence(
                 isJson5Member(
-                    isJson5MemberName("foo", isJson5SourceRange(1, 6)),
-                    isJson5Boolean(true, isJson5SourceRange(8, 12)),
-                    isJson5SourceRange(1, 12)
+                    isJson5MemberName("foo", isSourceRange(1, 6)),
+                    isJson5Boolean(true, isSourceRange(8, 12)),
+                    isSourceRange(1, 12)
                 )
             ),
-            isJson5SourceRange(0, 13)
+            isSourceRange(0, 13)
         ));
     }
 
@@ -1129,12 +1129,12 @@ public class Json5ParserTests {
         assertThat(result, isJson5Object(
             isSequence(
                 isJson5Member(
-                    isJson5MemberName("foo", isJson5SourceRange(1, 6)),
-                    isJson5Boolean(true, isJson5SourceRange(8, 12)),
-                    isJson5SourceRange(1, 12)
+                    isJson5MemberName("foo", isSourceRange(1, 6)),
+                    isJson5Boolean(true, isSourceRange(8, 12)),
+                    isSourceRange(1, 12)
                 )
             ),
-            isJson5SourceRange(0, 13)
+            isSourceRange(0, 13)
         ));
     }
 
@@ -1144,7 +1144,7 @@ public class Json5ParserTests {
     public void emptyArray() {
         var result = Json5Parser.parseText("[]");
 
-        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(0, 2)));
+        assertThat(result, isJson5Array(isSequence(), isSourceRange(0, 2)));
     }
 
     @Test
@@ -1153,9 +1153,9 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5Array(
             isSequence(
-                isJson5Boolean(true, isJson5SourceRange(1, 5))
+                isJson5Boolean(true, isSourceRange(1, 5))
             ),
-            isJson5SourceRange(0, 6)
+            isSourceRange(0, 6)
         ));
     }
 
@@ -1165,9 +1165,9 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5Array(
             isSequence(
-                isJson5Boolean(true, isJson5SourceRange(1, 5))
+                isJson5Boolean(true, isSourceRange(1, 5))
             ),
-            isJson5SourceRange(0, 7)
+            isSourceRange(0, 7)
         ));
     }
 
@@ -1177,11 +1177,11 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5Array(
             isSequence(
-                isJson5Boolean(true, isJson5SourceRange(1, 5)),
-                isJson5Boolean(false, isJson5SourceRange(7, 12)),
-                isJson5Null(isJson5SourceRange(14, 18))
+                isJson5Boolean(true, isSourceRange(1, 5)),
+                isJson5Boolean(false, isSourceRange(7, 12)),
+                isJson5Null(isSourceRange(14, 18))
             ),
-            isJson5SourceRange(0, 19)
+            isSourceRange(0, 19)
         ));
     }
 
@@ -1191,11 +1191,11 @@ public class Json5ParserTests {
 
         assertThat(result, isJson5Array(
             isSequence(
-                isJson5Boolean(true, isJson5SourceRange(1, 5)),
-                isJson5Boolean(false, isJson5SourceRange(7, 12)),
-                isJson5Null(isJson5SourceRange(14, 18))
+                isJson5Boolean(true, isSourceRange(1, 5)),
+                isJson5Boolean(false, isSourceRange(7, 12)),
+                isJson5Null(isSourceRange(14, 18))
             ),
-            isJson5SourceRange(0, 20)
+            isSourceRange(0, 20)
         ));
     }
 
@@ -1207,10 +1207,10 @@ public class Json5ParserTests {
             isSequence(
                 isJson5Array(
                     isSequence(),
-                    isJson5SourceRange(1, 3)
+                    isSourceRange(1, 3)
                 )
             ),
-            isJson5SourceRange(0, 4)
+            isSourceRange(0, 4)
         ));
     }
 
@@ -1225,7 +1225,7 @@ public class Json5ParserTests {
             error.getMessage(),
             equalTo("Expected JSON value or ']', but was '}'")
         );
-        assertThat(error.sourceRange(), isJson5SourceRange(1, 2));
+        assertThat(error.sourceRange(), isSourceRange(1, 2));
     }
 
     @Test
@@ -1239,7 +1239,7 @@ public class Json5ParserTests {
             error.getMessage(),
             equalTo("Expected ',' or ']', but was '}'")
         );
-        assertThat(error.sourceRange(), isJson5SourceRange(5, 6));
+        assertThat(error.sourceRange(), isSourceRange(5, 6));
     }
 
     @Test
@@ -1268,7 +1268,7 @@ public class Json5ParserTests {
             error.getMessage(),
             equalTo("Expected JSON value, but was end of document")
         );
-        assertThat(error.sourceRange(), isJson5SourceRange(0, 0));
+        assertThat(error.sourceRange(), isSourceRange(0, 0));
     }
 
     @Test
@@ -1282,98 +1282,98 @@ public class Json5ParserTests {
             error.getMessage(),
             equalTo("Expected end of document, but was '['")
         );
-        assertThat(error.sourceRange(), isJson5SourceRange(2, 3));
+        assertThat(error.sourceRange(), isSourceRange(2, 3));
     }
 
     @Test
     public void whitespaceIsIgnored() {
         var result = Json5Parser.parseText("   [ ]  ");
 
-        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(3, 6)));
+        assertThat(result, isJson5Array(isSequence(), isSourceRange(3, 6)));
     }
 
     @Test
     public void tabIsTreatedAsWhiteSpace() {
         var result = Json5Parser.parseText("\t[]");
 
-        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(1, 3)));
+        assertThat(result, isJson5Array(isSequence(), isSourceRange(1, 3)));
     }
 
     @Test
     public void verticalTabIsTreatedAsWhiteSpace() {
         var result = Json5Parser.parseText("\u000b[]");
 
-        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(1, 3)));
+        assertThat(result, isJson5Array(isSequence(), isSourceRange(1, 3)));
     }
 
     @Test
     public void formFeedIsTreatedAsWhiteSpace() {
         var result = Json5Parser.parseText("\f[]");
 
-        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(1, 3)));
+        assertThat(result, isJson5Array(isSequence(), isSourceRange(1, 3)));
     }
 
     @Test
     public void noBreakSpaceIsTreatedAsWhiteSpace() {
         var result = Json5Parser.parseText("\u00a0[]");
 
-        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(1, 3)));
+        assertThat(result, isJson5Array(isSequence(), isSourceRange(1, 3)));
     }
 
     @Test
     public void spaceIsTreatedAsWhiteSpace() {
         var result = Json5Parser.parseText(" []");
 
-        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(1, 3)));
+        assertThat(result, isJson5Array(isSequence(), isSourceRange(1, 3)));
     }
 
     @Test
     public void byteOrderMarkIsTreatedAsWhiteSpace() {
         var result = Json5Parser.parseText("\ufeff[]");
 
-        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(1, 3)));
+        assertThat(result, isJson5Array(isSequence(), isSourceRange(1, 3)));
     }
 
     @Test
     public void anyOtherUnicodeSpaceSeparatorIsTreatedAsWhiteSpace() {
         var result = Json5Parser.parseText("\u2000[]");
 
-        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(1, 3)));
+        assertThat(result, isJson5Array(isSequence(), isSourceRange(1, 3)));
     }
 
     @Test
     public void lineTerminatorLineFeedIsIgnored() {
         var result = Json5Parser.parseText("\n\n\n[\n]\n\n");
 
-        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(3, 6)));
+        assertThat(result, isJson5Array(isSequence(), isSourceRange(3, 6)));
     }
 
     @Test
     public void lineTerminatorCarriageReturnIsIgnored() {
         var result = Json5Parser.parseText("\r\r\r[\r]\r\r");
 
-        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(3, 6)));
+        assertThat(result, isJson5Array(isSequence(), isSourceRange(3, 6)));
     }
 
     @Test
     public void lineTerminatorLineSeparatorIsIgnored() {
         var result = Json5Parser.parseText("\u2028\u2028\u2028[\u2028]\u2028\u2028");
 
-        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(3, 6)));
+        assertThat(result, isJson5Array(isSequence(), isSourceRange(3, 6)));
     }
 
     @Test
     public void lineTerminatorParagraphSeparatorIsIgnored() {
         var result = Json5Parser.parseText("\u2029\u2029\u2029[\u2029]\u2029\u2029");
 
-        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(3, 6)));
+        assertThat(result, isJson5Array(isSequence(), isSourceRange(3, 6)));
     }
 
     @Test
     public void multiLineCommentIsIgnored() {
         var result = Json5Parser.parseText("/* a */[/* b\n\nc */] /** d*  **/");
 
-        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(7, 19)));
+        assertThat(result, isJson5Array(isSequence(), isSourceRange(7, 19)));
     }
 
     @Test
@@ -1387,21 +1387,21 @@ public class Json5ParserTests {
             error.getMessage(),
             equalTo("Expected '*/', but was end of document")
         );
-        assertThat(error.sourceRange(), isJson5SourceRange(4, 4));
+        assertThat(error.sourceRange(), isSourceRange(4, 4));
     }
 
     @Test
     public void singleLineCommentIsIgnored() {
         var result = Json5Parser.parseText("// a\n[// b\n] // c\n\n");
 
-        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(5, 12)));
+        assertThat(result, isJson5Array(isSequence(), isSourceRange(5, 12)));
     }
 
     @Test
     public void singleLineCommentCanBeClosedByEndOfDocument() {
         var result = Json5Parser.parseText("[]//");
 
-        assertThat(result, isJson5Array(isSequence(), isJson5SourceRange(0, 2)));
+        assertThat(result, isJson5Array(isSequence(), isSourceRange(0, 2)));
     }
 
     @Test
@@ -1416,7 +1416,7 @@ public class Json5ParserTests {
             error.getMessage(),
             equalTo("Expected JSON5 token, but was '='")
         );
-        assertThat(error.sourceRange(), isJson5SourceRange(0, 1));
+        assertThat(error.sourceRange(), isSourceRange(0, 1));
     }
 
     @Test
@@ -1427,14 +1427,14 @@ public class Json5ParserTests {
             isSequence(
                 isJson5String(
                     "\uD83E\uDD67",
-                    isJson5SourceRange(1, 5)
+                    isSourceRange(1, 5)
                 ),
                 isJson5Boolean(
                     true,
-                    isJson5SourceRange(7, 11)
+                    isSourceRange(7, 11)
                 )
             ),
-            isJson5SourceRange(0, 12)
+            isSourceRange(0, 12)
         ));
     }
 

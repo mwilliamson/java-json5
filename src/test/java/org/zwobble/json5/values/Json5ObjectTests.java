@@ -2,21 +2,21 @@ package org.zwobble.json5.values;
 
 import org.junit.jupiter.api.Test;
 import org.zwobble.json5.paths.Json5Path;
-import org.zwobble.json5.sources.Json5SourcePosition;
-import org.zwobble.json5.sources.Json5SourceRange;
-import org.zwobble.json5.sources.Json5SourceText;
+import org.zwobble.sourcetext.SourcePosition;
+import org.zwobble.sourcetext.SourceRange;
+import org.zwobble.sourcetext.SourceText;
 
-import static org.zwobble.json5.sources.Json5SourceRangeMatchers.isJson5SourceRange;
+import static org.zwobble.json5.sources.SourceRangeMatchers.isSourceRange;
 import static org.zwobble.json5.values.Json5ValueMatchers.isJson5Boolean;
 import static org.zwobble.precisely.AssertThat.assertThat;
 import static org.zwobble.precisely.Matchers.isOptionalEmpty;
 import static org.zwobble.precisely.Matchers.isOptionalOf;
 
 public class Json5ObjectTests {
-    public static final Json5SourceRange SOURCE_RANGE = new Json5SourceRange(
-        Json5SourceText.fromString(""),
-        new Json5SourcePosition(0),
-        new Json5SourcePosition(0)
+    public static final SourceRange SOURCE_RANGE = new SourceRange(
+        SourceText.fromString(""),
+        new SourcePosition(0),
+        new SourcePosition(0)
     );
 
     @Test
@@ -37,7 +37,7 @@ public class Json5ObjectTests {
         var result = object.getValue("foo");
 
         assertThat(result, isOptionalOf(
-            isJson5Boolean(true, isJson5SourceRange(0, 0))
+            isJson5Boolean(true, isSourceRange(0, 0))
         ));
     }
 

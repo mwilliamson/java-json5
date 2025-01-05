@@ -1,14 +1,15 @@
 package org.zwobble.json5.sources;
 
 import org.zwobble.precisely.Matcher;
+import org.zwobble.sourcetext.SourcePosition;
 
 import static org.zwobble.precisely.Matchers.*;
 
-public class Json5SourcePositionMatchers {
-    private Json5SourcePositionMatchers() {
+public class SourcePositionMatchers {
+    private SourcePositionMatchers() {
     }
 
-    public static Matcher<Json5SourcePosition> isJson5SourcePosition(
+    public static Matcher<SourcePosition> isSourcePosition(
         int characterIndex
     ) {
         return has("characterIndex", x -> x.characterIndex(), equalTo(characterIndex));

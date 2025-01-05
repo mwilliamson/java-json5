@@ -1,19 +1,19 @@
 package org.zwobble.json5.parser;
 
 import org.junit.jupiter.api.Test;
-import org.zwobble.json5.sources.Json5SourcePosition;
-import org.zwobble.json5.sources.Json5SourceRange;
-import org.zwobble.json5.sources.Json5SourceText;
+import org.zwobble.sourcetext.SourcePosition;
+import org.zwobble.sourcetext.SourceRange;
+import org.zwobble.sourcetext.SourceText;
 
 import static org.zwobble.precisely.AssertThat.assertThat;
 import static org.zwobble.precisely.Matchers.equalTo;
 
 public class Json5TokenTests {
-    public static Json5SourceRange sourceRange(String text) {
-        return new Json5SourceRange(
-            Json5SourceText.fromString(text),
-            new Json5SourcePosition(0),
-            new Json5SourcePosition(text.length())
+    public static SourceRange sourceRange(String text) {
+        return new SourceRange(
+            SourceText.fromString(text),
+            new SourcePosition(0),
+            new SourcePosition(text.length())
         );
     }
 
