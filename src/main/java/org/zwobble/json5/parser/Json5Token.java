@@ -2,8 +2,6 @@ package org.zwobble.json5.parser;
 
 import org.zwobble.sourcetext.SourceRange;
 
-import java.nio.CharBuffer;
-
 record Json5Token(
     Json5TokenType tokenType,
     SourceRange sourceRange
@@ -12,14 +10,18 @@ record Json5Token(
         return this.tokenType == tokenType;
     }
 
-    boolean is(Json5TokenType tokenToken, CharBuffer buffer) {
-        return this.tokenType == tokenToken && charBuffer().equals(buffer);
+    boolean is(Json5TokenType tokenToken, String contents) {
+        return is(tokenToken) && is(contents);
+    }
+
+    boolean is(String contents) {
+        return CharSequence.compare(charSequence(), contents) == 0;
     }
 
     String describe() {
         return switch (this.tokenType()) {
             case IDENTIFIER ->
-                String.format("identifier '%s'", charBuffer());
+                String.format("identifier '%s'", charSequence());
 
             case PUNCTUATOR_BRACE_OPEN ->
                 "'{'";
@@ -40,17 +42,17 @@ record Json5Token(
                 "','";
 
             case STRING ->
-                String.format("string %s", charBuffer());
+                String.format("string %s", charSequence());
 
             case NUMBER_DECIMAL, NUMBER_HEX, NUMBER_POSITIVE_INFINITY, NUMBER_NEGATIVE_INFINITY, NUMBER_NAN ->
-                String.format("number '%s'", charBuffer());
+                String.format("number '%s'", charSequence());
 
             case END ->
                 "end of document";
         };
     }
 
-    public CharBuffer charBuffer() {
-        return this.sourceRange.charBuffer();
+    public CharSequence charSequence() {
+        return this.sourceRange.charSequence();
     }
 }

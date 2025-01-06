@@ -136,11 +136,11 @@ class Json5Tokenizer {
         // then the entire comment is considered to be a LineTerminator for
         // purposes of parsing by the syntactic grammar.
 
-        if (!characters.trySkip(BUFFER_FORWARD_SLASH_ASTERISK)) {
+        if (!characters.trySkip("/*")) {
             return false;
         }
 
-        while (!characters.trySkip(BUFFER_ASTERISK_FORWARD_SLASH)) {
+        while (!characters.trySkip("*/")) {
             if (characters.isEnd()) {
                 var sourceRange = characters.characterSourceRange();
                 throw Json5ParseError.unexpectedTextError("'*/'", "end of document", sourceRange);
@@ -150,9 +150,6 @@ class Json5Tokenizer {
 
         return true;
     }
-
-    private static final CharBuffer BUFFER_FORWARD_SLASH_ASTERISK = CharBuffer.wrap("/*");
-    private static final CharBuffer BUFFER_ASTERISK_FORWARD_SLASH = CharBuffer.wrap("*/");
 
     private static boolean trySkipSingleLineComment(CharacterIterator characters) {
         // SingleLineComment ::
@@ -825,12 +822,12 @@ class Json5Tokenizer {
             }
         }
 
-        private boolean trySkip(CharBuffer skip) {
+        private boolean trySkip(CharSequence skip) {
             if (this.iterator.remaining() < skip.length()) {
                 return false;
             }
 
-            if (this.iterator.peekSequence(skip.length()).equals(skip)) {
+            if (CharSequence.compare(this.iterator.peekSequence(skip.length()), skip) == 0) {
                 this.iterator.skip(skip.length());
                 return true;
             } else {

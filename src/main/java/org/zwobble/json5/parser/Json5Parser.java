@@ -6,7 +6,6 @@ import org.zwobble.sourcetext.SourceText;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -101,15 +100,13 @@ public class Json5Parser {
         //     `null`
 
         var token = tokens.peek();
-        if (token.is(Json5TokenType.IDENTIFIER, BUFFER_NULL)) {
+        if (token.is(Json5TokenType.IDENTIFIER, "null")) {
             tokens.skip();
             return Optional.of(new Json5Null(path, token.sourceRange()));
         } else {
             return Optional.empty();
         }
     }
-
-    private static final CharBuffer BUFFER_NULL = CharBuffer.wrap("null");
 
     private static Optional<Json5Value> tryParseBoolean(
         TokenIterator tokens,
@@ -123,19 +120,16 @@ public class Json5Parser {
         //     `false`
 
         var token = tokens.peek();
-        if (token.is(Json5TokenType.IDENTIFIER, BUFFER_TRUE)) {
+        if (token.is(Json5TokenType.IDENTIFIER, "true")) {
             tokens.skip();
             return Optional.of(new Json5Boolean(true, path, token.sourceRange()));
-        } else if (token.is(Json5TokenType.IDENTIFIER, BUFFER_FALSE)) {
+        } else if (token.is(Json5TokenType.IDENTIFIER, "false")) {
             tokens.skip();
             return Optional.of(new Json5Boolean(false, path, token.sourceRange()));
         } else {
             return Optional.empty();
         }
     }
-
-    private static final CharBuffer BUFFER_TRUE = CharBuffer.wrap("true");
-    private static final CharBuffer BUFFER_FALSE = CharBuffer.wrap("false");
 
     private static Optional<Json5Value> tryParseString(
         TokenIterator tokens,
@@ -158,12 +152,12 @@ public class Json5Parser {
     }
 
     private static String parseStringValue(Json5Token token) {
-        var stringCharacters = token.charBuffer()
-            .subSequence(1, token.charBuffer().length() - 1);
+        var stringCharacters = token.charSequence()
+            .subSequence(1, token.charSequence().length() - 1);
 
         var stringValue = new StringBuilder();
         var index = 0;
-        while (index < stringCharacters.remaining()) {
+        while (index < stringCharacters.length()) {
             var character = stringCharacters.charAt(index);
             if (character == '\\') {
                 index = parseEscapeSequenceOrLineContinuation(stringCharacters, index, stringValue);
@@ -177,7 +171,7 @@ public class Json5Parser {
     }
 
     private static int parseEscapeSequenceOrLineContinuation(
-        CharBuffer stringCharacters,
+        CharSequence stringCharacters,
         int index,
         StringBuilder stringValue
     ) {
@@ -278,13 +272,13 @@ public class Json5Parser {
                 // Therefore, to keep identifier handling straightforward, we
                 // interpret such tokens as identifiers, and handle the special
                 // case when parsing numbers i.e. here.
-                if (token.charBuffer().equals(BUFFER_INFINITY)) {
+                if (token.is("Infinity")) {
                     tokens.skip();
                     return Optional.of(new Json5NumberPositiveInfinity(
                         path,
                         token.sourceRange()
                     ));
-                } else if (token.charBuffer().equals(BUFFER_NAN)) {
+                } else if (token.is("NaN")) {
                     tokens.skip();
                     return Optional.of(new Json5NumberNan(
                         path,
@@ -295,7 +289,7 @@ public class Json5Parser {
             case NUMBER_DECIMAL -> {
                 tokens.skip();
                 return Optional.of(new Json5NumberFinite(
-                    new BigDecimal(token.charBuffer().toString()),
+                    new BigDecimal(token.charSequence().toString()),
                     path,
                     token.sourceRange()
                 ));
@@ -306,7 +300,7 @@ public class Json5Parser {
                 var hasSign = false;
                 var isNegative = false;
 
-                var buffer = token.charBuffer();
+                var buffer = token.charSequence();
                 if (buffer.charAt(0) == '+') {
                     hasSign = true;
                 } else if (buffer.charAt(0) == '-') {
@@ -315,7 +309,7 @@ public class Json5Parser {
                 }
 
                 var unsignedInteger = new BigInteger(
-                    token.charBuffer().toString().substring(hasSign ? 3 : 2),
+                    token.charSequence().toString().substring(hasSign ? 3 : 2),
                     16
                 );
                 var integer = isNegative ? unsignedInteger.negate() : unsignedInteger;
@@ -350,9 +344,6 @@ public class Json5Parser {
 
         return Optional.empty();
     }
-
-    private static final CharBuffer BUFFER_INFINITY = CharBuffer.wrap("Infinity");
-    private static final CharBuffer BUFFER_NAN = CharBuffer.wrap("NaN");
 
     private static Optional<Json5Value> tryParseObject(
         TokenIterator tokens,
@@ -433,7 +424,7 @@ public class Json5Parser {
         switch (token.tokenType()) {
             case IDENTIFIER -> {
                 tokens.skip();
-                var name = parseIdentifier(token.charBuffer());
+                var name = parseIdentifier(token.charSequence());
                 return Optional.of(new Json5MemberName(name, token.sourceRange()));
             }
 
@@ -493,7 +484,7 @@ public class Json5Parser {
         return Optional.of(new Json5Array(elements, path, sourceRange));
     }
 
-    private static String parseIdentifier(CharBuffer buffer) {
+    private static String parseIdentifier(CharSequence buffer) {
         // We assume that any buffer is a valid identifier.
         var identifier = new StringBuilder();
         var index = 0;
