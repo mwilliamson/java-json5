@@ -2,7 +2,6 @@ package org.zwobble.json5.values;
 
 import org.junit.jupiter.api.Test;
 import org.zwobble.json5.paths.Json5Path;
-import org.zwobble.sourcetext.SourcePosition;
 import org.zwobble.sourcetext.SourceRange;
 import org.zwobble.sourcetext.SourceText;
 
@@ -13,10 +12,11 @@ import static org.zwobble.precisely.Matchers.isOptionalEmpty;
 import static org.zwobble.precisely.Matchers.isOptionalOf;
 
 public class Json5ObjectTests {
-    public static final SourceRange SOURCE_RANGE = new SourceRange(
-        SourceText.fromString("<string>", ""),
-        new SourcePosition(0),
-        new SourcePosition(0)
+    private static final SourceText SOURCE_TEXT = SourceText.fromString("<string>", "");
+    private static final SourceRange SOURCE_RANGE = new SourceRange(
+        SOURCE_TEXT,
+        SOURCE_TEXT.characterPosition(0),
+        SOURCE_TEXT.characterPosition(0)
     );
 
     @Test

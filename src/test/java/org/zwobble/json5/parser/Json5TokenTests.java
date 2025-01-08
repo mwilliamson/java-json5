@@ -1,7 +1,6 @@
 package org.zwobble.json5.parser;
 
 import org.junit.jupiter.api.Test;
-import org.zwobble.sourcetext.SourcePosition;
 import org.zwobble.sourcetext.SourceRange;
 import org.zwobble.sourcetext.SourceText;
 
@@ -10,11 +9,10 @@ import static org.zwobble.precisely.Matchers.equalTo;
 
 public class Json5TokenTests {
     public static SourceRange sourceRange(String text) {
-        return new SourceRange(
-            SourceText.fromString("<string>", text),
-            new SourcePosition(0),
-            new SourcePosition(text.length())
-        );
+        var sourceText = SourceText.fromString("<string>", text);
+        var start = sourceText.characterPosition(0);
+        var end = sourceText.characterPosition(text.length());
+        return start.to(end);
     }
 
     @Test
