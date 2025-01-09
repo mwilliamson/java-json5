@@ -62,7 +62,7 @@
     <dependency>
       <groupId>com.github.mwilliamson</groupId>
       <artifactId>java-source-text</artifactId>
-      <version>8a4e62e96d66342c7a571897c16b18fcc650cb87</version>
+      <version>109d38e3496ab1e2dba80012e226ac7ec5058606</version>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
