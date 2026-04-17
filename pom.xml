@@ -10,6 +10,7 @@
   <packaging>jar</packaging>
 
   <name>zwobble-json5</name>
+  <description>Parse JSON5, retaining source locations</description>
   <url>https://github.com/mwilliamson/java-json5</url>
 
   <licenses>
