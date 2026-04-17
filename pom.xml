@@ -43,13 +43,6 @@
     <maven.compiler.target>25</maven.compiler.target>
   </properties>
 
-  <repositories>
-    <repository>
-      <id>jitpack.io</id>
-      <url>https://jitpack.io</url>
-    </repository>
-  </repositories>
-
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -64,9 +57,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.github.mwilliamson</groupId>
-      <artifactId>java-source-text</artifactId>
-      <version>3877c5ff7042212a7912f1c743548cd591f3e48c</version>
+      <groupId>org.zwobble.source-text</groupId>
+      <artifactId>source-text</artifactId>
+      <version>0.1.0</version>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -74,9 +67,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.github.mwilliamson</groupId>
-      <artifactId>java-precisely</artifactId>
-      <version>d0a4cb17bdec754a3d061ce6bc481bf9978d90ac</version>
+      <groupId>org.zwobble.precisely</groupId>
+      <artifactId>precisely</artifactId>
+      <version>0.1.5</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
