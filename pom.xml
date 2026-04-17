@@ -9,7 +9,7 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>zwobble-toml</name>
+  <name>zwobble-json5</name>
   <url>https://github.com/mwilliamson/java-json5</url>
 
   <licenses>
