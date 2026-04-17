@@ -6,7 +6,7 @@
 
   <groupId>org.zwobble.json5</groupId>
   <artifactId>zwobble-json5</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>0.1.0</version>
   <packaging>jar</packaging>
 
   <name>zwobble-json5</name>
