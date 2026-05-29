@@ -12,6 +12,23 @@ import static org.zwobble.precisely.Matchers.equalTo;
 
 public class Json5ObjectReaderTests {
     @Test
+    public void whenDocumentIsNotObjectThenParseThrowsError() {
+        var source = "null";
+
+        var error = assertThrows(
+            Json5ObjectReadError.class,
+            () -> parseJson5Object(source)
+        );
+
+        assertThat(error.getMessage(), equalTo("$ expected to be object, but was null"));
+        assertThat(error.sourceRange().describe(), equalTo("""
+            <string>:1:1
+            null
+            ^^^^"""
+        ));
+    }
+
+    @Test
     public void whenMemberIsMissingThenGetLongThrowsError() {
         var source = """
             {
