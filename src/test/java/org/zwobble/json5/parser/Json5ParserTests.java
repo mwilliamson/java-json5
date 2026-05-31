@@ -2,15 +2,13 @@ package org.zwobble.json5.parser;
 
 import org.junit.jupiter.api.Test;
 import org.zwobble.json5.paths.Json5Path;
-import org.zwobble.json5.values.Json5Array;
-import org.zwobble.json5.values.Json5Boolean;
-import org.zwobble.json5.values.Json5Object;
-import org.zwobble.json5.values.Json5Value;
+import org.zwobble.json5.values.*;
 import org.zwobble.sourcetext.SourceText;
 
 import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.zwobble.json5.sources.SourcePositionMatchers.isSourcePosition;
 import static org.zwobble.json5.sources.SourceRangeMatchers.isSourceRange;
 import static org.zwobble.json5.values.Json5ValueMatchers.*;
 import static org.zwobble.precisely.AssertThat.assertThat;
@@ -308,6 +306,39 @@ public class Json5ParserTests {
             equalTo("Expected string character or '\\'', but was end of document")
         );
         assertThat(error.sourceRange(), isSourceRange(1, 1));
+    }
+
+    @Test
+    public void canConvertCharacterIndexInValueToSourcePosition() {
+        var result = parseText("[\"abc\"]");
+
+        var jsonString = (Json5String) ((Json5Array) result).elements().iterator().next();
+        assertThat(jsonString.characterIndexToSourcePosition(0), isSourcePosition(2));
+        assertThat(jsonString.characterIndexToSourcePosition(1), isSourcePosition(3));
+        assertThat(jsonString.characterIndexToSourcePosition(2), isSourcePosition(4));
+        assertThat(jsonString.characterIndexToSourcePosition(3), isSourcePosition(5));
+    }
+
+    @Test
+    public void canConvertCharacterIndexInValueWithEscapeSequenceToSourcePosition() {
+        var result = parseText("[\"a\\tb\"]");
+
+        var jsonString = (Json5String) ((Json5Array) result).elements().iterator().next();
+        assertThat(jsonString.characterIndexToSourcePosition(0), isSourcePosition(2));
+        assertThat(jsonString.characterIndexToSourcePosition(1), isSourcePosition(3));
+        assertThat(jsonString.characterIndexToSourcePosition(2), isSourcePosition(5));
+        assertThat(jsonString.characterIndexToSourcePosition(3), isSourcePosition(6));
+    }
+
+    @Test
+    public void whenCharacterIndexIsBeyondEndOfStringValueThenErrorIsThrown() {
+        var result = parseText("[\"abc\"]");
+
+        var jsonString = (Json5String) ((Json5Array) result).elements().iterator().next();
+        assertThrows(
+            IndexOutOfBoundsException.class,
+            () -> jsonString.characterIndexToSourcePosition(4)
+        );
     }
 
     // == Numbers ==

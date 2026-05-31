@@ -2,6 +2,7 @@ package org.zwobble.json5.parser;
 
 import org.zwobble.json5.paths.Json5Path;
 import org.zwobble.json5.values.*;
+import org.zwobble.sourcetext.SourcePosition;
 import org.zwobble.sourcetext.SourceText;
 
 import java.math.BigDecimal;
@@ -156,18 +157,50 @@ public class Json5Parser {
             .subSequence(1, token.charSequence().length() - 1);
 
         var stringValue = new StringBuilder();
-        var index = 0;
-        while (index < stringCharacters.length()) {
-            var character = stringCharacters.charAt(index);
+        var stringCharacterIndex = 0;
+        while (stringCharacterIndex < stringCharacters.length()) {
+            var character = stringCharacters.charAt(stringCharacterIndex);
             if (character == '\\') {
-                index = parseEscapeSequenceOrLineContinuation(stringCharacters, index, stringValue);
+                stringCharacterIndex = parseEscapeSequenceOrLineContinuation(stringCharacters, stringCharacterIndex, stringValue);
             } else {
                 stringValue.append(character);
-                index += 1;
+                stringCharacterIndex += 1;
             }
         }
 
         return stringValue.toString();
+    }
+
+    public static SourcePosition characterIndexToSourcePosition(
+        Json5String string,
+        int valueCharacterIndex
+    ) {
+        if (valueCharacterIndex == 0) {
+            return string.sourceRange().characterPosition(1);
+        }
+
+        var tokenCharacters = string.sourceRange().charSequence();
+        var stringCharacters = tokenCharacters
+            .subSequence(1, tokenCharacters.length() - 1);
+
+        // TODO: avoid unnecessary stringValue (could just use an index)
+        var stringValue = new StringBuilder();
+        var stringCharacterIndex = 0;
+        while (stringCharacterIndex < stringCharacters.length()) {
+            var character = stringCharacters.charAt(stringCharacterIndex);
+            if (character == '\\') {
+                stringCharacterIndex = parseEscapeSequenceOrLineContinuation(stringCharacters, stringCharacterIndex, stringValue);
+            } else {
+                stringValue.append(character);
+                stringCharacterIndex += 1;
+            }
+
+            if (stringValue.length() == valueCharacterIndex) {
+                return string.sourceRange().characterPosition(1 + stringCharacterIndex);
+            }
+        }
+
+        throw new IndexOutOfBoundsException();
     }
 
     private static int parseEscapeSequenceOrLineContinuation(
