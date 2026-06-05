@@ -331,6 +331,14 @@ public class Json5ParserTests {
     }
 
     @Test
+    public void canTreatJsonStringValueAsSourceText() {
+        var result = parseText("[\"a\\tb\"]");
+
+        var jsonString = (Json5String) ((Json5Array) result).elements().iterator().next();
+        assertThat(jsonString.valueAsSourceText().characterPosition(2).toString(), equalTo("<string>:1:6"));
+    }
+
+    @Test
     public void whenCharacterIndexIsBeyondEndOfStringValueThenErrorIsThrown() {
         var result = parseText("[\"abc\"]");
 
