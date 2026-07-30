@@ -39,6 +39,14 @@ public class Json5ObjectReader {
         return getValueOfType(Json5Array.class, memberName);
     }
 
+    public List<Json5ObjectReader> getArrayOfObjects(String memberName) {
+        return getArrayOfObjectsOrNone(memberName)
+            .orElseThrow(() -> Json5ObjectReadError.missingMember(
+                object,
+                memberName
+            ));
+    }
+
     public Optional<List<Json5ObjectReader>> getArrayOfObjectsOrNone(String memberName) {
         return getArrayOrNone(memberName).map(array -> {
             var objects = new ArrayList<Json5ObjectReader>();

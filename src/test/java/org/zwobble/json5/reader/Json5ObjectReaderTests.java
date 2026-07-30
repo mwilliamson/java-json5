@@ -77,7 +77,7 @@ public class Json5ObjectReaderTests {
     }
 
     @Test
-    public void whenMemberIsObjectThenGetObjectReturnsObject() {
+    public void whenMemberIsObjectThenGetObjectReturnsObjectReader() {
         var source = """
             {
                 a: {b: {c: 1}},
@@ -90,6 +90,95 @@ public class Json5ObjectReaderTests {
             .getObject("b");
 
         assertThat(result.getLong("c"), equalTo(1L));
+    }
+
+    @Test
+    public void whenMemberIsMissingThenGetArrayOfObjectsThrowsError() {
+        var source = """
+            {
+                a: {},
+            }
+            """;
+        var object = parseJson5Object(source);
+
+        var error = assertThrows(
+            Json5ObjectReadError.class,
+            () -> object
+                .getObject("a")
+                .getArrayOfObjects("b")
+        );
+
+        assertThat(error.getMessage(), equalTo("$.a missing member b"));
+        assertThat(error.sourceRange().describe(), equalTo("""
+            <string>:2:8
+                a: {},
+                   ^^"""
+        ));
+    }
+
+    @Test
+    public void whenMemberIsNotArrayThenGetArrayOfObjectsThrowsError() {
+        var source = """
+            {
+                a: {b: 1},
+            }
+            """;
+        var object = parseJson5Object(source);
+
+        var error = assertThrows(
+            Json5ObjectReadError.class,
+            () -> object
+                .getObject("a")
+                .getArrayOfObjects("b")
+        );
+
+        assertThat(error.getMessage(), equalTo("$.a.b expected to be array, but was finite number"));
+        assertThat(error.sourceRange().describe(), equalTo("""
+            <string>:2:12
+                a: {b: 1},
+                       ^"""
+        ));
+    }
+
+    @Test
+    public void whenMemberIsArrayOfNonObjectsThenGetArrayOfObjectsThrowsError() {
+        var source = """
+            {
+                a: {b: [1]},
+            }
+            """;
+        var object = parseJson5Object(source);
+
+        var error = assertThrows(
+            Json5ObjectReadError.class,
+            () -> object
+                .getObject("a")
+                .getArrayOfObjects("b")
+        );
+
+        assertThat(error.getMessage(), equalTo("$.a.b[0] expected to be object, but was finite number"));
+        assertThat(error.sourceRange().describe(), equalTo("""
+            <string>:2:13
+                a: {b: [1]},
+                        ^"""
+        ));
+    }
+
+    @Test
+    public void whenMemberIsArrayOfObjectsThenGetArrayOfObjectsReturnsListOfObjectReaders() {
+        var source = """
+            {
+                a: {b: [{c: 1}, {c: 2}]},
+            }
+            """;
+        var object = parseJson5Object(source);
+
+        var result = object
+            .getObject("a")
+            .getArrayOfObjects("b");
+
+        assertThat(result.get(0).getLong("c"), equalTo(1L));
+        assertThat(result.get(1).getLong("c"), equalTo(2L));
     }
 
     @Test
