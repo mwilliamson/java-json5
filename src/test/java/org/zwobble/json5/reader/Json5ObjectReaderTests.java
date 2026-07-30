@@ -45,9 +45,9 @@ public class Json5ObjectReaderTests {
         var error = assertThrows(
             Json5ObjectReadError.class,
             () -> object
-                .getObject("a")
+                .getObjectOrNone("a")
                 .orElseThrow()
-                .getArrayOfObjects("b")
+                .getArrayOfObjectsOrNone("b")
                 .orElseThrow()
                 .get(1)
                 .getLong("x")
@@ -78,9 +78,9 @@ public class Json5ObjectReaderTests {
         var error = assertThrows(
             Json5ObjectReadError.class,
             () -> object
-                .getObject("a")
+                .getObjectOrNone("a")
                 .orElseThrow()
-                .getArrayOfObjects("b")
+                .getArrayOfObjectsOrNone("b")
                 .orElseThrow()
                 .get(1)
                 .getLong("x")
@@ -111,9 +111,9 @@ public class Json5ObjectReaderTests {
         var error = assertThrows(
             Json5ObjectReadError.class,
             () -> object
-                .getObject("a")
+                .getObjectOrNone("a")
                 .orElseThrow()
-                .getArrayOfObjects("b")
+                .getArrayOfObjectsOrNone("b")
                 .orElseThrow()
                 .get(1)
                 .getLong("x")
@@ -142,9 +142,9 @@ public class Json5ObjectReaderTests {
         var object = parseJson5Object(source);
 
         var result = object
-            .getObject("a")
+            .getObjectOrNone("a")
             .orElseThrow()
-            .getArrayOfObjects("b")
+            .getArrayOfObjectsOrNone("b")
             .orElseThrow()
             .get(1)
             .getLong("x");
@@ -167,9 +167,9 @@ public class Json5ObjectReaderTests {
         var object = parseJson5Object(source);
 
         var result = object
-            .getObject("a")
+            .getObjectOrNone("a")
             .orElseThrow()
-            .getArrayOfObjects("b")
+            .getArrayOfObjectsOrNone("b")
             .orElseThrow()
             .get(1)
             .getLongOrNone("x");
@@ -194,9 +194,9 @@ public class Json5ObjectReaderTests {
         var error = assertThrows(
             Json5ObjectReadError.class,
             () -> object
-                .getObject("a")
+                .getObjectOrNone("a")
                 .orElseThrow()
-                .getArrayOfObjects("b")
+                .getArrayOfObjectsOrNone("b")
                 .orElseThrow()
                 .get(1)
                 .getLongOrNone("x")
@@ -225,9 +225,9 @@ public class Json5ObjectReaderTests {
         var object = parseJson5Object(source);
 
         var result = object
-            .getObject("a")
+            .getObjectOrNone("a")
             .orElseThrow()
-            .getArrayOfObjects("b")
+            .getArrayOfObjectsOrNone("b")
             .orElseThrow()
             .get(1)
             .getLongOrNone("x");
@@ -252,9 +252,9 @@ public class Json5ObjectReaderTests {
         var error = assertThrows(
             Json5ObjectReadError.class,
             () -> object
-                .getObject("shed")
+                .getObjectOrNone("shed")
                 .orElseThrow()
-                .getArrayOfObjects("bins")
+                .getArrayOfObjectsOrNone("bins")
                 .orElseThrow()
                 .get(1)
                 .getString("name")
@@ -285,9 +285,9 @@ public class Json5ObjectReaderTests {
         var error = assertThrows(
             Json5ObjectReadError.class,
             () -> object
-                .getObject("shed")
+                .getObjectOrNone("shed")
                 .orElseThrow()
-                .getArrayOfObjects("bins")
+                .getArrayOfObjectsOrNone("bins")
                 .orElseThrow()
                 .get(1)
                 .getString("name")
@@ -316,9 +316,9 @@ public class Json5ObjectReaderTests {
         var object = parseJson5Object(source);
 
         var result = object
-            .getObject("shed")
+            .getObjectOrNone("shed")
             .orElseThrow()
-            .getArrayOfObjects("bins")
+            .getArrayOfObjectsOrNone("bins")
             .orElseThrow()
             .get(1)
             .getString("name");
@@ -347,9 +347,9 @@ public class Json5ObjectReaderTests {
         var object = parseJson5Object(source);
 
         var result = object
-            .getObject("shed")
+            .getObjectOrNone("shed")
             .orElseThrow()
-            .getArrayOfObjects("bins")
+            .getArrayOfObjectsOrNone("bins")
             .orElseThrow()
             .get(1)
             .getStringOrNone("name");
@@ -374,9 +374,9 @@ public class Json5ObjectReaderTests {
         var error = assertThrows(
             Json5ObjectReadError.class,
             () -> object
-                .getObject("shed")
+                .getObjectOrNone("shed")
                 .orElseThrow()
-                .getArrayOfObjects("bins")
+                .getArrayOfObjectsOrNone("bins")
                 .orElseThrow()
                 .get(1)
                 .getStringOrNone("name")
@@ -405,9 +405,9 @@ public class Json5ObjectReaderTests {
         var object = parseJson5Object(source);
 
         var result = object
-            .getObject("shed")
+            .getObjectOrNone("shed")
             .orElseThrow()
-            .getArrayOfObjects("bins")
+            .getArrayOfObjectsOrNone("bins")
             .orElseThrow()
             .get(1)
             .getStringOrNone("name");

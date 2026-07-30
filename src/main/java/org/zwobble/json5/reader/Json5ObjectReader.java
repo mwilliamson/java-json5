@@ -22,17 +22,17 @@ public class Json5ObjectReader {
         return new Json5ObjectReader(castJson5Value(Json5Object.class, document));
     }
 
-    public Optional<Json5ObjectReader> getObject(String memberName) {
+    public Optional<Json5ObjectReader> getObjectOrNone(String memberName) {
         return getValueOfType(Json5Object.class, memberName)
             .map(object -> new Json5ObjectReader(object));
     }
 
-    private Optional<Json5Array> getArray(String memberName) {
+    private Optional<Json5Array> getArrayOrNone(String memberName) {
         return getValueOfType(Json5Array.class, memberName);
     }
 
-    public Optional<List<Json5ObjectReader>> getArrayOfObjects(String memberName) {
-        return getArray(memberName).map(array -> {
+    public Optional<List<Json5ObjectReader>> getArrayOfObjectsOrNone(String memberName) {
+        return getArrayOrNone(memberName).map(array -> {
             var objects = new ArrayList<Json5ObjectReader>();
             for (var element : array.elements()) {
                 var object = castJson5Value(
