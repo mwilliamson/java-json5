@@ -22,6 +22,14 @@ public class Json5ObjectReader {
         return new Json5ObjectReader(castJson5Value(Json5Object.class, document));
     }
 
+    public Json5ObjectReader getObject(String memberName) {
+        return getObjectOrNone(memberName)
+            .orElseThrow(() -> Json5ObjectReadError.missingMember(
+                object,
+                memberName
+            ));
+    }
+
     public Optional<Json5ObjectReader> getObjectOrNone(String memberName) {
         return getValueOfType(Json5Object.class, memberName)
             .map(object -> new Json5ObjectReader(object));

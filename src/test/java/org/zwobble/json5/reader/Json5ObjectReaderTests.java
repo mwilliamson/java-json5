@@ -29,6 +29,70 @@ public class Json5ObjectReaderTests {
     }
 
     @Test
+    public void whenMemberIsMissingThenGetObjectThrowsError() {
+        var source = """
+            {
+                a: {},
+            }
+            """;
+        var object = parseJson5Object(source);
+
+        var error = assertThrows(
+            Json5ObjectReadError.class,
+            () -> object
+                .getObject("a")
+                .getObject("b")
+        );
+
+        assertThat(error.getMessage(), equalTo("$.a missing member b"));
+        assertThat(error.sourceRange().describe(), equalTo("""
+            <string>:2:8
+                a: {},
+                   ^^"""
+        ));
+    }
+
+    @Test
+    public void whenMemberIsNotObjectThenGetObjectThrowsError() {
+        var source = """
+            {
+                a: {b: 1},
+            }
+            """;
+        var object = parseJson5Object(source);
+
+        var error = assertThrows(
+            Json5ObjectReadError.class,
+            () -> object
+                .getObject("a")
+                .getObject("b")
+        );
+
+        assertThat(error.getMessage(), equalTo("$.a.b expected to be object, but was finite number"));
+        assertThat(error.sourceRange().describe(), equalTo("""
+            <string>:2:12
+                a: {b: 1},
+                       ^"""
+        ));
+    }
+
+    @Test
+    public void whenMemberIsObjectThenGetObjectReturnsObject() {
+        var source = """
+            {
+                a: {b: {c: 1}},
+            }
+            """;
+        var object = parseJson5Object(source);
+
+        var result = object
+            .getObject("a")
+            .getObject("b");
+
+        assertThat(result.getLong("c"), equalTo(1L));
+    }
+
+    @Test
     public void whenMemberIsMissingThenGetLongThrowsError() {
         var source = """
             {
